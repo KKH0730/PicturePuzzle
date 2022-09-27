@@ -43,6 +43,11 @@ object Dependency {
         const val COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha15"
     }
 
+    object Accompanist {
+        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:0.25.1"
+        const val PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
+    }
+
     object Hilt {
         private const val VERSION = "2.42"
         const val ANDROID = "com.google.dagger:hilt-android:$VERSION"

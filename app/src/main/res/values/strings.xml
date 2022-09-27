@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">base</string>
+    <string name="app_name">game</string>
+
+    <string name="blank"></string>
+    <string name="network_error">네트워크 연결 상태를 확인해 주세요.</string>
+
+    <string name="game_prepare_ready">준비</string>
+    <string name="game_prepare_start">시작!</string>
+
+    <string name="hummin_correct">정답!</string>
+    <string name="hummin_incorrect">일치하는 단어가 없어요…</string>
+    <string name="hummin_mismatch">초성 불일치</string>
+    <string name="hummin_submit">제출</string>
+    <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
 </resources>

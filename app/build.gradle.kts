@@ -9,7 +9,7 @@ android {
     compileSdk = 32
 
     defaultConfig {
-        applicationId = "com.example.base"
+        applicationId = "com.seno.game"
         minSdk = 21
         targetSdk = 32
         versionCode = 1
@@ -61,6 +61,8 @@ dependencies {
     implementation(Dependency.Compose.MATERIAL)
     implementation(Dependency.Compose.RUNTIME)
     implementation(Dependency.Compose.UI)
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("com.google.android.material:material:1.4.0")
     debugImplementation(Dependency.Compose.UI_TOOLING)
     implementation(Dependency.Compose.PREVIEW)
     implementation(Dependency.Hilt.HILT_NAVIGATION)
@@ -69,6 +71,10 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
+
+    // Accompanist
+    implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
+    implementation(Dependency.Accompanist.PAGER)
 
     // Retrofit
     implementation(Dependency.Retrofit.RETROFIT)
@@ -87,4 +93,6 @@ dependencies {
     implementation(Dependency.Hilt.ANDROID)
     kapt(Dependency.Hilt.COMPILER)
     testImplementation(Dependency.Hilt.TESTING)
+
+    implementation("com.google.accompanist:accompanist-insets:0.22.0-rc")
 }

@@ -24,7 +24,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.game.humminjeongeum.HunMinJeongEumActivity"
+            android:name=".ui.game.humminjeongeumgame.HunMinJeongEumActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
 

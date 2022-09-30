@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.areagame.AreaGameActivity
-import com.seno.game.ui.game.humminjeongeum.HunMinJeongEumActivity
+import com.seno.game.ui.game.humminjeongeumgame.HunMinJeongEumActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

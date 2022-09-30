@@ -1,4 +1,4 @@
-package com.seno.game.ui.game.humminjeongeum
+package com.seno.game.ui.game.humminjeongeumgame
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility

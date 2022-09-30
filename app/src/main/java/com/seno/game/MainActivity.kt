@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.areagame.AreaGameActivity
+import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.game.humminjeongeumgame.HunMinJeongEumActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -54,6 +55,17 @@ class MainActivity : AppCompatActivity() {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(text = "땅따먹기")
+                        }
+
+                        Button(
+                            onClick = {
+                                startActivity(DiffPictureGameActivity::class.java)
+                                overridePendingTransition(R.anim.slide_right_enter,
+                                    R.anim.slide_right_exit)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "틀린그림찾기")
                         }
                     }
                 }

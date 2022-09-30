@@ -17,17 +17,22 @@
         android:theme="@style/Theme.Base"
         android:usesCleartextTraffic="true"
         tools:targetApi="s">
+        <activity
+            android:name=".ui.game.diffgame.DiffPictureGameActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"/>
 
         <activity
             android:name=".ui.game.areagame.AreaGameActivity"
+            android:exported="false"
             android:theme="@style/Theme.Base"
-            android:exported="false" />
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.game.humminjeongeumgame.HunMinJeongEumActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
-
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

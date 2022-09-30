@@ -127,7 +127,7 @@ object OpencvUtil {
         val whiteMat = Mat()
         Utils.bitmapToMat(whiteBitmap, whiteMat)
 
-        Core.copyTo(colorMat, whiteMat, mask) // 합성할 이미지, 원본이미지(합성 되어질 원본 이미지), 마스크
+        Core.copyTo(colorMat, whiteMat, mask) // 마스크에 합성할 이미지, 원본이미지(합성 되어질 원본 이미지), 마스크
         Imgproc.cvtColor(whiteMat, whiteMat, Imgproc.COLOR_RGB2BGR)
 
         return whiteMat to getPixelCount(src = whiteMat, maxPixel = mask.rows() * mask.cols())

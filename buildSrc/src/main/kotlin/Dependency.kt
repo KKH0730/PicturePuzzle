@@ -24,7 +24,7 @@ object Dependency {
         const val ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.0"
         const val ACTIVITY_KTX = "androidx.activity:activity-ktx:1.4.0"
 
-        const val MATERIAL = "androidx.compose.material:material:$VERSION"
+        const val COMPOSE_MATERIAL = "androidx.compose.material:material:$VERSION"
         const val PREVIEW = "androidx.compose.ui:ui-tooling-preview:$VERSION"
         const val RUNTIME = "androidx.compose.runtime:runtime:$VERSION"
         const val UI = "androidx.compose.ui:ui:$VERSION"

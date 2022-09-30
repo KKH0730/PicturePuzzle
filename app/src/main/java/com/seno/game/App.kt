@@ -2,6 +2,7 @@ package com.seno.game
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import org.opencv.android.OpenCVLoader
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -17,6 +18,8 @@ class App : Application() {
         super.onCreate()
         instance = this
         Timber.plant(Timber.DebugTree())
+
+        OpenCVLoader.initDebug()
     }
 
 }

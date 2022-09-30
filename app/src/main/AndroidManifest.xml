@@ -19,9 +19,14 @@
         tools:targetApi="s">
 
         <activity
+            android:name=".ui.game.areagame.AreaGameActivity"
+            android:theme="@style/Theme.Base"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.game.humminjeongeum.HunMinJeongEumActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible"/>
+            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
 
         <activity
             android:name=".MainActivity"

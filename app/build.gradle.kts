@@ -47,6 +47,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":opencv"))
 
     //AndroidX
     implementation(Dependency.AndroidX.APP_COMPAT)
@@ -58,12 +59,9 @@ dependencies {
 
     // Compose
     implementation(Dependency.Compose.ACTIVITY_COMPOSE)
-    implementation(Dependency.Compose.MATERIAL)
+    implementation(Dependency.Compose.COMPOSE_MATERIAL)
     implementation(Dependency.Compose.RUNTIME)
     implementation(Dependency.Compose.UI)
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.4.0")
-    debugImplementation(Dependency.Compose.UI_TOOLING)
     implementation(Dependency.Compose.PREVIEW)
     implementation(Dependency.Hilt.HILT_NAVIGATION)
     implementation(Dependency.Lifecycle.VIEWMODEL_COMPOSE)
@@ -71,6 +69,7 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
+    debugImplementation(Dependency.Compose.UI_TOOLING)
 
     // Accompanist
     implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
@@ -93,6 +92,4 @@ dependencies {
     implementation(Dependency.Hilt.ANDROID)
     kapt(Dependency.Hilt.COMPILER)
     testImplementation(Dependency.Hilt.TESTING)
-
-    implementation("com.google.accompanist:accompanist-insets:0.22.0-rc")
 }

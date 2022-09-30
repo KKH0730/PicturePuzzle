@@ -7,7 +7,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -102,7 +101,7 @@ fun HunMinJeongEumScreen(
         ) {
             TopTimer(
                 prepareVisible = prepareVisible,
-                onFinishedGame = { TODO() },
+                onFinishedGame = {  },
                 modifier = Modifier.align(alignment = Alignment.End)
             )
             Spacer(modifier = Modifier.height(100.dp))
@@ -156,7 +155,7 @@ private fun TopTimer(
     if (!prepareVisible) {
         LaunchedEffect(key1 = timber) {
             delay(1000)
-            if (timber - 1 == 0) {
+            if (timber - 1 == -1) {
                 onFinishedGame.invoke()
                 return@LaunchedEffect
             } else {

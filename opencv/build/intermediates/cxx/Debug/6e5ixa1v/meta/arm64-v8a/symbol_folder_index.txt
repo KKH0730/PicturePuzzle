@@ -1,0 +1,1 @@
+/Users/mycelebs/AndroidStudioProjects/game/opencv/build/intermediates/cxx/Debug/6e5ixa1v/obj/arm64-v8a

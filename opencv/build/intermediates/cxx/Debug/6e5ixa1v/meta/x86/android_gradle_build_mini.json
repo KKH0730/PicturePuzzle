@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/mycelebs/AndroidStudioProjects/game/opencv/libcxx_helper/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/mycelebs/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/Users/mycelebs/AndroidStudioProjects/game/opencv/.cxx/Debug/6e5ixa1v/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/mycelebs/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/Users/mycelebs/AndroidStudioProjects/game/opencv/.cxx/Debug/6e5ixa1v/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "opencv_jni_shared::@6890427a1f51a3e7e1df": {
+      "artifactName": "opencv_jni_shared",
+      "abi": "x86",
+      "output": "/Users/mycelebs/AndroidStudioProjects/game/opencv/.cxx/Debug/6e5ixa1v/x86/libopencv_jni_shared.a",
+      "runtimeFiles": []
+    }
+  }
+}

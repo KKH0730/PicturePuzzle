@@ -76,6 +76,7 @@ dependencies {
     // Firebase
     implementation(platform(Dependency.Firebase.FIREBASE_BOM))
     implementation(Dependency.Firebase.FIREBASE_ANALYTICS)
+    implementation(Dependency.Firebase.FIREBASE_AUTH)
     implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
 
     // Accompanist

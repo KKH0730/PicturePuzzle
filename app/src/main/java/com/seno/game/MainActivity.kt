@@ -13,6 +13,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import com.google.firebase.auth.FirebaseAuth
 import com.seno.game.extensions.screenHeight
 import com.seno.game.extensions.screenWidth
 import com.seno.game.extensions.startActivity
@@ -31,47 +32,64 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    Column(Modifier.fillMaxSize()) {
-                        Button(
-                            onClick = {
-                                startActivity(HunMinJeongEumActivity::class.java)
-                                overridePendingTransition(
-                                    R.anim.slide_right_enter,
-                                    R.anim.slide_right_exit
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = "훈민정음")
-                        }
+        setAuthentication() {
+            if (it) {
+                setContent {
+                    AppTheme {
+                        Surface(Modifier.fillMaxSize()) {
+                            Column(Modifier.fillMaxSize()) {
+                                Button(
+                                    onClick = {
+                                        startActivity(HunMinJeongEumActivity::class.java)
+                                        overridePendingTransition(
+                                            R.anim.slide_right_enter,
+                                            R.anim.slide_right_exit
+                                        )
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "훈민정음")
+                                }
 
-                        Button(
-                            onClick = {
-                                startActivity(AreaGameActivity::class.java)
-                                overridePendingTransition(R.anim.slide_right_enter,
-                                    R.anim.slide_right_exit)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = "땅따먹기")
-                        }
+                                Button(
+                                    onClick = {
+                                        startActivity(AreaGameActivity::class.java)
+                                        overridePendingTransition(R.anim.slide_right_enter,
+                                            R.anim.slide_right_exit)
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "땅따먹기")
+                                }
 
-                        Button(
-                            onClick = {
-                                startActivity(DiffPictureGameActivity::class.java)
-                                overridePendingTransition(R.anim.slide_right_enter,
-                                    R.anim.slide_right_exit)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = "틀린그림찾기")
+                                Button(
+                                    onClick = {
+                                        startActivity(DiffPictureGameActivity::class.java)
+                                        overridePendingTransition(R.anim.slide_right_enter,
+                                            R.anim.slide_right_exit)
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "틀린그림찾기")
+                                }
+                            }
                         }
                     }
                 }
             }
+
+        }
+    }
+
+    private fun setAuthentication(callback: (Boolean) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            callback(true)
+        } else {
+            Timber.e("kkh not user ")
+            auth.signInAnonymously()
+                .addOnSuccessListener { callback(true) }
+                .addOnFailureListener { callback(false) }
         }
     }
 }

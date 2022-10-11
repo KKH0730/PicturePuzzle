@@ -6,6 +6,9 @@ object Plugins {
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.2"
     const val HILT_AGP = "com.google.dagger:hilt-android-gradle-plugin:2.42"
     const val KOTLIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
+    const val KOTLIN_GRADLE = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+    const val GOOGLE_SERVICE = "com.google.gms:google-services:4.3.13"
+    const val CRASHLYTICS = "com.google.firebase:firebase-crashlytics-gradle:2.9.2"
 }
 
 object Dependency {
@@ -31,6 +34,12 @@ object Dependency {
         const val UI_TOOLING = "androidx.compose.ui:ui-tooling:$VERSION"
         const val COMPOSE_CONSTRAINT = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
         const val NAVIGATION = "androidx.navigation:navigation-compose:2.5.1"
+    }
+
+    object Firebase {
+        const val FIREBASE_BOM = "com.google.firebase:firebase-bom:30.4.1"
+        const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-crashlytics-ktx"
+        const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-analytics-ktx"
     }
 
     object Lifecycle {

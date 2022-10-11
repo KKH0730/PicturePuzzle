@@ -3,6 +3,8 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -69,10 +71,12 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     debugImplementation(Dependency.Compose.UI_TOOLING)
+
+    // Firebase
+    implementation(platform(Dependency.Firebase.FIREBASE_BOM))
+    implementation(Dependency.Firebase.FIREBASE_ANALYTICS)
+    implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
 
     // Accompanist
     implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
@@ -86,7 +90,7 @@ dependencies {
     // Timber
     implementation(Dependency.Timber.TIMBER)
 
-    //TEST
+    // TEST
     testImplementation(Dependency.Test.JUNIT)
     androidTestImplementation(Dependency.AndroidTest.TEST_RUNNER)
     androidTestImplementation(Dependency.AndroidTest.ESPRESSO_CORE)

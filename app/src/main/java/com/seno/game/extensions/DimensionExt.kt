@@ -10,6 +10,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.seno.game.App
 
+private var metrics: DisplayMetrics = App.getInstance().resources.displayMetrics
+
+val screenWidth get() = metrics.widthPixels
+val screenHeight get() = metrics.heightPixels
+
 fun Int.textDp(density: Density): TextUnit = with(density) {
     this@textDp.dp.toSp()
 }
@@ -45,4 +50,8 @@ fun Float.pxToDp(): Int  {
         }
     }
     return (this / density).toInt()
+}
+
+fun Int.pxToDp(): Int {
+    return this.toFloat().pxToDp()
 }

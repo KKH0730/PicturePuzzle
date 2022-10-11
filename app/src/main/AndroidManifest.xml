@@ -25,7 +25,6 @@
         <activity
             android:name=".ui.game.areagame.AreaGameActivity"
             android:exported="false"
-            android:theme="@style/Theme.Base"
             android:screenOrientation="portrait"/>
 
         <activity

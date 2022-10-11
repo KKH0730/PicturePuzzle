@@ -13,12 +13,15 @@ import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import com.seno.game.extensions.screenHeight
+import com.seno.game.extensions.screenWidth
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.areagame.AreaGameActivity
 import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.game.humminjeongeumgame.HunMinJeongEumActivity
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -31,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-
                     Column(Modifier.fillMaxSize()) {
                         Button(
                             onClick = {

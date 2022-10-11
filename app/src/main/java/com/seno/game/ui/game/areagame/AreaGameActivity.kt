@@ -7,23 +7,27 @@ import androidx.annotation.RequiresApi
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityAreaGameBinding
+import com.seno.game.util.AreaOpencvUtil
 import com.seno.game.util.BitmapUtil
 import com.seno.game.util.GameColor
 import com.seno.game.util.OpencvUtil
 import org.opencv.core.Mat
-import timber.log.Timber
 
 class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
     layoutResId = R.layout.activity_area_game
 ) {
+    private lateinit var opencvUtil: AreaOpencvUtil
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        opencvUtil = AreaOpencvUtil()
+
         binding.btn.setOnClickListener {
             val bitmap = binding.canvasView.currentCanvas
             val maxScorePair = getMaxScorePair(bitmap = bitmap)
-            val strokeMat = OpencvUtil.drawBorder(mat = maxScorePair.first)
+            val strokeMat = opencvUtil.drawBorder(mat = maxScorePair.first)
             binding.imgView.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = strokeMat))
         }
 
@@ -46,17 +50,17 @@ class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
     }
 
     private fun getMaxScorePair(bitmap: Bitmap): Pair<Mat, Int> {
-        val greenExtractedPair = OpencvUtil.extractColor(
+        val greenExtractedPair = opencvUtil.extractColor(
             bitmap = bitmap,
             gameColor = GameColor.GREEN,
             context = this@AreaGameActivity
         )
-        val redExtractedPair = OpencvUtil.extractColor(
+        val redExtractedPair = opencvUtil.extractColor(
             bitmap = bitmap,
             gameColor = GameColor.RED,
             context = this@AreaGameActivity
         )
-        val blueExtractedPair = OpencvUtil.extractColor(
+        val blueExtractedPair = opencvUtil.extractColor(
             bitmap = bitmap,
             gameColor = GameColor.BLUE,
             context = this@AreaGameActivity

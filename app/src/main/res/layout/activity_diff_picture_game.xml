@@ -1,43 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
+    <data>
+        <variable
+            name="activity"
+            type="com.seno.game.ui.game.diffgame.DiffPictureGameActivity" />
+    </data>
+
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/clContainer"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.game.diffgame.DiffPictureGameActivity">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/img1"
-            android:layout_width="200dp"
-            android:layout_height="0dp"
-            android:src="@drawable/img_diff_ex1"
-            android:layout_marginStart="15dp"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clTopView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingHorizontal="15dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/img2"/>
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:text="@string/diff_title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTotalAnswerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:text="맞춘 횟수 : 0"
+                android:layout_marginStart="14dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnResult"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Result"
+                android:onClick="@{() -> activity.onClickResult()}"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/img2"
-            android:layout_width="200dp"
+            android:id="@+id/ivOrigin"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/img_diff_ex2"
-            app:layout_constraintStart_toEndOf="@+id/img1"
-            app:layout_constraintEnd_toStartOf="@+id/imgResult"
-            app:layout_constraintTop_toTopOf="parent"
+            android:scaleType="centerInside"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintTop_toBottomOf="@+id/clTopView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ivCopy"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCopy"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerInside"
+            app:layout_constraintStart_toEndOf="@+id/ivOrigin"
+            app:layout_constraintEnd_toStartOf="@+id/rvRank"
+            app:layout_constraintTop_toTopOf="@+id/ivOrigin"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imgResult"
-            android:layout_width="200dp"
+            android:id="@+id/ivResult"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="15dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:scaleType="centerInside"
+            android:visibility="invisible"
+            app:layout_constraintStart_toEndOf="@+id/ivOrigin"
+            app:layout_constraintEnd_toStartOf="@+id/rvRank"
+            app:layout_constraintTop_toTopOf="@+id/ivOrigin"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRank"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@+id/clTopView"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/img2"
+            app:layout_constraintStart_toEndOf="@+id/ivResult"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clAnswerMark"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/cvPrepareView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

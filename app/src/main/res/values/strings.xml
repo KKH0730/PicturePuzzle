@@ -12,4 +12,7 @@
     <string name="hummin_mismatch">초성 불일치</string>
     <string name="hummin_submit">제출</string>
     <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
+
+    <string name="diff_title">틀린그림을 찾아보세요</string>
+    <string name="diff_total_answer_count">점수 : %s</string>
 </resources>

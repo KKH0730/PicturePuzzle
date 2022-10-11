@@ -1,1 +1,0 @@
-/Users/mycelebs/AndroidStudioProjects/game/opencv/build/intermediates/cxx/RelWithDebInfo/586n6zq6/obj/x86

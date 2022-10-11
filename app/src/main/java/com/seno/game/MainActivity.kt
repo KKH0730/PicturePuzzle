@@ -13,11 +13,15 @@ import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
+import com.seno.game.extensions.screenHeight
+import com.seno.game.extensions.screenWidth
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.areagame.AreaGameActivity
+import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.game.humminjeongeumgame.HunMinJeongEumActivity
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -30,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-
                     Column(Modifier.fillMaxSize()) {
                         Button(
                             onClick = {
@@ -54,6 +57,17 @@ class MainActivity : AppCompatActivity() {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(text = "땅따먹기")
+                        }
+
+                        Button(
+                            onClick = {
+                                startActivity(DiffPictureGameActivity::class.java)
+                                overridePendingTransition(R.anim.slide_right_enter,
+                                    R.anim.slide_right_exit)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "틀린그림찾기")
                         }
                     }
                 }

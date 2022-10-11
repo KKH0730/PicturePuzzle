@@ -8,7 +8,10 @@ import org.opencv.imgproc.Imgproc
 import timber.log.Timber
 
 object BitmapUtil {
-    fun bitmapFrom(bgrMat: Mat): Bitmap? {
+    fun bitmapFrom(bgrMat: Mat?): Bitmap? {
+        if (bgrMat == null) {
+            return null
+        }
         var bmp: Bitmap? = null
         val rgbMat = Mat()
         Imgproc.cvtColor(bgrMat, rgbMat, Imgproc.COLOR_BGR2RGB)

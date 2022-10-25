@@ -6,7 +6,10 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
+import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.getValue
@@ -23,14 +26,17 @@ import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.model.Setting
 import com.seno.game.util.BitmapUtil
 import com.seno.game.util.DiffPictureOpencvUtil
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 const val ANSWER_CORRECTION = 20
 
+@AndroidEntryPoint
 class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
     layoutResId = R.layout.activity_diff_picture_game
 ) {
@@ -66,16 +72,19 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         observeFlow()
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initSetting() {
         val imageList = viewModel.imageListFlow.value
 
-        binding.ivOrigin.setImageResource(imageList[0].first)
-        binding.ivCopy.setImageResource(imageList[0].second)
+        setImageResource(
+            resource1 = imageList[0].first,
+            resource2 = imageList[0].second
+        )
 
         setting = Setting(
             answerInfoPair = opencvUtil.drawCircle(
-                srcBitmap = binding.ivOrigin.drawable.toBitmap(),
-                copyBitmap = binding.ivCopy.drawable.toBitmap()
+                srcBitmap = getDrawable(imageList[0].first)?.toBitmap(),
+                copyBitmap = getDrawable(imageList[0].second)?.toBitmap()
             )
         ).apply {
             this.imageList = imageList
@@ -176,6 +185,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun observeFlow() {
         lifecycleScope.launch {
             setting.currentRound.distinctUntilChanged { _, new ->
@@ -185,12 +195,14 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
                     Handler(Looper.getMainLooper()).postDelayed({
                         clearAnswerMark()
 
-                        binding.ivOrigin.setImageResource(setting.imageList[new].first)
-                        binding.ivCopy.setImageResource(setting.imageList[new].second)
+                        setImageResource(
+                            resource1 = setting.imageList[new].first,
+                            resource2 = setting.imageList[new].second
+                        )
 
                         setting.answerInfoPair = opencvUtil.drawCircle(
-                            srcBitmap = binding.ivOrigin.drawable.toBitmap(),
-                            copyBitmap = binding.ivCopy.drawable.toBitmap()
+                            srcBitmap = getDrawable(setting.imageList[new].first)?.toBitmap(),
+                            copyBitmap =  getDrawable(setting.imageList[new].second)?.toBitmap()
                         )
                     }, 1000)
                 }
@@ -201,6 +213,27 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
     private fun clearAnswerMark() {
         binding.clAnswerMark.removeAllViews()
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun setImageResource(@DrawableRes resource1: Int, @DrawableRes resource2: Int) {
+        binding.ivOrigin.post {
+            getDrawable(resource1)?.let {
+//                val ivHeight = (it.intrinsicHeight * binding.ivOrigin.width) / it.intrinsicWidth
+//                val params = LinearLayoutCompat.LayoutParams(binding.ivOrigin.width, ivHeight)
+//                binding.ivOrigin.layoutParams = params
+                binding.ivOrigin.setImageResource(resource1)
+            }
+        }
+
+        binding.ivCopy.post {
+            getDrawable(resource2)?.let {
+//                val ivHeight = (it.intrinsicHeight * binding.ivCopy.width) / it.intrinsicWidth
+//                val params = LinearLayoutCompat.LayoutParams(binding.ivCopy.width, ivHeight)
+//                binding.ivCopy.layoutParams = params
+                binding.ivCopy.setImageResource(resource2)
+            }
+        }
     }
 
     fun onClickResult() {

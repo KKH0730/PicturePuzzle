@@ -1,3 +1,4 @@
+
 object Version {
     const val COMPOSE = "1.2.0"
 }
@@ -38,9 +39,12 @@ object Dependency {
 
     object Firebase {
         const val FIREBASE_BOM = "com.google.firebase:firebase-bom:30.4.1"
+        const val FIREBASE_FIRESTORE = "com.google.firebase:firebase-firestore-ktx"
         const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-crashlytics-ktx"
         const val FIREBASE_AUTH = "com.google.firebase:firebase-auth-ktx"
         const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-analytics-ktx"
+        const val FIREBASE_MESSAGING = "com.google.firebase:firebase-messaging-ktx"
+        const val FIREBASE_STORAGE = "com.google.firebase:firebase-storage-ktx"
     }
 
     object Lifecycle {
@@ -51,6 +55,15 @@ object Dependency {
     object Paging {
         const val RUNTIME = "androidx.paging:paging-runtime:3.1.1"
         const val COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha15"
+    }
+
+    object Facebook {
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:13.2.0"
+        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:13.2.0"
+    }
+
+    object Google {
+        const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
     }
 
     object Accompanist {

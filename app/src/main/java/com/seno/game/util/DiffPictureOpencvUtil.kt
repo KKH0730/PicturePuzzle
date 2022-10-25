@@ -63,7 +63,10 @@ class DiffPictureOpencvUtil {
         return diffMat
     }
 
-    fun drawCircle(srcBitmap: Bitmap, copyBitmap: Bitmap) : Pair<Mat, ArrayList<com.seno.game.ui.game.diffgame.model.Point>>? {
+    fun drawCircle(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Pair<Mat, ArrayList<com.seno.game.ui.game.diffgame.model.Point>>? {
+        if (srcBitmap == null || copyBitmap == null) {
+            return null
+        }
         try {
             val src = Mat()
             Utils.bitmapToMat(srcBitmap, src)

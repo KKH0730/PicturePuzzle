@@ -1,0 +1,131 @@
+package com.seno.game.ui.main
+
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.util.Base64
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.facebook.FacebookButtonBase
+import com.facebook.login.widget.LoginButton
+import com.google.firebase.auth.FirebaseAuth
+import com.seno.game.R
+import com.seno.game.extensions.restartApp
+import com.seno.game.theme.AppTheme
+import com.seno.game.ui.common.RestartDialog
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
+    private val viewModel by viewModels<MainViewModel>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        printHashKey()
+//        setAuthentication {
+//            if (it) {
+//                setContent {
+//                    AppTheme {
+//                        Surface(Modifier.fillMaxSize()) {
+//                            if (checkNetworkConnectivity()) {
+//                                MainScreen()
+//                            } else {
+//                                RestartDialog(
+//                                    title = getString(R.string.network_error_title),
+//                                    content = getString(R.string.network_error),
+//                                    confirmText = getString(R.string.alert_dialog_restart),
+//                                    onClickConfirm = { this@MainActivity.restartApp() }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        setContent {
+            AppTheme {
+                Surface(Modifier.fillMaxSize()) {
+                    if (checkNetworkConnectivity()) {
+                        MainScreen()
+                    } else {
+                        RestartDialog(
+                            title = getString(R.string.network_error_title),
+                            content = getString(R.string.network_error),
+                            confirmText = getString(R.string.alert_dialog_restart),
+                            onClickConfirm = { this@MainActivity.restartApp() }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setAuthentication(callback: (Boolean) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            callback(true)
+        } else {
+            auth.signInAnonymously()
+                .addOnSuccessListener { callback(true) }
+                .addOnFailureListener { callback(false) }
+        }
+    }
+
+    /**
+     * 네트워크 연결 상태 확인
+     */
+    @Composable
+    private fun checkNetworkConnectivity(): Boolean {
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return connectivityManager.activeNetwork != null
+    }
+
+    fun printHashKey() {
+        try {
+            val info: PackageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            for (signature in info.signatures) {
+                val md: MessageDigest = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                val hashKey: String = String(Base64.encode(md.digest(), 0))
+                Timber.e("kkh Hash Key: $hashKey")
+            }
+        } catch (e: NoSuchAlgorithmException) {
+            Timber.e("kkh Hash Key: ${e.message}")
+        } catch (e: Exception) {
+            Timber.e("kkh Hash Key: ${e.message}")
+        }
+    }
+}
+
+@Composable
+fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
+    val eventHandler by rememberUpdatedState(newValue = event)
+    val lifecycle = this@LifecycleEventListener.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            eventHandler(event)
+        }
+
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+}

@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.seno.game"
-        minSdk = 21
+        minSdk = 28
         targetSdk = 32
         versionCode = 1
         versionName = "1.0"
@@ -23,12 +23,27 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            manifestPlaceholders["enableCrashReporting"] = false
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                // If you don't need crash reporting for your debug build,
+                // you can speed up your build by disabling mapping file uploading.
+                mappingFileUploadEnabled = false
+            }
+            // crashlytics 플러그인을 사용하지 않음
+            extra.set("enableCrashlytics", false)
+            // crashlytics 빌드 ID 업데이트 막기
+            extra.set("alwaysUpdateBuildId", false)
         }
 
         getByName("release") {
+            isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            manifestPlaceholders["enableCrashReporting"] = true
         }
     }
     compileOptions {
@@ -37,6 +52,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-Xjvm-default=compatibility")
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.2.0"
@@ -71,17 +87,31 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("com.google.android.material:material:1.4.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     debugImplementation(Dependency.Compose.UI_TOOLING)
 
     // Firebase
     implementation(platform(Dependency.Firebase.FIREBASE_BOM))
+    implementation(Dependency.Firebase.FIREBASE_FIRESTORE)
     implementation(Dependency.Firebase.FIREBASE_ANALYTICS)
     implementation(Dependency.Firebase.FIREBASE_AUTH)
     implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
+    implementation(Dependency.Firebase.FIREBASE_MESSAGING)
+    implementation(Dependency.Firebase.FIREBASE_STORAGE)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.3")
 
     // Accompanist
     implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
     implementation(Dependency.Accompanist.PAGER)
+
+    // Facebook
+    implementation(Dependency.Facebook.FACEBOOK_LOGIN)
+    implementation(Dependency.Facebook.FACEBOOK_APP_LINK)
+
+    // Google
+    implementation(Dependency.Google.PLAY_SERVICE_AUTH)
 
     // Retrofit
     implementation(Dependency.Retrofit.RETROFIT)

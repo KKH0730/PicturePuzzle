@@ -1,4 +1,4 @@
-package com.seno.game
+package com.seno.game.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

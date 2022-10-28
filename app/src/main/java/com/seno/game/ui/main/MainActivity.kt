@@ -37,43 +37,43 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
-//        setAuthentication {
-//            if (it) {
-//                setContent {
-//                    AppTheme {
-//                        Surface(Modifier.fillMaxSize()) {
-//                            if (checkNetworkConnectivity()) {
-//                                MainScreen()
-//                            } else {
-//                                RestartDialog(
-//                                    title = getString(R.string.network_error_title),
-//                                    content = getString(R.string.network_error),
-//                                    confirmText = getString(R.string.alert_dialog_restart),
-//                                    onClickConfirm = { this@MainActivity.restartApp() }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    if (checkNetworkConnectivity()) {
-                        MainScreen()
-                    } else {
-                        RestartDialog(
-                            title = getString(R.string.network_error_title),
-                            content = getString(R.string.network_error),
-                            confirmText = getString(R.string.alert_dialog_restart),
-                            onClickConfirm = { this@MainActivity.restartApp() }
-                        )
+        setAuthentication {
+            if (it) {
+                setContent {
+                    AppTheme {
+                        Surface(Modifier.fillMaxSize()) {
+                            if (checkNetworkConnectivity()) {
+                                MainScreen()
+                            } else {
+                                RestartDialog(
+                                    title = getString(R.string.network_error_title),
+                                    content = getString(R.string.network_error),
+                                    confirmText = getString(R.string.alert_dialog_restart),
+                                    onClickConfirm = { this@MainActivity.restartApp() }
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+
+//        setContent {
+//            AppTheme {
+//                Surface(Modifier.fillMaxSize()) {
+//                    if (checkNetworkConnectivity()) {
+//                        MainScreen()
+//                    } else {
+//                        RestartDialog(
+//                            title = getString(R.string.network_error_title),
+//                            content = getString(R.string.network_error),
+//                            confirmText = getString(R.string.alert_dialog_restart),
+//                            onClickConfirm = { this@MainActivity.restartApp() }
+//                        )
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun setAuthentication(callback: (Boolean) -> Unit) {

@@ -1,6 +1,7 @@
 package com.seno.game.manager
 
 import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.seno.game.App
 import com.seno.game.data.network.FirebaseRequest
@@ -9,11 +10,13 @@ import com.seno.game.extensions.toast
 
 object AccountManager {
     private var firebaseRequest: FirebaseRequest = FirebaseRequest()
-    var firebaseUid: String = ""
     var firebaseAuthToken: String = ""
 
     val currentUser: FirebaseUser?
         get() = firebaseRequest.currentUser
+
+    val firebaseUid: String?
+        get() = firebaseRequest.currentUser?.uid
 
     val isSignedIn: Boolean
         get() = currentUser != null

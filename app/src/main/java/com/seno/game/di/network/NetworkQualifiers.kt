@@ -8,4 +8,4 @@ annotation class HunMinJeongEumRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class DiffPictureStorageRef
+annotation class DiffDocRef

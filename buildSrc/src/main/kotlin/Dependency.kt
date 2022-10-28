@@ -17,6 +17,7 @@ object Dependency {
         const val APP_COMPAT = "androidx.appcompat:appcompat:1.5.1"
         const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:2.1.4"
         const val MATERIAL = "com.google.android.material:material:1.6.1"
+        const val RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.2.1"
     }
 
     object KTX {

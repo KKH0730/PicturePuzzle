@@ -8,6 +8,7 @@
     <string name="blank"></string>
     <string name="network_error_title">네트워크 오류</string>
     <string name="network_error">네트워크 연결 상태를 확인해 주세요.</string>
+    <string name="network_request_error">"네트워크 요청을 실패했습니다. 다시 시도해주세요."</string>
     <string name="alert_dialog_restart">재시작</string>
     <string name="alert_dialog_confirm">확인</string>
     <string name="alert_dialog_dismiss">취소</string>

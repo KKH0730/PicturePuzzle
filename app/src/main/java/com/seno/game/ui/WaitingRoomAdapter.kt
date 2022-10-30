@@ -22,6 +22,6 @@ class WaitingRoomAdapter: ListAdapter<Player, RecyclerView.ViewHolder>(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as DiffPictureWaitingViewHolder).bind(data = getItem(position))
+        (holder as DiffPictureWaitingViewHolder).bind(data = getItem(position), position = position)
     }
 }

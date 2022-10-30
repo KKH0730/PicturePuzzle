@@ -30,4 +30,16 @@ class DiffPictureUseCase @Inject constructor(
         roomUid: String,
         nickName: String,
     ): Result<DiffPictureGame>? = diffPictureRepository.enterRoom(date = date, uid = uid, roomUid = roomUid, nickName = nickName)
+
+    suspend fun readyGamePlay(
+        date: String,
+        uid: String,
+        roomUid: String,
+    ): Result<Unit>? = diffPictureRepository.readyGamePlay(date = date, uid = uid, roomUid = roomUid)
+
+    suspend fun exitRoom(
+        date: String,
+        uid: String,
+        roomUid: String,
+    ): Result<DiffPictureGame>? = diffPictureRepository.exitRoom(date = date, uid = uid, roomUid = roomUid)
 }

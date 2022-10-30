@@ -35,15 +35,12 @@ fun HomeScreen() {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-//                Timber.e("kkh ON_RESUME")
                 isUser = AccountManager.currentUser != null
             }
             Lifecycle.Event.ON_PAUSE -> {}
             Lifecycle.Event.ON_STOP -> {
-//                Timber.e("kkh ON_STOP")
             }
             Lifecycle.Event.ON_DESTROY -> {
-//                Timber.e("kkh ON_DESTROY")
             }
             else -> return@LifecycleEventListener
         }
@@ -109,6 +106,7 @@ fun HomeScreen() {
                     val date = Date(Calendar.getInstance().timeInMillis)
                     context.startActivity(CreateGameActivity::class.java) {
                         putExtra("date", date.getTodayDate())
+                        putExtra("uid", uid)
                         putExtra("roomUid", "$uid${date.time}")
                         putExtra("isChief", true)
                     }

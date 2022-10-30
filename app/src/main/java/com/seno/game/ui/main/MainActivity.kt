@@ -103,12 +103,12 @@ class MainActivity : AppCompatActivity() {
                 val md: MessageDigest = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val hashKey: String = String(Base64.encode(md.digest(), 0))
-                Timber.e("kkh Hash Key: $hashKey")
+                Timber.e("Hash Key: $hashKey")
             }
         } catch (e: NoSuchAlgorithmException) {
-            Timber.e("kkh Hash Key: ${e.message}")
+            Timber.e("Hash Key: ${e.message}")
         } catch (e: Exception) {
-            Timber.e("kkh Hash Key: ${e.message}")
+            Timber.e("Hash Key: ${e.message}")
         }
     }
 }

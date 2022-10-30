@@ -38,9 +38,7 @@ class DiffPictureGameViewModel @Inject constructor(
 
             if (result is Result.Success) {
                 val uriPairList = result.data
-                Timber.e("kkh uriList size : ${uriPairList.size}")
             } else if(result is Result.Error) {
-                Timber.e("kkh error : ${result.exception.message}")
             }
         }
     }

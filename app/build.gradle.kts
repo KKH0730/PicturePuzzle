@@ -134,4 +134,7 @@ dependencies {
     testImplementation(Dependency.Hilt.TESTING)
 
     implementation("com.journeyapps:zxing-android-embedded:3.6.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1")
 }

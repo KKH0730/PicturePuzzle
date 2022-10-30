@@ -58,7 +58,6 @@ fun FaceBookLoginModule(context: Context) {
         faceBookAccountManager.login(
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
-                    Timber.e("kkh signInWithCredential")
                     idToken?.let { token ->
                         val credential = FacebookAuthProvider.getCredential(token)
                         AccountManager.signInWithCredential(

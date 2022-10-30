@@ -6,8 +6,7 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.viewbinding.ViewBinding
-import timber.log.Timber
+
 
 abstract class BaseActivity<T: ViewDataBinding>(
     @LayoutRes private val layoutResId: Int

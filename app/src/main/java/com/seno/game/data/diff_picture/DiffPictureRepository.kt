@@ -22,4 +22,16 @@ interface DiffPictureRepository {
         roomUid: String,
         nickName: String,
     ): Result<DiffPictureGame>?
+
+    suspend fun readyGamePlay(
+        date: String,
+        uid: String,
+        roomUid: String,
+    ): Result<Unit>?
+
+    suspend fun exitRoom(
+        date: String,
+        uid: String,
+        roomUid: String,
+    ): Result<DiffPictureGame>?
 }

@@ -62,50 +62,20 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
         )
     }
 
-    private fun init() {
-        binding.eventListener = this@CreateGameActivity
-
-        isChief = intent.getBooleanExtra("isChief", false)
-        todayDate = intent.getStringExtra("date")!!
-        uid = intent.getStringExtra("uid")!!
-        roomUid = intent.getStringExtra("roomUid")!!
-
-        if (isChief) {
-            binding.tvReady.text = "시작"
-        } else {
-            binding.tvReady.text = "준비"
-        }
-    }
-
-    private fun setRecyclerView() {
-        binding.rvPlayer.adapter = ConcatAdapter(WaitingRoomAdapter())
-
-        val itemAnimator = binding.rvPlayer.itemAnimator
-        if (itemAnimator is SimpleItemAnimator) {
-            itemAnimator.supportsChangeAnimations = false
-        }
-    }
-
-    private fun reqCreateQRCode() {
-        // QR 코드 생성
-        AccountManager.firebaseUid?.let { uid ->
-            homeViewModel.reqCreateRoom(
-                date = todayDate,
-                uid = uid,
-                roomUid = roomUid,
-                nickName = "nick"
-            )
-        }
-    }
-
-    private fun setQRCode() {
-        binding.ivQRCode.setImageBitmap(QRCodeUtil.createQRCode(uid = roomUid))
+    override fun onDestroy() {
+        snapshotListener?.remove()
+        homeViewModel.reqExitRoom(
+            date = todayDate,
+            uid = uid,
+            roomUid = roomUid
+        )
+        super.onDestroy()
     }
 
     private fun observeFlowData() {
         lifecycleScope.launch {
             launch {
-                homeViewModel.createRoomFlow.collect { it ->
+                homeViewModel.createRoomFlow.collect {
                     it?.roomUid?.let { roomUid ->
                         binding.ivQRCode.setImageBitmap(QRCodeUtil.createQRCode(uid = roomUid))
                         val numberedPlayerList = it.playerList.mapIndexed { index, player ->
@@ -147,19 +117,17 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
 
                 if (snapShot != null && snapShot.exists()) {
                     val numberedPlayerList = (snapShot.get("playerList") as ArrayList<HashMap<String, Any>>).mapIndexed { index, hashMap ->
-                        AccountManager.firebaseUid?.let { uid ->
-                            // 방장이 변경되었음
-                            if (hashMap["uid"] as String == uid && index == 0) {
-                                isChief = true
-                                binding.tvReady.text = "시작"
-                            }
-                        }
+                        setReadyButton(
+                            index = index,
+                            playerInfoMap = hashMap,
+                        )
 
                         Player(
                             id = index,
                             uid = (hashMap["uid"] as String),
                             nickName = (hashMap["nickName"] as String),
                             isReady = if (index == 0) {
+                                isChief = true
                                 true
                             } else {
                                 (hashMap["ready"] as Boolean)
@@ -171,14 +139,61 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
             }
     }
 
-    override fun onDestroy() {
-        snapshotListener?.remove()
-        homeViewModel.reqExitRoom(
-            date = todayDate,
-            uid = uid,
-            roomUid = roomUid
-        )
-        super.onDestroy()
+    private fun init() {
+        binding.eventListener = this@CreateGameActivity
+
+        isChief = intent.getBooleanExtra("isChief", false)
+        todayDate = intent.getStringExtra("date")!!
+        uid = intent.getStringExtra("uid")!!
+        roomUid = intent.getStringExtra("roomUid")!!
+
+        if (isChief) {
+            binding.tvReady.text = getString(R.string.game_start)
+        } else {
+            binding.tvReady.text = getString(R.string.game_prepare)
+        }
+    }
+
+    private fun setRecyclerView() {
+        binding.rvPlayer.adapter = ConcatAdapter(WaitingRoomAdapter())
+
+        val itemAnimator = binding.rvPlayer.itemAnimator
+        if (itemAnimator is SimpleItemAnimator) {
+            itemAnimator.supportsChangeAnimations = false
+        }
+    }
+
+    private fun reqCreateQRCode() {
+        // QR 코드 생성
+        AccountManager.firebaseUid?.let { uid ->
+            homeViewModel.reqCreateRoom(
+                date = todayDate,
+                uid = uid,
+                roomUid = roomUid,
+                nickName = "nick"
+            )
+        }
+    }
+
+    private fun setQRCode() {
+        binding.ivQRCode.setImageBitmap(QRCodeUtil.createQRCode(uid = roomUid))
+    }
+
+    private fun setReadyButton(index: Int, playerInfoMap: HashMap<String, Any>) {
+        AccountManager.firebaseUid?.let { uid ->
+            // 방장이 변경되었음
+            if (playerInfoMap["uid"] as String == uid) {
+                if (index == 0) {
+                    binding.tvReady.text = getString(R.string.game_start)
+                } else {
+                    if (playerInfoMap["ready"] as Boolean) {
+                        binding.tvReady.text = getString(R.string.game_prepare_complete)
+                    } else {
+                        binding.tvReady.text = getString(R.string.game_prepare)
+                    }
+                }
+            }
+        }
     }
 
     override fun onClickReady() {

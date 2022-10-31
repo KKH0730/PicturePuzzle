@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">game</string>
 
+    <!-- 공통 -->
+    <string name="game_start">시작</string>
+    <string name="game_prepare">준비</string>
+    <string name="game_prepare_complete">준비 완료</string>
+
     <!-- 로그인 -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
     <string name="account_google_login">Google 아이디로 로그인</string>

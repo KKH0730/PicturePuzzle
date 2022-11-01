@@ -65,11 +65,11 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             ) {
                 GamePrepareView { prepareVisible = false }
             }
-        }
 
-        initSetting()
-        setImageTouchListener()
-        observeFlow()
+            initSetting()
+            setImageTouchListener()
+            observeFlow()
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -82,7 +82,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         )
 
         setting = Setting(
-            answerInfoPair = opencvUtil.drawCircle(
+            answer = opencvUtil.drawCircle(
                 srcBitmap = getDrawable(imageList[0].first)?.toBitmap(),
                 copyBitmap = getDrawable(imageList[0].second)?.toBitmap()
             )
@@ -131,7 +131,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             abs(binding.ivOrigin.height.toFloat() - resizedLength)
         }
 
-        setting.answerInfoPair?.second?.forEachIndexed { index, point ->
+        setting.answer?.answerPointList?.forEachIndexed { index, point ->
             val centerX = if (copyIntrinsicWidth < copyIntrinsicHeight) {
                 (diff / 2f) + (resizedLength * point.centerX / point.srcWidth)
             } else {
@@ -175,7 +175,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
                     return
                 }
             } else {
-                if (index == setting.answerInfoPair?.second?.size?.minus(1)) {
+                if (index == setting.answer?.answerPointList?.size?.minus(1)) {
                     setting.score -= 1
                     binding.tvTotalAnswerCount.text = String.format(
                         getString(R.string.diff_total_answer_count), setting.score.toString()
@@ -200,7 +200,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
                             resource2 = setting.imageList[new].second
                         )
 
-                        setting.answerInfoPair = opencvUtil.drawCircle(
+                        setting.answer = opencvUtil.drawCircle(
                             srcBitmap = getDrawable(setting.imageList[new].first)?.toBitmap(),
                             copyBitmap =  getDrawable(setting.imageList[new].second)?.toBitmap()
                         )
@@ -219,18 +219,12 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
     private fun setImageResource(@DrawableRes resource1: Int, @DrawableRes resource2: Int) {
         binding.ivOrigin.post {
             getDrawable(resource1)?.let {
-//                val ivHeight = (it.intrinsicHeight * binding.ivOrigin.width) / it.intrinsicWidth
-//                val params = LinearLayoutCompat.LayoutParams(binding.ivOrigin.width, ivHeight)
-//                binding.ivOrigin.layoutParams = params
                 binding.ivOrigin.setImageResource(resource1)
             }
         }
 
         binding.ivCopy.post {
             getDrawable(resource2)?.let {
-//                val ivHeight = (it.intrinsicHeight * binding.ivCopy.width) / it.intrinsicWidth
-//                val params = LinearLayoutCompat.LayoutParams(binding.ivCopy.width, ivHeight)
-//                binding.ivCopy.layoutParams = params
                 binding.ivCopy.setImageResource(resource2)
             }
         }
@@ -240,6 +234,6 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         binding.clAnswerMark.visibility = View.INVISIBLE
         binding.ivCopy.visibility = View.INVISIBLE
         binding.ivResult.visibility = View.VISIBLE
-        binding.ivResult.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = setting.answerInfoPair?.first))
+        binding.ivResult.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = setting.answer?.answerMat))
     }
 }

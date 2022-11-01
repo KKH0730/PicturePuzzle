@@ -5,7 +5,7 @@ import org.opencv.core.Mat
 
 data class Setting(
     var imageList: ArrayList<Pair<Int, Int>> = ArrayList(),
-    var answerInfoPair: Pair<Mat, ArrayList<Point>>? = null, // 정답 이미지와 좌표
+    var answer: Answer? = null,
     var totalRound: Int = 3,
     val answerHashMap: HashMap<Float, Float> = HashMap(),
 ) {
@@ -13,7 +13,7 @@ data class Setting(
     var currentAnswerCount = 0
         set(value) {
             score += 1
-            field = if (value == answerInfoPair?.second?.size) {
+            field = if (value == answer?.answerPointList?.size) {
                 currentRound.value += 1
                 0
             } else {

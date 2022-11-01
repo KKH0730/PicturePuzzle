@@ -1,6 +1,7 @@
 package com.seno.game.util
 
 import android.graphics.Bitmap
+import com.seno.game.ui.game.diffgame.model.Answer
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -63,7 +64,8 @@ class DiffPictureOpencvUtil {
         return diffMat
     }
 
-    fun drawCircle(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Pair<Mat, ArrayList<com.seno.game.ui.game.diffgame.model.Point>>? {
+    fun drawCircle(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
+
         if (srcBitmap == null || copyBitmap == null) {
             return null
         }
@@ -134,7 +136,7 @@ class DiffPictureOpencvUtil {
                 )
             }
             Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2BGR)
-            return src to pointList
+            return Answer(answerMat = src, answerPointList = pointList)
         } catch (e: Exception) {
             e.printStackTrace()
             return null

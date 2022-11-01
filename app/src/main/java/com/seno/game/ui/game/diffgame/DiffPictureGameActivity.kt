@@ -56,20 +56,25 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             activity = this@DiffPictureGameActivity
         }
 
-        binding.cvPrepareView.setContent {
-            var prepareVisible by remember { mutableStateOf(true) }
+//        binding.cvPrepareView.setContent {
+//            var prepareVisible by remember { mutableStateOf(true) }
+//
+//            AnimatedVisibility(
+//                visible = prepareVisible,
+//                exit = ExitTransition.None
+//            ) {
+//                GamePrepareView { prepareVisible = false }
+//            }
+//
+//            initSetting()
+//            setImageTouchListener()
+//            observeFlow()
+//        }
 
-            AnimatedVisibility(
-                visible = prepareVisible,
-                exit = ExitTransition.None
-            ) {
-                GamePrepareView { prepareVisible = false }
-            }
+        val drawable1 = binding.ivOrigin.drawable
+        val drawable2 = binding.ivCopy.drawable
+        binding.ivOrigin.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = opencvUtil.diff2(drawable1.toBitmap(), drawable2.toBitmap())))
 
-            initSetting()
-            setImageTouchListener()
-            observeFlow()
-        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -190,8 +195,9 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         lifecycleScope.launch {
             setting.currentRound.distinctUntilChanged { _, new ->
                 if (new > setting.totalRound - 1) {
-
+                    Timber.e("kkh 111")
                 } else {
+                    Timber.e("kkh 222")
                     Handler(Looper.getMainLooper()).postDelayed({
                         clearAnswerMark()
 

@@ -32,6 +32,7 @@
                 android:layout_height="0dp"
                 android:background="@color/white"
                 android:layout_weight="0.5"
+                android:src="@drawable/diff_image1"
                 android:scaleType="fitXY"/>
 
             <Space
@@ -43,6 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:background="@color/white"
+                android:src="@drawable/diff_image1_copy"
                 android:layout_weight="0.5"
                 android:scaleType="fitXY"/>
 

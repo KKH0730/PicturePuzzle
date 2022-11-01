@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.firebase.firestore.DocumentReference
@@ -13,7 +12,6 @@ import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityCreateGameBinding
 import com.seno.game.di.network.DiffDocRef
-import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
@@ -24,10 +22,7 @@ import com.seno.game.util.QRCodeUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 @AndroidEntryPoint
 class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
@@ -56,10 +51,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
         }
         setRecyclerView()
         observeFlowData()
-        observePlayerJoin(
-            date = todayDate,
-            roomUid = roomUid
-        )
+        observePlayerJoin(date = todayDate, roomUid = roomUid)
     }
 
     override fun onDestroy() {
@@ -81,7 +73,8 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
                         val numberedPlayerList = it.playerList.mapIndexed { index, player ->
                             player.apply { id = index }
                         }
-                        ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).submitList(numberedPlayerList)
+                        ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).submitList(
+                            numberedPlayerList)
                     }
                 }
             }
@@ -116,25 +109,27 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
                 }
 
                 if (snapShot != null && snapShot.exists()) {
-                    val numberedPlayerList = (snapShot.get("playerList") as ArrayList<HashMap<String, Any>>).mapIndexed { index, hashMap ->
-                        setReadyButton(
-                            index = index,
-                            playerInfoMap = hashMap,
-                        )
+                    val numberedPlayerList =
+                        (snapShot.get("playerList") as ArrayList<HashMap<String, Any>>).mapIndexed { index, hashMap ->
+                            setReadyButton(
+                                index = index,
+                                playerInfoMap = hashMap,
+                            )
 
-                        Player(
-                            id = index,
-                            uid = (hashMap["uid"] as String),
-                            nickName = (hashMap["nickName"] as String),
-                            isReady = if (index == 0) {
-                                isChief = true
-                                true
-                            } else {
-                                (hashMap["ready"] as Boolean)
-                            }
-                        )
-                    }
-                    ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).submitList(numberedPlayerList)
+                            Player(
+                                id = index,
+                                uid = (hashMap["uid"] as String),
+                                nickName = (hashMap["nickName"] as String),
+                                isReady = if (index == 0) {
+                                    isChief = true
+                                    true
+                                } else {
+                                    (hashMap["ready"] as Boolean)
+                                }
+                            )
+                        }
+                    ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).submitList(
+                        numberedPlayerList)
                 }
             }
     }
@@ -198,7 +193,8 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
 
     override fun onClickReady() {
         if (isChief) {
-            val currentPlayerList = ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).currentList
+            val currentPlayerList =
+                ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).currentList
             if (currentPlayerList.size < 2) {
                 return
             }

@@ -4,8 +4,8 @@
 4
 5    <uses-sdk
 6        android:minSdkVersion="21"
-6-->/Users/kyungho/AndroidStudioProjects/game/opencv/java/AndroidManifest.xml
+6-->/Users/mycelebs/AndroidStudioProjects/game/opencv/java/AndroidManifest.xml
 7        android:targetSdkVersion="26" />
-7-->/Users/kyungho/AndroidStudioProjects/game/opencv/java/AndroidManifest.xml
+7-->/Users/mycelebs/AndroidStudioProjects/game/opencv/java/AndroidManifest.xml
 8
 9</manifest>

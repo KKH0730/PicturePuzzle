@@ -41,6 +41,9 @@ class HomeViewModel @Inject constructor(
     private val _loadingFlow = MutableStateFlow<Boolean>(false)
     val loadingFlow = _loadingFlow.asStateFlow()
 
+    private val _gameReadySharedFlow = MutableSharedFlow<Unit>()
+    val gameReadySharedFlow = _gameReadySharedFlow.asSharedFlow()
+
 
     fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
         viewModelScope.launch {
@@ -104,7 +107,10 @@ class HomeViewModel @Inject constructor(
                 roomUid = roomUid
             )
 
-            if (result is Result.Error) {
+            if (result is Result.Success) {
+                _gameReadySharedFlow.emit(Unit)
+            } else {
+                _gameReadySharedFlow.emit(Unit)
                 _message.emit(getString(R.string.network_request_error))
             }
         }

@@ -6,7 +6,7 @@ import org.opencv.core.Mat
 data class Setting(
     var imageList: ArrayList<Pair<Int, Int>> = ArrayList(),
     var answer: Answer? = null,
-    var totalRound: Int = 3,
+    var totalRound: Int = 2,
     val answerHashMap: HashMap<Float, Float> = HashMap(),
 ) {
     var score = 0

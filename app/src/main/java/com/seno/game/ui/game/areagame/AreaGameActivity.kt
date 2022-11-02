@@ -7,10 +7,9 @@ import androidx.annotation.RequiresApi
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityAreaGameBinding
+import com.seno.game.extensions.bitmapFrom
 import com.seno.game.util.AreaOpencvUtil
-import com.seno.game.util.BitmapUtil
 import com.seno.game.util.GameColor
-import com.seno.game.util.OpencvUtil
 import org.opencv.core.Mat
 
 class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
@@ -28,7 +27,7 @@ class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
             val bitmap = binding.canvasView.currentCanvas
             val maxScorePair = getMaxScorePair(bitmap = bitmap)
             val strokeMat = opencvUtil.drawBorder(mat = maxScorePair.first)
-            binding.imgView.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = strokeMat))
+            binding.imgView.setImageBitmap(strokeMat.bitmapFrom())
         }
 
         binding.reset.setOnClickListener {

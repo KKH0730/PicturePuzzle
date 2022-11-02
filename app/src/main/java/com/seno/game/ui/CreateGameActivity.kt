@@ -12,13 +12,14 @@ import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityCreateGameBinding
 import com.seno.game.di.network.DiffDocRef
+import com.seno.game.extensions.checkNetworkConnectivity
+import com.seno.game.extensions.createQRCode
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.Player
 import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.main.home.HomeViewModel
-import com.seno.game.util.QRCodeUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -45,7 +46,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
 
         init()
         if (isChief) {
-            reqCreateQRCode()
+            reqCreateRoom()
         } else {
             setQRCode()
         }
@@ -64,12 +65,27 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
         super.onDestroy()
     }
 
+    private fun init() {
+        binding.eventListener = this@CreateGameActivity
+
+        isChief = intent.getBooleanExtra("isChief", false)
+        todayDate = intent.getStringExtra("date")!!
+        uid = intent.getStringExtra("uid")!!
+        roomUid = intent.getStringExtra("roomUid")!!
+
+        if (isChief) {
+            binding.tvReady.text = getString(R.string.game_start)
+        } else {
+            binding.tvReady.text = getString(R.string.game_prepare)
+        }
+    }
+
     private fun observeFlowData() {
         lifecycleScope.launch {
             launch {
                 homeViewModel.createRoomFlow.collect {
                     it?.roomUid?.let { roomUid ->
-                        binding.ivQRCode.setImageBitmap(QRCodeUtil.createQRCode(uid = roomUid))
+                        binding.ivQRCode.setImageBitmap(roomUid.createQRCode())
                         val numberedPlayerList = it.playerList.mapIndexed { index, player ->
                             player.apply { id = index }
                         }
@@ -90,13 +106,19 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
             }
 
             launch {
-                homeViewModel.message.collect { toast(message = it) }
-            }
-
-            launch {
                 homeViewModel.exitRoomFlow.collect {
                     Timber.e("kkh exitRoomFlow : $it")
                 }
+            }
+
+            launch {
+                homeViewModel.gameReadySharedFlow.collect {
+                    binding.tvReady.isEnabled = true
+                }
+            }
+
+            launch {
+                homeViewModel.message.collect { toast(message = it) }
             }
         }
     }
@@ -134,21 +156,6 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
             }
     }
 
-    private fun init() {
-        binding.eventListener = this@CreateGameActivity
-
-        isChief = intent.getBooleanExtra("isChief", false)
-        todayDate = intent.getStringExtra("date")!!
-        uid = intent.getStringExtra("uid")!!
-        roomUid = intent.getStringExtra("roomUid")!!
-
-        if (isChief) {
-            binding.tvReady.text = getString(R.string.game_start)
-        } else {
-            binding.tvReady.text = getString(R.string.game_prepare)
-        }
-    }
-
     private fun setRecyclerView() {
         binding.rvPlayer.adapter = ConcatAdapter(WaitingRoomAdapter())
 
@@ -158,7 +165,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
         }
     }
 
-    private fun reqCreateQRCode() {
+    private fun reqCreateRoom() {
         // QR 코드 생성
         AccountManager.firebaseUid?.let { uid ->
             homeViewModel.reqCreateRoom(
@@ -171,7 +178,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
     }
 
     private fun setQRCode() {
-        binding.ivQRCode.setImageBitmap(QRCodeUtil.createQRCode(uid = roomUid))
+        binding.ivQRCode.setImageBitmap(roomUid.createQRCode())
     }
 
     private fun setReadyButton(index: Int, playerInfoMap: HashMap<String, Any>) {
@@ -192,21 +199,19 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
     }
 
     override fun onClickReady() {
+        binding.tvReady.isEnabled = false
         if (isChief) {
-            val currentPlayerList =
-                ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).currentList
-            if (currentPlayerList.size < 2) {
-                return
-            }
+            val currentPlayerList = ((binding.rvPlayer.adapter as ConcatAdapter).adapters[0] as WaitingRoomAdapter).currentList
+            val isNotAllReady: Boolean = currentPlayerList.any { !it.isReady }
 
-            for (player in currentPlayerList) {
-                if (!player.isReady) {
-                    return
+            if (currentPlayerList.size >= 2 && !isNotAllReady) {
+                if (checkNetworkConnectivity()) {
+                    startActivity(DiffPictureGameActivity::class.java)
+                } else {
+                    finish()
                 }
             }
-
-            binding.tvReady.isEnabled = false
-            startActivity(DiffPictureGameActivity::class.java)
+            binding.tvReady.isEnabled = true
         } else {
             homeViewModel.reqGameReady(
                 date = todayDate,

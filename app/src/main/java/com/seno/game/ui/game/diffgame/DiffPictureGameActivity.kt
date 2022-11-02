@@ -6,10 +6,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.getValue
@@ -21,10 +19,10 @@ import androidx.lifecycle.lifecycleScope
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureGameBinding
+import com.seno.game.extensions.bitmapFrom
 import com.seno.game.extensions.drawAnswerCircle
 import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.model.Setting
-import com.seno.game.util.BitmapUtil
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -56,25 +54,20 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             activity = this@DiffPictureGameActivity
         }
 
-//        binding.cvPrepareView.setContent {
-//            var prepareVisible by remember { mutableStateOf(true) }
-//
-//            AnimatedVisibility(
-//                visible = prepareVisible,
-//                exit = ExitTransition.None
-//            ) {
-//                GamePrepareView { prepareVisible = false }
-//            }
-//
-//            initSetting()
-//            setImageTouchListener()
-//            observeFlow()
-//        }
+        binding.cvPrepareView.setContent {
+            var prepareVisible by remember { mutableStateOf(true) }
 
-        val drawable1 = binding.ivOrigin.drawable
-        val drawable2 = binding.ivCopy.drawable
-        binding.ivOrigin.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = opencvUtil.diff2(drawable1.toBitmap(), drawable2.toBitmap())))
+            AnimatedVisibility(
+                visible = prepareVisible,
+                exit = ExitTransition.None
+            ) {
+                GamePrepareView { prepareVisible = false }
+            }
 
+            initSetting()
+            setImageTouchListener()
+            observeFlow()
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -240,6 +233,6 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         binding.clAnswerMark.visibility = View.INVISIBLE
         binding.ivCopy.visibility = View.INVISIBLE
         binding.ivResult.visibility = View.VISIBLE
-        binding.ivResult.setImageBitmap(BitmapUtil.bitmapFrom(bgrMat = setting.answer?.answerMat))
+        binding.ivResult.setImageBitmap(setting.answer?.answerMat.bitmapFrom())
     }
 }

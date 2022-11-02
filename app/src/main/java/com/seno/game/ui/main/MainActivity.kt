@@ -22,6 +22,8 @@ import com.facebook.FacebookButtonBase
 import com.facebook.login.widget.LoginButton
 import com.google.firebase.auth.FirebaseAuth
 import com.seno.game.R
+import com.seno.game.extensions.checkNetworkConnectivity
+import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
                 setContent {
                     AppTheme {
                         Surface(Modifier.fillMaxSize()) {
-                            if (checkNetworkConnectivity()) {
+                            if (checkNetworkConnectivityForComposable()) {
                                 MainScreen()
                             } else {
                                 RestartDialog(
@@ -57,23 +59,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-//        setContent {
-//            AppTheme {
-//                Surface(Modifier.fillMaxSize()) {
-//                    if (checkNetworkConnectivity()) {
-//                        MainScreen()
-//                    } else {
-//                        RestartDialog(
-//                            title = getString(R.string.network_error_title),
-//                            content = getString(R.string.network_error),
-//                            confirmText = getString(R.string.alert_dialog_restart),
-//                            onClickConfirm = { this@MainActivity.restartApp() }
-//                        )
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun setAuthentication(callback: (Boolean) -> Unit) {
@@ -85,15 +70,6 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { callback(true) }
                 .addOnFailureListener { callback(false) }
         }
-    }
-
-    /**
-     * 네트워크 연결 상태 확인
-     */
-    @Composable
-    private fun checkNetworkConnectivity(): Boolean {
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetwork != null
     }
 
     fun printHashKey() {

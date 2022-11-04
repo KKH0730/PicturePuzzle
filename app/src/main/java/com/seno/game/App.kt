@@ -1,6 +1,7 @@
 package com.seno.game
 
 import android.app.Application
+import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import dagger.hilt.android.HiltAndroidApp
 import org.opencv.android.OpenCVLoader
@@ -18,6 +19,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        FacebookSdk.sdkInitialize(applicationContext)
         Timber.plant(Timber.DebugTree())
 
         OpenCVLoader.initDebug()

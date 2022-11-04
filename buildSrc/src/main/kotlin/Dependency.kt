@@ -59,8 +59,8 @@ object Dependency {
     }
 
     object Facebook {
-        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:13.2.0"
-        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:13.2.0"
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:14.1.1"
+        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:14.1.1"
     }
 
     object Google {

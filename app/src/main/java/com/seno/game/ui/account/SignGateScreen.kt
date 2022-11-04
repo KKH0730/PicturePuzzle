@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.viewinterop.AndroidView
+import com.facebook.login.widget.LoginButton
 import com.google.firebase.auth.FacebookAuthProvider
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
@@ -34,11 +36,12 @@ import com.seno.game.manager.OnSocialSignInCallbackListener
 import timber.log.Timber
 
 @Composable
-fun SignGateScreen() {
+fun SignGateScreen(facebookAccountManager: FacebookAccountManager) {
     val accountState = rememberAccountState()
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
         FaceBookLoginModule(
+            facebookAccountManager = facebookAccountManager,
             context = context
         )
         GoogleLoginModule(
@@ -48,27 +51,32 @@ fun SignGateScreen() {
 }
 
 @Composable
-fun FaceBookLoginModule(context: Context) {
-    val faceBookAccountManager = FacebookAccountManager(activity = context as SignGateActivity)
-
+fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager, context: Context) {
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_launcher_foreground),
         text = stringResource(id = R.string.account_facebook_login)
     ) {
-        faceBookAccountManager.login(
+        facebookAccountManager.login(
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
-                    idToken?.let { token ->
-                        val credential = FacebookAuthProvider.getCredential(token)
-                        AccountManager.signInWithCredential(
-                            credential = credential,
-                            onSignInSucceed = {
-                                context.toast("로그인 성공")
-                            },
-                            onSigInFailed = {
-                                context.toast("로그인 실패")
-                            }
-                        )
+                    Timber.e("kkh 11")
+                    try {
+                        idToken?.let { token ->
+                            val credential = FacebookAuthProvider.getCredential(token)
+                            AccountManager.signInWithCredential(
+                                credential = credential,
+                                onSignInSucceed = {
+                                    Timber.e("kkh 22")
+                                    context.toast("로그인 성공")
+                                },
+                                onSigInFailed = {
+                                    Timber.e("kkh 33")
+                                    context.toast("로그인 실패")
+                                }
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Timber.e("kkh 44 : ${e.message}")
                     }
                 }
 
@@ -108,7 +116,7 @@ fun GoogleLoginModule(context: Context) {
                     }
 
                     override fun onError(e: Exception?) {
-                        
+
                     }
                 }
             )

@@ -7,15 +7,18 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import com.seno.game.R
 import timber.log.Timber
 
-class FacebookAccountManager(private val activity: Activity) {
+class FacebookAccountManager(val activity: Activity) {
+
+
     private var loginManager: LoginManager = LoginManager.getInstance()
     private var callbackManager: CallbackManager = CallbackManager.Factory.create()
 
     fun login(onSocialLoginCallbackListener: OnSocialSignInCallbackListener) {
         loginManager.run {
-            logInWithReadPermissions(activity, listOf("public_profile"))
+            logInWithReadPermissions(activity, arrayListOf(*activity.resources.getStringArray(R.array.login_fbreadpermissions)))
             registerCallback(
                 callbackManager,
                 object : FacebookCallback<LoginResult> {

@@ -2,27 +2,26 @@ package com.seno.game.ui.main
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.facebook.FacebookButtonBase
-import com.facebook.login.widget.LoginButton
 import com.google.firebase.auth.FirebaseAuth
 import com.seno.game.R
-import com.seno.game.extensions.checkNetworkConnectivity
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.theme.AppTheme
@@ -39,26 +38,42 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
-        setAuthentication {
-            if (it) {
-                setContent {
-                    AppTheme {
-                        Surface(Modifier.fillMaxSize()) {
-                            if (checkNetworkConnectivityForComposable()) {
-                                MainScreen()
-                            } else {
-                                RestartDialog(
-                                    title = getString(R.string.network_error_title),
-                                    content = getString(R.string.network_error),
-                                    confirmText = getString(R.string.alert_dialog_restart),
-                                    onClickConfirm = { this@MainActivity.restartApp() }
-                                )
-                            }
-                        }
+        setContent {
+            AppTheme {
+                Surface(Modifier.fillMaxSize()) {
+                    if (checkNetworkConnectivityForComposable()) {
+                        MainScreen()
+                    } else {
+                        RestartDialog(
+                            title = getString(R.string.network_error_title),
+                            content = getString(R.string.network_error),
+                            confirmText = getString(R.string.alert_dialog_restart),
+                            onClickConfirm = { this@MainActivity.restartApp() }
+                        )
                     }
                 }
             }
         }
+//        setAuthentication {
+//            if (it) {
+//                setContent {
+//                    AppTheme {
+//                        Surface(Modifier.fillMaxSize()) {
+//                            if (checkNetworkConnectivityForComposable()) {
+//                                MainScreen()
+//                            } else {
+//                                RestartDialog(
+//                                    title = getString(R.string.network_error_title),
+//                                    content = getString(R.string.network_error),
+//                                    confirmText = getString(R.string.alert_dialog_restart),
+//                                    onClickConfirm = { this@MainActivity.restartApp() }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun setAuthentication(callback: (Boolean) -> Unit) {

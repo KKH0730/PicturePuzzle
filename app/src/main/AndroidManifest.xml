@@ -4,8 +4,7 @@
     package="com.seno.game">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission
-        android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <queries>
         <package android:name="com.android.chrome" />
@@ -27,6 +26,13 @@
         tools:replace="android?:allowBackup">
 
         <activity
+            android:name=".ui.account.create_account.CreateAccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.splash.SplashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Splash" />
+        <activity
             android:name=".ui.FindGameActivity"
             android:exported="false" />
         <activity
@@ -42,7 +48,7 @@
             android:value="@string/facebook_client_token" />
 
         <activity
-            android:name=".ui.account.SignGateActivity"
+            android:name=".ui.account.sign_gate.SignGateActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -60,7 +66,8 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".ui.main.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.DiffGame">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -71,7 +78,6 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
-
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">

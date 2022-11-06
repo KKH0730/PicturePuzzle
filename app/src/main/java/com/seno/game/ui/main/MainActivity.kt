@@ -1,5 +1,7 @@
 package com.seno.game.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -24,8 +26,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
+import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.splash.SplashActivity
+import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.security.MessageDigest
@@ -34,22 +39,30 @@ import java.security.NoSuchAlgorithmException
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
+    private val isSplashFinish: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    if (checkNetworkConnectivityForComposable()) {
-                        MainScreen()
-                    } else {
-                        RestartDialog(
-                            title = getString(R.string.network_error_title),
-                            content = getString(R.string.network_error),
-                            confirmText = getString(R.string.alert_dialog_restart),
-                            onClickConfirm = { this@MainActivity.restartApp() }
-                        )
+
+        if (!intent.getBooleanExtra("isSplashFinish", false)) {
+            SplashActivity.start(context = this@MainActivity)
+            finish()
+        } else {
+            setContent {
+                AppTheme {
+                    Surface(Modifier.fillMaxSize()) {
+                        if (checkNetworkConnectivityForComposable()) {
+                            MusicPlayUtil.startBackgroundBGM(context = this@MainActivity)
+                            MainScreen()
+                        } else {
+                            RestartDialog(
+                                title = getString(R.string.network_error_title),
+                                content = getString(R.string.network_error),
+                                confirmText = getString(R.string.alert_dialog_restart),
+                                onClickConfirm = { this@MainActivity.restartApp() }
+                            )
+                        }
                     }
                 }
             }
@@ -76,6 +89,11 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
+    override fun onDestroy() {
+        MusicPlayUtil.release()
+        super.onDestroy()
+    }
+
     private fun setAuthentication(callback: (Boolean) -> Unit) {
         val auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
@@ -100,6 +118,15 @@ class MainActivity : AppCompatActivity() {
             Timber.e("Hash Key: ${e.message}")
         } catch (e: Exception) {
             Timber.e("Hash Key: ${e.message}")
+        }
+    }
+
+    companion object {
+        fun start(context: Context) {
+            context.startActivity(MainActivity::class.java) {
+                putExtra("isSplashFinish", true)
+                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            }
         }
     }
 }

@@ -6,9 +6,13 @@
     <string name="game_prepare">준비</string>
     <string name="game_prepare_complete">준비 완료</string>
 
-    <!-- 로그인 -->
+    <!-- SignGate -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
-    <string name="account_google_login">Google 아이디로 로그인</string>
+    <string name="account_google_login">Google 아성디로 로그인</string>
+    <string name="sign_gate_guide">로그인을 하면 닉네임과 아바타 변경이 가능해져요!</string>
+    <string name="sign_gate_login">로그인</string>
+    <string name="sign_gate_create_account">계정생성</string>
+    <string name="sign_gate_close">닫기</string>
 
     <string name="blank"></string>
     <string name="network_error_title">네트워크 오류</string>
@@ -17,6 +21,30 @@
     <string name="alert_dialog_restart">재시작</string>
     <string name="alert_dialog_confirm">확인</string>
     <string name="alert_dialog_dismiss">취소</string>
+
+    <!-- Home -->
+    <string name="home_quit_message">앗, 떠나시나요?</string>
+    <string name="home_quit_y">응!안녕</string>
+    <string name="home_quit_n">아냐아냐</string>
+    <string name="home_logout_message1">로그아웃 하시나요?</string>
+    <string name="home_logout_message2">게임 데이터는 날아가지 않는답니다.</string>
+    <string name="home_logout_y">응!할거야</string>
+    <string name="home_logout_n">역시 안할래</string>
+    <string name="home_setting_title">게임설정</string>
+    <string name="home_setting_sound">SOUND</string>
+    <string name="home_setting_sound_background">배경음악</string>
+    <string name="home_setting_sound_effect">효과음</string>
+    <string name="home_setting_sound_vibration">진동</string>
+    <string name="home_setting_notification">NOTIFICATION</string>
+    <string name="home_setting_notification_push">Push 알림</string>
+    <string name="home_setting_account">ACCOUNT</string>
+    <string name="home_setting_account_no_member">현재 QUEST 이시네요!</string>
+    <string name="home_setting_account_member">%1$s 님은 지금\n %2$s 계정으로 로그인 중이에요.</string>
+    <string name="home_setting_account_login">로그인</string>
+    <string name="home_setting_account_logout">로그아웃</string>
+    <string name="home_setting_account_create_account">계정생성</string>
+    <string name="home_setting_account_profile">프로필 관리</string>
+
 
     <string name="game_prepare_ready">준비</string>
     <string name="game_prepare_start">시작!</string>

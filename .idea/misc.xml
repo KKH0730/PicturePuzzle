@@ -5,7 +5,6 @@
       <map>
         <entry key="../../../../layout/compose-model-1664181839054.xml" value="0.25" />
         <entry key="../../../../layout/compose-model-1664182515211.xml" value="0.33" />
-        <entry key="../../../../layout/custom_preview.xml" value="0.15092592592592594" />
         <entry key="app/src/main/res/drawable/bg_color_blue.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/bg_color_green.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/bg_color_red.xml" value="0.1975" />
@@ -17,6 +16,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_new_game.xml" value="0.32314814814814813" />
         <entry key="app/src/main/res/layout/activity_sign_gate.xml" value="0.1648148148148148" />
+        <entry key="app/src/main/res/layout/activity_splash.xml" value="0.203125" />
         <entry key="app/src/main/res/layout/humin_layout.xml" value="0.375" />
         <entry key="app/src/main/res/layout/loading_view_all_ready.xml" value="0.375" />
         <entry key="app/src/main/res/layout/viewholder_diff.xml" value="0.375" />

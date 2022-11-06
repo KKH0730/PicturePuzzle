@@ -41,7 +41,6 @@ object AccountManager {
                 onSignInSucceed.invoke()
             }
     }
-
 }
 
 interface OnSocialSignInCallbackListener {

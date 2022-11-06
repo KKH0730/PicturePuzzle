@@ -13,11 +13,16 @@ import com.seno.game.ui.main.component.BottomNavigationBar
 fun MainScreen() {
     val navController = rememberNavController()
 
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
-            NavigationGraph(navController = navController)
-        }
+//    Scaffold(
+//        bottomBar = { BottomNavigationBar(navController = navController) },
+//    ) { innerPadding ->
+//        Box(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
+//            NavigationGraph(navController = navController)
+//        }
+//    }
+
+
+    Box {
+        NavigationGraph(navController = navController)
     }
 }

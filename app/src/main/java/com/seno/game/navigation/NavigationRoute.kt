@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.seno.game.R
-import com.seno.game.ui.account.SignGateScreen
 import com.seno.game.ui.main.MainScreen
 import com.seno.game.ui.main.home.HomeScreen
 

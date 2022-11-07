@@ -1,11 +1,19 @@
 package com.seno.game.ui.main.home
 
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -22,6 +30,7 @@ import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.util.MusicPlayUtil
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
@@ -29,6 +38,13 @@ fun HomeScreen() {
     var isUser by remember { mutableStateOf(false) }
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
+
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibrator = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibrator.defaultVibrator
+    } else {
+        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
 
     (context as MainActivity).LifecycleEventListener {
         when (it) {
@@ -68,6 +84,21 @@ fun HomeScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(id = R.color.color_e7c6ff))
+            .pointerInteropFilter {
+                when (it.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if(Build.VERSION.SDK_INT >= 26) {
+                            vibrator.vibrate(VibrationEffect.createOneShot(50, 50))
+                        } else {    //26보다 낮으면
+                            vibrator.vibrate(50)
+                        }
+                    }
+                    MotionEvent.ACTION_MOVE -> {}
+                    MotionEvent.ACTION_UP -> {}
+                    else ->  false
+                }
+                true
+            }
     ) {
         Spacer(modifier = Modifier.height(14.dp))
         Row() {

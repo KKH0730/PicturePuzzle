@@ -57,6 +57,9 @@ fun HomeScreen() {
     if (isShowSettingDialog) {
         SettingDialog(
             onClickClose = { isShowSettingDialog = false },
+            onValueChangeBackgroundSlider = {
+              MusicPlayUtil.setVol(leftVol = it, rightVol = it)
+            },
             onDismissed = { isShowSettingDialog = false }
         )
     }

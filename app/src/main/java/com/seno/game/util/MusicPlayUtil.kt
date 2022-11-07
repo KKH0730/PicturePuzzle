@@ -16,6 +16,7 @@ object MusicPlayUtil {
         }
 
         mediaPlayer = MediaPlayer.create(context, R.raw.bgm_picnic).apply {
+            setVol(0.5f, 0.5f)
             setOnCompletionListener {
                 startBackgroundBGM(context = context)
             }
@@ -53,5 +54,9 @@ object MusicPlayUtil {
                 this.mediaPlayer = null
             }
         }
+    }
+
+    fun setVol(leftVol: Float, rightVol: Float) {
+        mediaPlayer?.setVolume(leftVol, rightVol)
     }
 }

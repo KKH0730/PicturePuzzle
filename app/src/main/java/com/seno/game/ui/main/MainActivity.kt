@@ -27,8 +27,10 @@ import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
+import com.seno.game.manager.AccountManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.main.home.HomeDummyScreen
 import com.seno.game.ui.splash.SplashActivity
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,11 +41,12 @@ import java.security.NoSuchAlgorithmException
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
-    private val isSplashFinish: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
+
+        Timber.e("kkh displayName : ${AccountManager.currentUser?.displayName}")
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
             SplashActivity.start(context = this@MainActivity)
@@ -52,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             setContent {
                 AppTheme {
                     Surface(Modifier.fillMaxSize()) {
+                        HomeDummyScreen()
                         if (checkNetworkConnectivityForComposable()) {
                             MusicPlayUtil.startBackgroundBGM(context = this@MainActivity)
                             MainScreen()

@@ -26,6 +26,7 @@ import com.seno.game.util.BlueRippleTheme
 @Composable
 fun SettingDialog(
     onClickClose: () -> Unit,
+    onValueChangeBackgroundSlider: (Float) -> Unit,
     onDismissed: () -> Unit
 ) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
@@ -43,7 +44,10 @@ fun SettingDialog(
                         .verticalScroll(rememberScrollState())
                 ) {
                     DialogTitle(onClickClose = onClickClose)
-                    SoundControlPanel(modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+                    SoundControlPanel(
+                        onValueChangeBackgroundSlider = onValueChangeBackgroundSlider,
+                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    )
                     Spacer(modifier = Modifier.height(height = 15.dp))
                     NotificationPanel(
                         onCheckedChange = {},
@@ -88,7 +92,10 @@ fun DialogTitle(
 }
 
 @Composable
-fun SoundControlPanel(modifier: Modifier = Modifier) {
+fun SoundControlPanel(
+    onValueChangeBackgroundSlider: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.fillMaxWidth(0.83f)
     ) {
@@ -107,9 +114,7 @@ fun SoundControlPanel(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(height = 13.5.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_background),
-            onValueChangeFinished = {
-
-            }
+            onValueChangeFinished = onValueChangeBackgroundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
@@ -134,7 +139,7 @@ fun SliderUnit(
     onValueChangeFinished: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var sliderPosition by remember { mutableStateOf(0f) }
+    var sliderPosition by remember { mutableStateOf(0.5f) }
 
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
@@ -152,7 +157,7 @@ fun SliderUnit(
             Slider(
                 value = sliderPosition,
                 onValueChange = { sliderPosition = it },
-                valueRange = 0f..100f,
+                valueRange = 0.0f..1.0f,
                 onValueChangeFinished = { onValueChangeFinished.invoke(sliderPosition) },
                 colors = SliderDefaults.colors(
                     thumbColor = colorResource(id = R.color.color_bbd0ff),

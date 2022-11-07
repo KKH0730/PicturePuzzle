@@ -1,10 +1,15 @@
 package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -53,24 +58,43 @@ fun HomeQuickMenuContainer(
 @Composable
 fun SoundOnOffButton(onToggledSound: () -> Unit) {
     val isPlaying = MusicPlayUtil.isPlaying
-    IconButton(onClick = onToggledSound) {
-        Image(
-            painter = if (isPlaying == null || !isPlaying) {
-                painterResource(id = R.drawable.ic_sound_on_off) // on 아이콘
-            } else {
-                painterResource(id = R.drawable.ic_sound_on_off)
-            },
-            contentDescription = null
-        )
+    if (isPlaying != null) {
+        var isPlayingSound by remember { mutableStateOf(isPlaying) }
+        IconButton(onClick = {
+            onToggledSound.invoke()
+            isPlayingSound = MusicPlayUtil.isPlaying ?: false
+        }) {
+            Image(
+                painter = if (isPlayingSound) {
+                    painterResource(id = R.drawable.ic_sound_on)
+                } else {
+                    painterResource(id = R.drawable.ic_sound_off)
+                },
+                contentDescription = null
+            )
+        }
     }
 }
 
 @Composable
 fun SettingButton(onClickSetting: () -> Unit) {
-    IconButton(onClick = onClickSetting) {
+
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val settingImage = if (isPressed) {
+        painterResource(id = R.drawable.ic_home_setting_pressed)
+    } else {
+        painterResource(id = R.drawable.ic_home_setting)
+    }
+
+    IconButton(
+        onClick = onClickSetting,
+        interactionSource = interactionSource,
+    ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_sound_on_off),
-            contentDescription = null
+            painter = settingImage,
+            contentDescription = null,
         )
     }
 }
@@ -97,7 +121,8 @@ fun SoloPlayButton(onClick: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_sol_play_button),
         contentDescription = null,
-        modifier = Modifier.width(width = 125.dp)
+        modifier = Modifier
+            .width(width = 125.dp)
             .aspectRatio(2.6f)
             .noRippleClickable { onClick.invoke() }
     )
@@ -108,7 +133,8 @@ fun MultiPlayButton(onClick: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_multi_play_button),
         contentDescription = null,
-        modifier = Modifier.width(width = 125.dp)
+        modifier = Modifier
+            .width(width = 125.dp)
             .aspectRatio(2.6f)
             .noRippleClickable { onClick.invoke() }
     )
@@ -119,7 +145,8 @@ fun QuitButton(onClick: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.ic_quit_button),
         contentDescription = null,
-        modifier = Modifier.width(width = 125.dp)
+        modifier = Modifier
+            .width(width = 125.dp)
             .aspectRatio(2.6f)
             .noRippleClickable { onClick.invoke() }
     )

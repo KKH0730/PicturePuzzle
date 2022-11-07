@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.seno.game.view.DrawCanvas
+            android:id="@+id/canvasView"
+            android:layout_width="0dp"
+            android:layout_height="250dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgView"
+            android:layout_width="0dp"
+            android:layout_height="250dp"
+            app:layout_constraintTop_toBottomOf="@+id/canvasView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/reset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imgView"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="Result"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/reset"
+            app:layout_constraintBottom_toTopOf="@+id/btnChangeBlue"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnChangeBlue"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="Green"
+            android:background="@color/area_blue"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnChangeGreen"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="Green"
+            android:background="@color/area_green"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn"
+            app:layout_constraintTop_toBottomOf="@+id/reset"
+            app:layout_constraintBottom_toTopOf="@+id/btnChangeRed"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnChangeRed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="Red"
+            android:background="@color/area_red"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn"
+            app:layout_constraintTop_toBottomOf="@+id/btnChangeGreen"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

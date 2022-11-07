@@ -1,3 +1,4 @@
+
 object Version {
     const val COMPOSE = "1.2.0"
 }
@@ -6,6 +7,9 @@ object Plugins {
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.2"
     const val HILT_AGP = "com.google.dagger:hilt-android-gradle-plugin:2.42"
     const val KOTLIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
+    const val KOTLIN_GRADLE = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
+    const val GOOGLE_SERVICE = "com.google.gms:google-services:4.3.13"
+    const val CRASHLYTICS = "com.google.firebase:firebase-crashlytics-gradle:2.9.2"
 }
 
 object Dependency {
@@ -13,6 +17,7 @@ object Dependency {
         const val APP_COMPAT = "androidx.appcompat:appcompat:1.5.1"
         const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:2.1.4"
         const val MATERIAL = "com.google.android.material:material:1.6.1"
+        const val RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.2.1"
     }
 
     object KTX {
@@ -33,6 +38,16 @@ object Dependency {
         const val NAVIGATION = "androidx.navigation:navigation-compose:2.5.1"
     }
 
+    object Firebase {
+        const val FIREBASE_BOM = "com.google.firebase:firebase-bom:30.4.1"
+        const val FIREBASE_FIRESTORE = "com.google.firebase:firebase-firestore-ktx"
+        const val FIREBASE_ANALYTICS = "com.google.firebase:firebase-crashlytics-ktx"
+        const val FIREBASE_AUTH = "com.google.firebase:firebase-auth-ktx"
+        const val FIREBASE_CRASHLYTICS = "com.google.firebase:firebase-analytics-ktx"
+        const val FIREBASE_MESSAGING = "com.google.firebase:firebase-messaging-ktx"
+        const val FIREBASE_STORAGE = "com.google.firebase:firebase-storage-ktx"
+    }
+
     object Lifecycle {
         const val VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
         const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha01"
@@ -41,6 +56,15 @@ object Dependency {
     object Paging {
         const val RUNTIME = "androidx.paging:paging-runtime:3.1.1"
         const val COMPOSE = "androidx.paging:paging-compose:1.0.0-alpha15"
+    }
+
+    object Facebook {
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:14.1.1"
+        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:14.1.1"
+    }
+
+    object Google {
+        const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
     }
 
     object Accompanist {

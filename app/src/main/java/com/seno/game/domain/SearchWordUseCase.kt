@@ -1,6 +1,5 @@
 package com.seno.game.domain
 
-import com.google.gson.JsonElement
 import com.seno.game.data.hunminjeongeum.HunMinJeongEumRepository
 import com.seno.game.data.network.model.HumMinJeongEumResponse
 import com.seno.game.di.coroutine.IoDispatcher

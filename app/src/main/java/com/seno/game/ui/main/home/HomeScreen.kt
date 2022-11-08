@@ -36,6 +36,8 @@ import timber.log.Timber
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
+    val facebookAccountManager = FacebookAccountManager(context as MainActivity)
+    val googleAccountManager = GoogleAccountManager(context as MainActivity)
     val homeViewModel = hiltViewModel<HomeViewModel>()
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
@@ -81,7 +83,8 @@ fun HomeScreen() {
         LogoutDialog(
             onClickYes = {
                 AccountManager.startLogout(
-                    activity = context as MainActivity,
+                    facebookAccountManager = facebookAccountManager,
+                    googleAccountManager = googleAccountManager,
                     isCompleteLogout = {
                         isShowLogoutDialog = false
                         nickname = context.resources.createRandomNickname()

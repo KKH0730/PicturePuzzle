@@ -1,7 +1,6 @@
 package com.seno.game.ui.account.create_account
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,23 +26,24 @@ import timber.log.Timber
 
 @Composable
 fun CreateAccountScreen(
+    facebookAccountManager: FacebookAccountManager,
+    googleAccountManager: GoogleAccountManager
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        FaceBookLoginModule()
-        GoogleLoginModule()
+        FaceBookLoginModule(facebookAccountManager = facebookAccountManager)
+        GoogleLoginModule(googleAccountManager = googleAccountManager)
     }
 }
 
 @Composable
-fun FaceBookLoginModule() {
+fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager) {
     val context = LocalContext.current
 
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_launcher_foreground),
         text = stringResource(id = R.string.account_facebook_login)
     ) {
-        FacebookAccountManager.login(
-            activity = context as CreateAccountActivity,
+        facebookAccountManager.login(
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
                     Timber.e("kkh 11")
@@ -78,16 +78,16 @@ fun FaceBookLoginModule() {
 }
 
 @Composable
-fun GoogleLoginModule() {
+fun GoogleLoginModule(googleAccountManager: GoogleAccountManager) {
     val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
-            GoogleAccountManager.onActivityResult(
+            googleAccountManager.onActivityResult(
                 data = it.data,
                 onSocialSignInCallbackListener = object: OnSocialSignInCallbackListener {
                     override fun signInWithCredential(idToken: String?) {
-                        val authCredential = GoogleAccountManager.getAuthCredential(idToken)
+                        val authCredential = googleAccountManager.getAuthCredential(idToken)
                         try {
                             AccountManager.signInWithCredential(
                                 credential = authCredential,
@@ -119,6 +119,6 @@ fun GoogleLoginModule() {
         snsImage = painterResource(id = R.drawable.ic_launcher_foreground),
         text = stringResource(id = R.string.account_google_login)
     ) {
-        GoogleAccountManager.login(activity = context as CreateAccountActivity, launcher = launcher)
+        googleAccountManager.login(launcher = launcher)
     }
 }

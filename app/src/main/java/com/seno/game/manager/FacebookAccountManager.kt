@@ -12,12 +12,12 @@ import timber.log.Timber
 
 const val LOGIN_FACEBOOK_REQUEST_CODE = 64206
 
-object FacebookAccountManager {
+class FacebookAccountManager(private val activity: Activity) {
 
     private var loginManager: LoginManager = LoginManager.getInstance()
     private var callbackManager: CallbackManager = CallbackManager.Factory.create()
 
-    fun login(activity: Activity, onSocialLoginCallbackListener: OnSocialSignInCallbackListener) {
+    fun login(onSocialLoginCallbackListener: OnSocialSignInCallbackListener) {
         loginManager.run {
             logInWithReadPermissions(activity, arrayListOf(*activity.resources.getStringArray(R.array.login_fbreadpermissions)))
             registerCallback(

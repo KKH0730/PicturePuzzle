@@ -1,6 +1,5 @@
 package com.seno.game.manager
 
-import android.app.Activity
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -8,7 +7,6 @@ import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
-import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.toast
 import timber.log.Timber
 
@@ -45,7 +43,7 @@ object AccountManager {
         }
 
     val displayName: String?
-        get()  {
+        get() {
             Timber.e("kkh displayname : ${FirebaseAuth.getInstance().currentUser?.displayName}")
             return FirebaseAuth.getInstance().currentUser?.displayName
         }
@@ -82,23 +80,23 @@ object AccountManager {
     }
 
     fun startLogout(
-        activity: Activity,
+        facebookAccountManager: FacebookAccountManager?,
+        googleAccountManager: GoogleAccountManager?,
         isCompleteLogout: () -> Unit,
     ) {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
-                FacebookAccountManager.logout()
+                facebookAccountManager?.logout()
                 signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutGoogle() {
-                GoogleAccountManager.logout(
-                    activity = activity,
-                    object : GoogleAccountManager.LogoutListener {
-                    override fun onSuccessLogout() {
-                        signOutFirebase(isCompleteLogout = isCompleteLogout)
-                    }
-                })
+                googleAccountManager?.logout(
+                    logoutListener = object : GoogleAccountManager.LogoutListener {
+                        override fun onSuccessLogout() {
+                            signOutFirebase(isCompleteLogout = isCompleteLogout)
+                        }
+                    })
             }
 
             override fun onSignOutEmail() {

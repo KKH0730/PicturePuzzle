@@ -19,23 +19,30 @@ import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
+import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.MusicPlayUtil
 
-
 @Composable
-fun ProfileContainer(onClick: () -> Unit) {
+fun ProfileContainer(
+    nickname: String,
+    onClick: () -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.noRippleClickable { onClick.invoke() }
     ) {
         Spacer(modifier = Modifier.width(width = 6.dp))
         Image(
-            painter = painterResource(id = R.drawable.ic_profile_not_login), 
+            painter = painterResource(id = R.drawable.ic_profile_not_login),
             contentDescription = null
         )
         Text(
-            text = "${PrefsManager.nickname} ${stringResource(id = R.string.guest2)}",
+            text = if (AccountManager.isSignedIn) {
+                nickname
+            } else {
+                "$nickname ${stringResource(id = R.string.guest2)}"
+            },
             color = colorResource(id = R.color.color_fbf8cc),
             fontSize = 14.textDp
         )
@@ -45,7 +52,7 @@ fun ProfileContainer(onClick: () -> Unit) {
 @Composable
 fun HomeQuickMenuContainer(
     onToggledSound: () -> Unit,
-    onClickSetting: () -> Unit
+    onClickSetting: () -> Unit,
 ) {
     Column() {
         SoundOnOffButton(
@@ -81,7 +88,6 @@ fun SoundOnOffButton(onToggledSound: () -> Unit) {
 @Composable
 fun SettingButton(onClickSetting: () -> Unit) {
 
-
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val settingImage = if (isPressed) {
@@ -106,7 +112,7 @@ fun GamePlayContainer(
     onClickSoloPlay: () -> Unit,
     onClickMultiPlay: () -> Unit,
     onClickQuit: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(space = 20.dp),

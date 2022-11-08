@@ -3,6 +3,7 @@ package com.seno.game.ui.splash
 import android.annotation.SuppressLint
 import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,6 +24,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.seno.game.R
+import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
@@ -49,7 +51,7 @@ class SplashActivity : AppCompatActivity() {
                     ) {
                         SplashScreen {
                             MainActivity.start(context = this@SplashActivity)
-                            overridePendingTransition(0, 0)
+                            overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
                             finish()
                         }
                     }
@@ -69,13 +71,8 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun createRandomNickname() {
-        val random = java.util.Random()
-        val adjectiveList = resources.getStringArray(R.array.adjective)
-        val nounList = resources.getStringArray(R.array.noun)
-
         if (PrefsManager.nickname.isEmpty() && AccountManager.isUser) {
-            PrefsManager.nickname =
-                "${adjectiveList[random.nextInt(adjectiveList.size - 1)]} ${nounList[random.nextInt(nounList.size - 1)]}"
+            resources.createRandomNickname()
         }
     }
 

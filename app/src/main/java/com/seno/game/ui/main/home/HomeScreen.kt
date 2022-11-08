@@ -2,34 +2,35 @@ package com.seno.game.ui.main.home
 
 import android.content.Context
 import android.os.Build
-import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.view.MotionEvent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import com.seno.game.R
+import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
-import com.seno.game.ui.account.sign_gate.SignGateActivity
+import com.seno.game.manager.FacebookAccountManager
+import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.account.create_account.CreateAccountActivity
+import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.util.MusicPlayUtil
+import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -37,7 +38,9 @@ fun HomeScreen() {
     val context = LocalContext.current
     val homeViewModel = hiltViewModel<HomeViewModel>()
     var isShowQuitDialog by remember { mutableStateOf(false) }
+    var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
+    var nickname by remember { mutableStateOf(PrefsManager.nickname) }
 
     val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibrator = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -51,12 +54,17 @@ fun HomeScreen() {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-                MusicPlayUtil.restart()
+                nickname = PrefsManager.nickname
+                MusicPlayUtil.restart(isBackgroundSound = true)
             }
             Lifecycle.Event.ON_PAUSE -> {
             }
-            Lifecycle.Event.ON_STOP -> { MusicPlayUtil.pause() }
-            Lifecycle.Event.ON_DESTROY -> { MusicPlayUtil.release() }
+            Lifecycle.Event.ON_STOP -> {
+                MusicPlayUtil.pause(isBackgroundSound = true)
+            }
+            Lifecycle.Event.ON_DESTROY -> {
+                MusicPlayUtil.release(isBackgroundSound = true)
+            }
             else -> return@LifecycleEventListener
         }
     }
@@ -69,12 +77,37 @@ fun HomeScreen() {
         )
     }
 
+    if (isShowLogoutDialog) {
+        LogoutDialog(
+            onClickYes = {
+                AccountManager.startLogout(
+                    activity = context as MainActivity,
+                    isCompleteLogout = {
+                        isShowLogoutDialog = false
+                        nickname = context.resources.createRandomNickname()
+                    }
+                )
+            },
+            onClickNo = { isShowLogoutDialog = false },
+            onDismissed = { isShowLogoutDialog = false }
+        )
+    }
+
     if (isShowSettingDialog) {
         SettingDialog(
             onClickClose = { isShowSettingDialog = false },
-            onValueChangeBackgroundSlider = {
-              MusicPlayUtil.setVol(leftVol = it, rightVol = it)
+            onValueChangeBackgroundSoundSlider = {
+                MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = true)
             },
+            onValueChangeEffectSoundSlider = {
+
+            },
+            onClickLogin = { context.startActivity(CreateAccountActivity::class.java) },
+            onClickLogout = {
+                isShowSettingDialog = false
+                isShowLogoutDialog = true
+            },
+            onClickManageProfile = {},
             onDismissed = { isShowSettingDialog = false }
         )
     }
@@ -107,24 +140,21 @@ fun HomeScreen() {
         ) {
             Spacer(modifier = Modifier.height(14.dp))
             Row() {
-                ProfileContainer(onClick = {
-                    context.startActivity(SignGateActivity::class.java)
-                    (context as MainActivity).overridePendingTransition(
-                        R.anim.slide_right_enter,
-                        R.anim.slide_right_exit
-                    )
-                })
+                ProfileContainer(
+                    nickname = nickname,
+                    onClick = { context.startActivity(MyProfileActivity::class.java) }
+                )
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(
                     onToggledSound = {
                         val isPlaying = MusicPlayUtil.isPlaying
                         if (isPlaying == null || !isPlaying) {
-                            MusicPlayUtil.restart()
+                            MusicPlayUtil.restart(isBackgroundSound = true)
                         } else {
-                            MusicPlayUtil.pause()
+                            MusicPlayUtil.pause(isBackgroundSound = true)
                         }
                     },
-                    onClickSetting = {  isShowSettingDialog = true }
+                    onClickSetting = { isShowSettingDialog = true }
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }

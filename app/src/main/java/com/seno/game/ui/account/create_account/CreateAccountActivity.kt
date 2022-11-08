@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.seno.game.manager.FacebookAccountManager
+import com.seno.game.manager.LOGIN_FACEBOOK_REQUEST_CODE
 import com.seno.game.theme.AppTheme
 
 class CreateAccountActivity : AppCompatActivity() {
-    private val facebookAccountManager = FacebookAccountManager(activity = this@CreateAccountActivity)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,14 +19,16 @@ class CreateAccountActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    CreateAccountScreen(facebookAccountManager = facebookAccountManager)
+                    CreateAccountScreen()
                 }
             }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        facebookAccountManager.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == LOGIN_FACEBOOK_REQUEST_CODE) {
+            FacebookAccountManager.onActivityResult(requestCode, resultCode, data)
+        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 }

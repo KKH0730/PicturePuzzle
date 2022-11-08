@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     Surface(Modifier.fillMaxSize()) {
                         HomeDummyScreen()
                         if (checkNetworkConnectivityForComposable()) {
-                            MusicPlayUtil.startBackgroundBGM(context = this@MainActivity)
+                            MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
                             MainScreen()
                         } else {
                             RestartDialog(
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        MusicPlayUtil.release()
+        MusicPlayUtil.release(isBackgroundSound = true)
         super.onDestroy()
     }
 
@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         fun start(context: Context) {
             context.startActivity(MainActivity::class.java) {
                 putExtra("isSplashFinish", true)
-                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             }
         }
     }

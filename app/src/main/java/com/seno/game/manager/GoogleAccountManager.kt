@@ -14,27 +14,24 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.seno.game.R
 import timber.log.Timber
 
-class GoogleAccountManager(private val activity: Activity) {
-    private val signInClient: GoogleSignInClient = GoogleSignIn.getClient(
-        activity,
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(activity.resources.getString(R.string.default_web_client_id))
-            .requestEmail()
-            .requestProfile()
-            .build()
-    )
-
-    fun login(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
-        launcher.launch(signInClient.signInIntent)
-//        activity.startActivityForResult(signInClient.signInIntent, LOGIN_GOOGLE_REQUEST_CODE)
+object GoogleAccountManager {
+    private fun getSignInClient(activity: Activity): GoogleSignInClient {
+        return GoogleSignIn.getClient(
+            activity,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(activity.resources.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestProfile()
+                .build()
+        )
     }
 
-    fun logout() {
-        signInClient.signOut().addOnSuccessListener {
+    fun login(activity: Activity, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        launcher.launch(getSignInClient(activity).signInIntent)
+    }
 
-        }.addOnFailureListener {
-
-        }
+    fun logout(activity:Activity, logoutListener: LogoutListener) {
+        getSignInClient(activity).signOut().addOnSuccessListener { logoutListener.onSuccessLogout() }
     }
 
     fun onActivityResult(
@@ -58,7 +55,7 @@ class GoogleAccountManager(private val activity: Activity) {
         return GoogleAuthProvider.getCredential(token, null)
     }
 
-    companion object {
-        const val LOGIN_GOOGLE_REQUEST_CODE = 1818
+    interface LogoutListener {
+        fun onSuccessLogout()
     }
 }

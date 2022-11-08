@@ -20,13 +20,18 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.BlueRippleTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingDialog(
     onClickClose: () -> Unit,
-    onValueChangeBackgroundSlider: (Float) -> Unit,
+    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
+    onValueChangeEffectSoundSlider: (Float) -> Unit,
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit,
     onDismissed: () -> Unit
 ) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
@@ -45,7 +50,8 @@ fun SettingDialog(
                 ) {
                     DialogTitle(onClickClose = onClickClose)
                     SoundControlPanel(
-                        onValueChangeBackgroundSlider = onValueChangeBackgroundSlider,
+                        onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
+                        onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                     )
                     Spacer(modifier = Modifier.height(height = 15.dp))
@@ -54,7 +60,12 @@ fun SettingDialog(
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                     )
                     Spacer(modifier = Modifier.height(height = 20.dp))
-                    AccountPanel(modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+                    AccountPanel(
+                        onClickLogin = onClickLogin,
+                        onClickLogout = onClickLogout,
+                        onClickManageProfile = onClickManageProfile,
+                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    )
                 }
             }
         }
@@ -93,7 +104,8 @@ fun DialogTitle(
 
 @Composable
 fun SoundControlPanel(
-    onValueChangeBackgroundSlider: (Float) -> Unit,
+    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
+    onValueChangeEffectSoundSlider: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -114,14 +126,12 @@ fun SoundControlPanel(
         Spacer(modifier = Modifier.height(height = 13.5.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_background),
-            onValueChangeFinished = onValueChangeBackgroundSlider
+            onValueChangeFinished = onValueChangeBackgroundSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_effect),
-            onValueChangeFinished = {
-
-            }
+            onValueChangeFinished = onValueChangeEffectSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
@@ -224,7 +234,12 @@ fun NotificationPanel(
 }
 
 @Composable
-fun AccountPanel(modifier: Modifier = Modifier) {
+fun AccountPanel(
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -246,7 +261,8 @@ fun AccountPanel(modifier: Modifier = Modifier) {
                 text = if (AccountManager.isSignedIn) {
                     String.format(
                         format = stringResource(id = R.string.home_setting_account_member),
-                        "김경호", "카카오"
+                        PrefsManager.nickname,
+                        AccountManager.authProviderName
                     )
                 } else {
                     stringResource(id = R.string.home_setting_account_no_member)
@@ -259,8 +275,9 @@ fun AccountPanel(modifier: Modifier = Modifier) {
         }
         Spacer(modifier = Modifier.height(height = 15.dp))
         AccountButtonContainer(
-            onClickLeftButton = {},
-            onClickRightButton = {},
+            onClickLogin = onClickLogin,
+            onClickLogout = onClickLogout,
+            onClickManageProfile = onClickManageProfile
         )
         Spacer(modifier = Modifier.height(height = 15.dp))
     }
@@ -268,51 +285,66 @@ fun AccountPanel(modifier: Modifier = Modifier) {
 
 @Composable
 fun AccountButtonContainer(
-    onClickLeftButton: () -> Unit,
-    onClickRightButton: () -> Unit
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit
 ) {
-    Row() {
-        Box(
-            modifier = Modifier
-                .weight(weight = 1f)
-                .noRippleClickable { onClickLeftButton.invoke() }
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_dialog_button_y),
-                contentDescription = null,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
-            Text(
-                text = if (AccountManager.isSignedIn) {
-                    stringResource(id = R.string.home_setting_account_logout)
-                } else {
-                    stringResource(id = R.string.home_setting_account_login)
-                },
-                color = Color.White,
-                fontSize = 16.textDp,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
+    if (AccountManager.isSignedIn) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .noRippleClickable { onClickLogout.invoke() }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_logout),
+                    color = Color.White,
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .noRippleClickable { onClickManageProfile.invoke() }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_n),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_profile),
+                    color = colorResource(id = R.color.color_bbd0ff),
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
         }
-        Box(
-            modifier = Modifier
-                .weight(weight = 1f)
-                .noRippleClickable { onClickRightButton.invoke() }
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_dialog_button_n),
-                contentDescription = null,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
-            Text(
-                text = if (AccountManager.isSignedIn) {
-                    stringResource(id = R.string.home_setting_account_profile)
-                } else {
-                    stringResource(id = R.string.home_setting_account_create_account)
-                },
-                color = colorResource(id = R.color.color_bbd0ff),
-                fontSize = 16.textDp,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
+    } else {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .noRippleClickable { onClickLogin.invoke() }
+                    .align(alignment = Alignment.Center)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text =    stringResource(id = R.string.home_setting_account_login),
+                    color = Color.White,
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
         }
     }
 }

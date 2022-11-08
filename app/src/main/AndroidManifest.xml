@@ -25,7 +25,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android?:allowBackup">
-
+        <activity
+            android:name=".ui.account.my_profile.MyProfileActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.account.create_account.CreateAccountActivity"
             android:exported="false" />

@@ -15,16 +15,6 @@ class SignGateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    SignGateScreen(
-                        onClickClose = { finish() },
-                        onClickLogin = { startActivity(CreateAccountActivity::class.java) },
-                        onClickCreateAccount = {}
-                    )
-                }
-            }
-        }
+
     }
 }

@@ -7,10 +7,13 @@
     <string name="game_prepare_complete">준비 완료</string>
     <string name="guest">GUEST</string>
     <string name="guest2">(GUEST)</string>
+    <string name="facebook">페이스북</string>
+    <string name="kakao">카카오</string>
+    <string name="google">구글</string>
 
     <!-- SignGate -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
-    <string name="account_google_login">Google 아성디로 로그인</string>
+    <string name="account_google_login">Google 아이디로 로그인</string>
     <string name="sign_gate_guide">로그인을 하면 닉네임과 아바타 변경이 가능해져요!</string>
     <string name="sign_gate_login">로그인</string>
     <string name="sign_gate_create_account">계정생성</string>

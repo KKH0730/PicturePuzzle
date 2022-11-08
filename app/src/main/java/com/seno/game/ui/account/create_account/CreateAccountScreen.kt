@@ -21,33 +21,29 @@ import com.seno.game.manager.AccountManager
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.OnSocialSignInCallbackListener
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.create_account.component.SnsLoginButton
 import timber.log.Timber
 
 @Composable
 fun CreateAccountScreen(
-    facebookAccountManager: FacebookAccountManager
 ) {
-    val context = LocalContext.current
-
     Column(modifier = Modifier.fillMaxSize()) {
-        FaceBookLoginModule(
-            facebookAccountManager = facebookAccountManager,
-            context = context
-        )
-        GoogleLoginModule(
-            context = context
-        )
+        FaceBookLoginModule()
+        GoogleLoginModule()
     }
 }
 
 @Composable
-fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager, context: Context) {
+fun FaceBookLoginModule() {
+    val context = LocalContext.current
+
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_launcher_foreground),
         text = stringResource(id = R.string.account_facebook_login)
     ) {
-        facebookAccountManager.login(
+        FacebookAccountManager.login(
+            activity = context as CreateAccountActivity,
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
                     Timber.e("kkh 11")
@@ -57,6 +53,9 @@ fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager, context:
                             AccountManager.signInWithCredential(
                                 credential = credential,
                                 onSignInSucceed = {
+                                    AccountManager.displayName?.let { name ->
+                                        PrefsManager.nickname = name
+                                    }
                                     context.toast("로그인 성공")
                                 },
                                 onSigInFailed = {
@@ -79,20 +78,23 @@ fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager, context:
 }
 
 @Composable
-fun GoogleLoginModule(context: Context) {
-    val googleAccountManager = GoogleAccountManager(activity = context as CreateAccountActivity)
+fun GoogleLoginModule() {
+    val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
-            googleAccountManager.onActivityResult(
+            GoogleAccountManager.onActivityResult(
                 data = it.data,
                 onSocialSignInCallbackListener = object: OnSocialSignInCallbackListener {
                     override fun signInWithCredential(idToken: String?) {
-                        val authCredential = googleAccountManager.getAuthCredential(idToken)
+                        val authCredential = GoogleAccountManager.getAuthCredential(idToken)
                         try {
                             AccountManager.signInWithCredential(
                                 credential = authCredential,
                                 onSignInSucceed = {
+                                    AccountManager.displayName?.let { name ->
+                                        PrefsManager.nickname = name
+                                    }
                                     context.toast("로그인 성공")
                                 },
                                 onSigInFailed = {
@@ -117,6 +119,6 @@ fun GoogleLoginModule(context: Context) {
         snsImage = painterResource(id = R.drawable.ic_launcher_foreground),
         text = stringResource(id = R.string.account_google_login)
     ) {
-        googleAccountManager.login(launcher)
+        GoogleAccountManager.login(activity = context as CreateAccountActivity, launcher = launcher)
     }
 }

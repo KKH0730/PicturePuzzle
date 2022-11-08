@@ -1,8 +1,10 @@
 package com.seno.game
 
 import android.app.Application
+import android.content.ContextWrapper
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
+import com.pixplicity.easyprefs.library.Prefs
 import dagger.hilt.android.HiltAndroidApp
 import org.opencv.android.OpenCVLoader
 import timber.log.Timber
@@ -20,13 +22,19 @@ class App : Application() {
         super.onCreate()
         instance = this
 
-        FacebookSdk.sdkInitialize(applicationContext)
         Timber.plant(Timber.DebugTree())
+
+        Prefs.Builder()
+            .setContext(this)
+            .setMode(ContextWrapper.MODE_PRIVATE)
+            .setPrefsName(packageName)
+            .setUseDefaultSharedPreference(true)
+            .build()
+
 
         OpenCVLoader.initDebug()
         if (!BuildConfig.DEBUG) {
             AppEventsLogger.activateApp(application = getInstance())
         }
     }
-
 }

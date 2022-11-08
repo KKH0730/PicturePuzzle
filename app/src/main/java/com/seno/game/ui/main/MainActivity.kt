@@ -46,8 +46,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         printHashKey()
 
-        Timber.e("kkh displayName : ${AccountManager.currentUser?.displayName}")
-
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
             SplashActivity.start(context = this@MainActivity)
             finish()

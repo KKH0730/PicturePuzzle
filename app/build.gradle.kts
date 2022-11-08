@@ -123,6 +123,9 @@ dependencies {
     // Timber
     implementation(Dependency.Timber.TIMBER)
 
+    // Libs
+    implementation(Dependency.Libs.EASY_PREFS)
+
     // TEST
     testImplementation(Dependency.Test.JUNIT)
     androidTestImplementation(Dependency.AndroidTest.TEST_RUNNER)

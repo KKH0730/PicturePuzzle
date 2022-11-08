@@ -1,6 +1,7 @@
 package com.seno.game.ui.splash
 
 import android.annotation.SuppressLint
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -23,9 +24,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.seno.game.R
 import com.seno.game.extensions.startActivity
+import com.seno.game.manager.AccountManager
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.MainActivity
 import timber.log.Timber
+import kotlin.random.Random
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -33,6 +37,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         hideNavigationBar()
+        createRandomNickname()
 
         setContent {
             AppTheme {
@@ -60,6 +65,17 @@ class SplashActivity : AppCompatActivity() {
             // a general rule, you should design your app to hide the status bar whenever you
             // hide the navigation bar.
             systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
+    }
+
+    private fun createRandomNickname() {
+        val random = java.util.Random()
+        val adjectiveList = resources.getStringArray(R.array.adjective)
+        val nounList = resources.getStringArray(R.array.noun)
+
+        if (PrefsManager.nickname.isEmpty() && AccountManager.isUser) {
+            PrefsManager.nickname =
+                "${adjectiveList[random.nextInt(adjectiveList.size - 1)]} ${nounList[random.nextInt(nounList.size - 1)]}"
         }
     }
 

@@ -10,7 +10,7 @@ import com.seno.game.R
 
 object BlueRippleTheme : RippleTheme {
     @Composable
-    override fun defaultColor(): Color = colorResource(id = R.color.color_bbd0ff)
+    override fun defaultColor(): Color = colorResource(id = R.color.color_4DBBD0FF)
 
     @Composable
     override fun rippleAlpha(): RippleAlpha = RippleTheme.defaultRippleAlpha(

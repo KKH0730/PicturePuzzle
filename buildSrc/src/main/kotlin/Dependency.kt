@@ -95,6 +95,10 @@ object Dependency {
         const val TIMBER = "com.jakewharton.timber:timber:5.0.1"
     }
 
+    object Libs {
+        const val EASY_PREFS = "com.pixplicity.easyprefs:EasyPrefs:1.10.0"
+    }
+
     object Test {
         const val JUNIT = "junit:junit:4.13.2"
     }

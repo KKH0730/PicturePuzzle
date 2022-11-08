@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.MusicPlayUtil
 
 
@@ -33,7 +35,7 @@ fun ProfileContainer(onClick: () -> Unit) {
             contentDescription = null
         )
         Text(
-            text = "닉네임",
+            text = "${PrefsManager.nickname} ${stringResource(id = R.string.guest2)}",
             color = colorResource(id = R.color.color_fbf8cc),
             fontSize = 14.textDp
         )

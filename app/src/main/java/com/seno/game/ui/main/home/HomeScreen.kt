@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -35,7 +36,6 @@ import com.seno.game.util.MusicPlayUtil
 fun HomeScreen() {
     val context = LocalContext.current
     val homeViewModel = hiltViewModel<HomeViewModel>()
-    var isUser by remember { mutableStateOf(false) }
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
 
@@ -51,7 +51,6 @@ fun HomeScreen() {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-                isUser = AccountManager.currentUser != null
                 MusicPlayUtil.restart()
             }
             Lifecycle.Event.ON_PAUSE -> {
@@ -80,73 +79,81 @@ fun HomeScreen() {
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(id = R.color.color_e7c6ff))
-            .pointerInteropFilter {
-                when (it.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        if(Build.VERSION.SDK_INT >= 26) {
-                            vibrator.vibrate(VibrationEffect.createOneShot(50, 50))
-                        } else {    //26보다 낮으면
-                            vibrator.vibrate(50)
-                        }
-                    }
-                    MotionEvent.ACTION_MOVE -> {}
-                    MotionEvent.ACTION_UP -> {}
-                    else ->  false
-                }
-                true
-            }
-    ) {
-        Spacer(modifier = Modifier.height(14.dp))
-        Row() {
-            ProfileContainer(onClick = {
-                context.startActivity(SignGateActivity::class.java)
-                (context as MainActivity).overridePendingTransition(
-                    R.anim.slide_right_enter,
-                    R.anim.slide_right_exit
-                )
-            })
-            Spacer(modifier = Modifier.weight(weight = 1f))
-            HomeQuickMenuContainer(
-                onToggledSound = {
-                    val isPlaying = MusicPlayUtil.isPlaying
-                    if (isPlaying == null || !isPlaying) {
-                        MusicPlayUtil.restart()
-                    } else {
-                        MusicPlayUtil.pause()
-                    }
-                },
-                onClickSetting = {  isShowSettingDialog = true }
-            )
-            Spacer(modifier = Modifier.width(width = 6.dp))
-        }
-        Spacer(modifier = Modifier.height(height = 92.dp))
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.ic_splash),
+            painter = painterResource(id = R.drawable.ic_home_background),
             contentDescription = null,
-            modifier = Modifier
-                .width(width = 216.dp)
-                .aspectRatio(ratio = 2.37f)
-                .align(Alignment.CenterHorizontally)
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
-        Spacer(modifier = Modifier.weight(weight = 1f))
-        GamePlayContainer(
-            onClickSoloPlay = {
-                context.startActivity(DiffPictureGameActivity::class.java)
-                (context as MainActivity).overridePendingTransition(
-                    R.anim.slide_right_enter,
-                    R.anim.slide_right_exit
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+//            .pointerInteropFilter {
+//                when (it.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        if(Build.VERSION.SDK_INT >= 26) {
+//                            vibrator.vibrate(VibrationEffect.createOneShot(50, 50))
+//                        } else {    //26보다 낮으면
+//                            vibrator.vibrate(50)
+//                        }
+//                    }
+//                    MotionEvent.ACTION_MOVE -> {}
+//                    MotionEvent.ACTION_UP -> {}
+//                    else ->  false
+//                }
+//                true
+//            }
+        ) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Row() {
+                ProfileContainer(onClick = {
+                    context.startActivity(SignGateActivity::class.java)
+                    (context as MainActivity).overridePendingTransition(
+                        R.anim.slide_right_enter,
+                        R.anim.slide_right_exit
+                    )
+                })
+                Spacer(modifier = Modifier.weight(weight = 1f))
+                HomeQuickMenuContainer(
+                    onToggledSound = {
+                        val isPlaying = MusicPlayUtil.isPlaying
+                        if (isPlaying == null || !isPlaying) {
+                            MusicPlayUtil.restart()
+                        } else {
+                            MusicPlayUtil.pause()
+                        }
+                    },
+                    onClickSetting = {  isShowSettingDialog = true }
                 )
-            },
-            onClickMultiPlay = {},
-            onClickQuit = { isShowQuitDialog = true },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        Spacer(modifier = Modifier.height(height = 56.dp))
+                Spacer(modifier = Modifier.width(width = 6.dp))
+            }
+            Spacer(modifier = Modifier.height(height = 92.dp))
+            Image(
+                painter = painterResource(id = R.drawable.ic_splash),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(width = 216.dp)
+                    .aspectRatio(ratio = 2.37f)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            GamePlayContainer(
+                onClickSoloPlay = {
+                    context.startActivity(DiffPictureGameActivity::class.java)
+                    (context as MainActivity).overridePendingTransition(
+                        R.anim.slide_right_enter,
+                        R.anim.slide_right_exit
+                    )
+                },
+                onClickMultiPlay = {},
+                onClickQuit = { isShowQuitDialog = true },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(height = 56.dp))
+        }
     }
+}
 
 //    Column(Modifier.fillMaxSize()) {
 //        Text(text = if (isUser) {
@@ -230,9 +237,3 @@ fun HomeScreen() {
 //            Text(text = "방 찾기")
 //        }
 //    }
-}
-
-@Composable
-fun DialogContainer() {
-
-}

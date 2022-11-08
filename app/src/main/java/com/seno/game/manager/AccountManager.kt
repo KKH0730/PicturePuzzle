@@ -24,6 +24,9 @@ object AccountManager {
     val isSignedOut: Boolean
         get() = currentUser == null
 
+    val isUser: Boolean
+        get() = currentUser == null
+
     fun signInWithCredential(
         credential: AuthCredential,
         onSignInSucceed: () -> Unit,

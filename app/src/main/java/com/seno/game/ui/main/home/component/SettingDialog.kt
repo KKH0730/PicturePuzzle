@@ -208,9 +208,9 @@ fun NotificationPanel(
                     checked = isSwitchChecked,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                        checkedTrackColor = colorResource(id = R.color.color_80bbd0ff),
-//                        uncheckedThumbColor = Color.Blue,
-//                        uncheckedTrackColor = Color.Red,
+                        checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
+                        uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                        uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
                     ),
                     onCheckedChange = {
                         isSwitchChecked = it

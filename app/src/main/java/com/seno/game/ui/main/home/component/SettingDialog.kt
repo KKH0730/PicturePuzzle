@@ -32,7 +32,7 @@ fun SettingDialog(
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
-    onDismissed: () -> Unit
+    onDismissed: () -> Unit,
 ) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         Dialog(onDismissRequest = onDismissed) {
@@ -66,6 +66,7 @@ fun SettingDialog(
                         onClickManageProfile = onClickManageProfile,
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                     )
+                    Spacer(modifier = Modifier.height(height = 25.dp))
                 }
             }
         }
@@ -74,7 +75,7 @@ fun SettingDialog(
 
 @Composable
 fun DialogTitle(
-    onClickClose: () -> Unit
+    onClickClose: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -106,7 +107,7 @@ fun DialogTitle(
 fun SoundControlPanel(
     onValueChangeBackgroundSoundSlider: (Float) -> Unit,
     onValueChangeEffectSoundSlider: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(0.83f)
@@ -126,16 +127,19 @@ fun SoundControlPanel(
         Spacer(modifier = Modifier.height(height = 13.5.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_background),
+            isBackgroundSlider = true,
             onValueChangeFinished = onValueChangeBackgroundSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_effect),
+            isBackgroundSlider = false,
             onValueChangeFinished = onValueChangeEffectSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_vibration),
+            isBackgroundSlider = false,
             onValueChangeFinished = {
 
             }
@@ -146,10 +150,19 @@ fun SoundControlPanel(
 @Composable
 fun SliderUnit(
     text: String,
+    isBackgroundSlider: Boolean,
     onValueChangeFinished: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    var sliderPosition by remember { mutableStateOf(0.5f) }
+    var sliderPosition by remember {
+        mutableStateOf(
+            if (isBackgroundSlider) {
+                PrefsManager.backgroundVolume
+            } else {
+                PrefsManager.effectVolume
+            }
+        )
+    }
 
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
@@ -184,7 +197,7 @@ fun SliderUnit(
 @Composable
 fun NotificationPanel(
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isSwitchChecked by remember { mutableStateOf(false) }
 
@@ -238,7 +251,7 @@ fun AccountPanel(
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -273,13 +286,12 @@ fun AccountPanel(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Spacer(modifier = Modifier.height(height = 15.dp))
+        Spacer(modifier = Modifier.height(height = 11.dp))
         AccountButtonContainer(
             onClickLogin = onClickLogin,
             onClickLogout = onClickLogout,
             onClickManageProfile = onClickManageProfile
         )
-        Spacer(modifier = Modifier.height(height = 15.dp))
     }
 }
 
@@ -287,7 +299,7 @@ fun AccountPanel(
 fun AccountButtonContainer(
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
-    onClickManageProfile: () -> Unit
+    onClickManageProfile: () -> Unit,
 ) {
     if (AccountManager.isSignedIn) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -339,7 +351,7 @@ fun AccountButtonContainer(
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
                 Text(
-                    text =    stringResource(id = R.string.home_setting_account_login),
+                    text = stringResource(id = R.string.home_setting_account_login),
                     color = Color.White,
                     fontSize = 16.textDp,
                     modifier = Modifier.align(alignment = Alignment.Center)

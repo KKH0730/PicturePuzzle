@@ -97,10 +97,12 @@ fun HomeScreen() {
         SettingDialog(
             onClickClose = { isShowSettingDialog = false },
             onValueChangeBackgroundSoundSlider = {
+                PrefsManager.backgroundVolume = it
                 MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = true)
             },
             onValueChangeEffectSoundSlider = {
-
+                PrefsManager.effectVolume = it
+                MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = false)
             },
             onClickLogin = { context.startActivity(CreateAccountActivity::class.java) },
             onClickLogout = {

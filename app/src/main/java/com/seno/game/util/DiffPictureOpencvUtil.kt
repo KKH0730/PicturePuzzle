@@ -6,7 +6,7 @@ import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import timber.log.Timber
-const val RADIUS_CORRECTION = 20
+const val RADIUS_CORRECTION = 50
 
 class DiffPictureOpencvUtil {
 
@@ -128,13 +128,13 @@ class DiffPictureOpencvUtil {
                     srcHeight = src.height().toFloat(),
                     centerX = centerX.toFloat(),
                     centerY = centerY.toFloat(),
-                    answerRadius = (rect.height.coerceAtLeast(rect.width) + RADIUS_CORRECTION).toFloat()
+                    answerRadius = ((rect.width.coerceAtLeast(rect.height) / 2) + RADIUS_CORRECTION).toFloat()
                 ))
 
                 Imgproc.circle(
                     src,
                     Point(centerX, centerY),
-                    rect.height.coerceAtLeast(rect.width) + RADIUS_CORRECTION,
+                    (rect.width.coerceAtLeast(rect.height) / 2) + RADIUS_CORRECTION,
                     RED,
                     10
                 )

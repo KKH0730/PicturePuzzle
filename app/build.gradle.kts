@@ -68,13 +68,13 @@ android {
 dependencies {
     implementation(project(":opencv"))
 
-    //AndroidX
+    // AndroidX
     implementation(Dependency.AndroidX.APP_COMPAT)
     implementation(Dependency.AndroidX.MATERIAL)
     implementation(Dependency.AndroidX.CONSTRAINT_LAYOUT)
     implementation(Dependency.AndroidX.RECYCLERVIEW)
 
-    //KTX
+    // KTX
     implementation(Dependency.KTX.CORE)
 
     // Compose
@@ -89,9 +89,6 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     debugImplementation(Dependency.Compose.UI_TOOLING)
 
     // Firebase
@@ -102,7 +99,10 @@ dependencies {
     implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
     implementation(Dependency.Firebase.FIREBASE_MESSAGING)
     implementation(Dependency.Firebase.FIREBASE_STORAGE)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.3")
+
+    // Jetbrains
+    implementation(Dependency.JETBRAINS.COROUTINE_ANDROID)
+    implementation(Dependency.JETBRAINS.COROUTINE_PLAY_SERVICE)
 
     // Accompanist
     implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
@@ -123,8 +123,10 @@ dependencies {
     // Timber
     implementation(Dependency.Timber.TIMBER)
 
-    // Libs
-    implementation(Dependency.Libs.EASY_PREFS)
+    // Etc
+    implementation(Dependency.Etc.EASY_PREFS)
+    implementation(Dependency.Etc.QR)
+    implementation(Dependency.Etc.LOTTIE)
 
     // TEST
     testImplementation(Dependency.Test.JUNIT)
@@ -135,9 +137,4 @@ dependencies {
     implementation(Dependency.Hilt.ANDROID)
     kapt(Dependency.Hilt.COMPILER)
     testImplementation(Dependency.Hilt.TESTING)
-
-    implementation("com.journeyapps:zxing-android-embedded:3.6.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1")
 }

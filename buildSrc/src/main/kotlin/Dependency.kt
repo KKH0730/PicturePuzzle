@@ -20,6 +20,11 @@ object Dependency {
         const val RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.2.1"
     }
 
+    object JETBRAINS {
+        const val COROUTINE_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+        const val COROUTINE_PLAY_SERVICE = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1"
+    }
+
     object KTX {
         const val CORE = "androidx.core:core-ktx:1.7.0"
     }
@@ -95,8 +100,10 @@ object Dependency {
         const val TIMBER = "com.jakewharton.timber:timber:5.0.1"
     }
 
-    object Libs {
+    object Etc {
         const val EASY_PREFS = "com.pixplicity.easyprefs:EasyPrefs:1.10.0"
+        const val QR = "com.journeyapps:zxing-android-embedded:3.6.0"
+        const val LOTTIE = "com.airbnb.android:lottie:3.6.0"
     }
 
     object Test {

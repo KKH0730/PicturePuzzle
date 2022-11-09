@@ -15,16 +15,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieAnimationView
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureGameBinding
 import com.seno.game.extensions.bitmapFrom
-import com.seno.game.extensions.drawAnswerCircle
+import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.screenWidth
 import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.model.Setting
 import com.seno.game.util.DiffPictureOpencvUtil
+import com.seno.game.util.RADIUS_CORRECTION
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -33,7 +36,7 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-const val ANSWER_CORRECTION = 20
+const val ANSWER_CORRECTION = 0
 
 @AndroidEntryPoint
 class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
@@ -82,6 +85,18 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             setImageTouchListener()
             observeFlow()
         }
+    }
+
+    override fun onDestroy() {
+        binding.clAnswerMark.children.forEach {
+            if (it is LottieAnimationView) {
+                if (it.isAnimating) {
+                    it.cancelAnimation()
+                }
+                it.removeAllAnimatorListeners()
+            }
+        }
+        super.onDestroy()
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -147,19 +162,27 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
             if (distance <= point.answerRadius + ANSWER_CORRECTION) {
                 if (setting.answerHashMap[centerX] == null || setting.answerHashMap[centerX] != centerY) {
-                    val ivCircle1 =
-                        (this@DiffPictureGameActivity).drawAnswerCircle(point.answerRadius).apply {
-                            this.x = binding.ivOrigin.x + centerX - (point.answerRadius / 2)
-                            this.y = binding.ivOrigin.y + centerY - (point.answerRadius / 2)
-                        }
+                    (this@DiffPictureGameActivity).drawLottieAnswerCircle(
+                        x = binding.ivOrigin.x + centerX - (point.answerRadius / 2),
+                        y = binding.ivOrigin.y + centerY - (point.answerRadius / 2),
+                        speed = 2f,
+                        maxProgress = 0.35f,
+                        radius = point.answerRadius.toInt()
+                    ).also {
+                        it.playAnimation()
+                        binding.clAnswerMark.addView(it)
+                    }
 
-                    val ivCircle2 =
-                        (this@DiffPictureGameActivity).drawAnswerCircle(point.answerRadius).apply {
-                            this.x = binding.ivCopy.x + centerX - (point.answerRadius / 2)
-                            this.y = binding.ivCopy.y + centerY - (point.answerRadius / 2)
-                        }
-                    binding.clAnswerMark.addView(ivCircle1)
-                    binding.clAnswerMark.addView(ivCircle2)
+                    (this@DiffPictureGameActivity).drawLottieAnswerCircle(
+                        x = binding.ivCopy.x + centerX - (point.answerRadius / 2),
+                        y = binding.ivCopy.y + centerY - (point.answerRadius / 2),
+                        speed = 2f,
+                        maxProgress = 0.35f,
+                        radius = point.answerRadius.toInt()
+                    ).also {
+                        it.playAnimation()
+                        binding.clAnswerMark.addView(it)
+                    }
 
                     setting.apply {
                         answerHashMap[centerX] = centerY

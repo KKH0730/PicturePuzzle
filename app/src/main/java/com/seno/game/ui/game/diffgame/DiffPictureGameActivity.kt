@@ -49,8 +49,8 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
     private val fitXYHeightCorrection: Float
         get() {
-            val originWidth = 1280f
-            val originHeight = 800f
+            val originWidth = binding.ivOrigin.drawable.intrinsicWidth.toFloat()
+            val originHeight = binding.ivOrigin.drawable.intrinsicHeight.toFloat()
             return if (originHeight == binding.ivOrigin.height.toFloat()) {
                 1f
             } else  {

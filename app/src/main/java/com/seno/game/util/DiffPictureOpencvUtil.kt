@@ -120,6 +120,10 @@ class DiffPictureOpencvUtil {
                 val centerY = (rect.y + (rect.height / 2)).toDouble()
 
                 pointList.add(com.seno.game.ui.game.diffgame.model.Point(
+                    rectX = rect.x.toFloat(),
+                    rectY = rect.y.toFloat(),
+                    rectWidth = rect.width.toFloat(),
+                    rectHeight = rect.height.toFloat(),
                     srcWidth = src.width().toFloat(),
                     srcHeight = src.height().toFloat(),
                     centerX = centerX.toFloat(),
@@ -133,6 +137,15 @@ class DiffPictureOpencvUtil {
                     rect.height.coerceAtLeast(rect.width) + RADIUS_CORRECTION,
                     RED,
                     10
+                )
+
+                Imgproc.rectangle(
+                    src,
+                    Point(rect.x.toDouble(), rect.y.toDouble()),
+                    Point((rect.x + rect.width).toDouble(), (rect.y + rect.height).toDouble()),
+                    RED,
+                    10,
+                    1
                 )
             }
             Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2BGR)

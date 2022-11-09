@@ -1,28 +1,17 @@
 package com.seno.game.ui.splash
 
 import android.annotation.SuppressLint
-import android.app.TaskStackBuilder
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
@@ -30,8 +19,6 @@ import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.MainActivity
-import timber.log.Timber
-import kotlin.random.Random
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {

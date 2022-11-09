@@ -21,6 +21,7 @@ import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureGameBinding
 import com.seno.game.extensions.bitmapFrom
 import com.seno.game.extensions.drawAnswerCircle
+import com.seno.game.extensions.screenWidth
 import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.model.Setting
 import com.seno.game.util.DiffPictureOpencvUtil
@@ -45,6 +46,19 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
     private val copyIntrinsicHeight: Int
         get() = binding.ivCopy.drawable.intrinsicHeight
+
+    private val fitXYHeightCorrection: Float
+        get() {
+            val originWidth = 1280f
+            val originHeight = 800f
+            return if (originHeight == binding.ivOrigin.height.toFloat()) {
+                1f
+            } else  {
+                val stretchedHeight = (originWidth * binding.ivOrigin.height.toFloat()) / screenWidth.toFloat()
+                val correction = stretchedHeight / originHeight
+                correction
+            }
+        }
     private lateinit var setting: Setting
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +69,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         }
 
         binding.cvPrepareView.setContent {
-            var prepareVisible by remember { mutableStateOf(true) }
+            var prepareVisible by remember { mutableStateOf(false) }
 
             AnimatedVisibility(
                 visible = prepareVisible,
@@ -117,30 +131,14 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         currentY: Float,
     ) {
         // 이미지의 길이가 긴쪽을 채우고 짧은 쪽의 리사이즈 된 길이를 구함
-        val resizedLength = if (copyIntrinsicWidth < copyIntrinsicHeight) {
-            (copyIntrinsicWidth.toFloat() * binding.ivOrigin.height.toFloat()) / copyIntrinsicHeight.toFloat()
-        } else {
-            (copyIntrinsicHeight.toFloat() * binding.ivOrigin.width.toFloat()) / copyIntrinsicWidth.toFloat()
-        }
+        val resizedLength = ((copyIntrinsicHeight.toFloat() * fitXYHeightCorrection) * binding.ivOrigin.width.toFloat()) / copyIntrinsicWidth.toFloat()
+
         // 이미지 뷰의 width 혹은 height 와 리사이즈된 실제 이미지의 width 혹은 height 의 차이
-        val diff = if (copyIntrinsicWidth < copyIntrinsicHeight) {
-            abs(binding.ivOrigin.width.toFloat() - resizedLength)
-        } else {
-            abs(binding.ivOrigin.height.toFloat() - resizedLength)
-        }
+        val diff = abs(binding.ivOrigin.height.toFloat() - resizedLength)
 
         setting.answer?.answerPointList?.forEachIndexed { index, point ->
-            val centerX = if (copyIntrinsicWidth < copyIntrinsicHeight) {
-                (diff / 2f) + (resizedLength * point.centerX / point.srcWidth)
-            } else {
-                (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
-            }
-
-            val centerY = if (copyIntrinsicWidth < copyIntrinsicHeight) {
-                (binding.ivOrigin.height.toFloat() * point.centerY / point.srcHeight)
-            } else {
-                (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
-            }
+            val centerX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
+            val centerY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
             // 두 점 사이의 거리를 구함
             val xLength = (currentX - centerX).toDouble().pow(2.0)
@@ -201,7 +199,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
                         setting.answer = opencvUtil.drawCircle(
                             srcBitmap = getDrawable(setting.imageList[new].first)?.toBitmap(),
-                            copyBitmap =  getDrawable(setting.imageList[new].second)?.toBitmap()
+                            copyBitmap = getDrawable(setting.imageList[new].second)?.toBitmap()
                         )
                     }, 1000)
                 }
@@ -230,9 +228,16 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
     }
 
     fun onClickResult() {
-        binding.clAnswerMark.visibility = View.INVISIBLE
-        binding.ivCopy.visibility = View.INVISIBLE
-        binding.ivResult.visibility = View.VISIBLE
-        binding.ivResult.setImageBitmap(setting.answer?.answerMat.bitmapFrom())
+        if (binding.ivResult.visibility == View.VISIBLE) {
+            binding.clAnswerMark.visibility = View.VISIBLE
+            binding.ivCopy.visibility = View.VISIBLE
+            binding.ivResult.visibility = View.INVISIBLE
+            binding.ivResult.setImageBitmap(null)
+        } else {
+            binding.clAnswerMark.visibility = View.INVISIBLE
+            binding.ivCopy.visibility = View.INVISIBLE
+            binding.ivResult.visibility = View.VISIBLE
+            binding.ivResult.setImageBitmap(setting.answer?.answerMat.bitmapFrom())
+        }
     }
 }

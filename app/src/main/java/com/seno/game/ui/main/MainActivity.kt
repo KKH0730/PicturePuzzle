@@ -1,7 +1,6 @@
 package com.seno.game.ui.main
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -10,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -18,8 +16,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.google.firebase.auth.FirebaseAuth
@@ -27,7 +23,6 @@ import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
-import com.seno.game.manager.AccountManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeDummyScreen

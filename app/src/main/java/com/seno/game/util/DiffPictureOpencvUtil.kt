@@ -128,7 +128,7 @@ class DiffPictureOpencvUtil {
                     srcHeight = src.height().toFloat(),
                     centerX = centerX.toFloat(),
                     centerY = centerY.toFloat(),
-                    answerRadius = ((rect.width.coerceAtLeast(rect.height) / 2) + RADIUS_CORRECTION).toFloat()
+                    answerRadius = (rect.width.coerceAtLeast(rect.height) / 2).toFloat()
                 ))
 
                 Imgproc.circle(

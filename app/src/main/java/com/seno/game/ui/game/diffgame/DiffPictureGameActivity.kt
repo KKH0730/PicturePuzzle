@@ -36,7 +36,7 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-const val ANSWER_CORRECTION = 0
+const val ANSWER_CORRECTION = 20
 
 @AndroidEntryPoint
 class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
@@ -160,7 +160,8 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             val yLength = (currentY - centerY).toDouble().pow(2.0)
             val distance = sqrt(xLength + yLength)
 
-            if (distance <= point.answerRadius + ANSWER_CORRECTION) {
+            //Todo(point.answerRadius / 2 << 검증 필요)
+            if (distance <= (point.answerRadius / 2) + ANSWER_CORRECTION) {
                 if (setting.answerHashMap[centerX] == null || setting.answerHashMap[centerX] != centerY) {
                     (this@DiffPictureGameActivity).drawLottieAnswerCircle(
                         x = binding.ivOrigin.x + centerX - (point.answerRadius / 2),

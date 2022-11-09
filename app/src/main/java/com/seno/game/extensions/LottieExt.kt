@@ -23,7 +23,7 @@ fun Context.drawLottieAnswerCircle(
         this.setAnimation(R.raw.lt_circle_mark)
         this.setMaxProgress(maxProgress)
         this.speed = speed
-        layoutParams = LinearLayout.LayoutParams(radius, radius)
+        this.layoutParams = LinearLayout.LayoutParams(radius, radius)
         this.addAnimatorListener(object: Animator.AnimatorListener {
             override fun onAnimationCancel(animator: Animator?) { onAnimationCancel.invoke(animator) }
             override fun onAnimationRepeat(animator: Animator?) { onAnimationRepeat.invoke(animator) }

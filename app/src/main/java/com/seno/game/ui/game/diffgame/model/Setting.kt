@@ -1,14 +1,14 @@
 package com.seno.game.ui.game.diffgame.model
 
+import androidx.lifecycle.LifecycleObserver
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.opencv.core.Mat
 
 data class Setting(
     var imageList: ArrayList<Pair<Int, Int>> = ArrayList(),
     var answer: Answer? = null,
     var totalRound: Int = 2,
     val answerHashMap: HashMap<Float, Float> = HashMap(),
-) {
+): LifecycleObserver {
     var score = 0
     var currentAnswerCount = 0
         set(value) {

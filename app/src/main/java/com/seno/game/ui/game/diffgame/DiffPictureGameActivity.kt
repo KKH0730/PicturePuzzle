@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -27,7 +28,6 @@ import com.seno.game.extensions.screenWidth
 import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.model.Setting
 import com.seno.game.util.DiffPictureOpencvUtil
-import com.seno.game.util.RADIUS_CORRECTION
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -107,7 +107,6 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
             resource1 = imageList[0].first,
             resource2 = imageList[0].second
         )
-
         setting = Setting(
             answer = opencvUtil.drawCircle(
                 srcBitmap = getDrawable(imageList[0].first)?.toBitmap(),
@@ -116,32 +115,39 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
         ).apply {
             this.imageList = imageList
         }
+
+        lifecycle.addObserver(setting)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setImageTouchListener() {
-        binding.ivOrigin.setOnTouchListener { _, event ->
+        binding.ivOrigin.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 drawAnswerCircle(
+                    v = v as ImageView,
                     currentX = event.x,
-                    currentY = event.y
+                    currentY = event.y,
                 )
             }
             false
         }
 
-        binding.ivCopy.setOnTouchListener { _, event ->
+        binding.ivCopy.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 drawAnswerCircle(
+                    v = v as ImageView,
                     currentX = event.x,
-                    currentY = event.y
+                    currentY = event.y,
                 )
             }
             false
         }
     }
 
+
+
     private fun drawAnswerCircle(
+        v: ImageView,
         currentX: Float,
         currentY: Float,
     ) {
@@ -150,60 +156,86 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
         // 이미지 뷰의 width 혹은 height 와 리사이즈된 실제 이미지의 width 혹은 height 의 차이
         val diff = abs(binding.ivOrigin.height.toFloat() - resizedLength)
+        var isFindAnswer = false
+        run {
+            setting.answer?.answerPointList?.forEachIndexed { index, point ->
+                val centerX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
+                val centerY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
-        setting.answer?.answerPointList?.forEachIndexed { index, point ->
-            val centerX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
-            val centerY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
+                // 두 점 사이의 거리를 구함
+                val xLength = (currentX - centerX).toDouble().pow(2.0)
+                val yLength = (currentY - centerY).toDouble().pow(2.0)
+                val distance = sqrt(xLength + yLength)
 
-            // 두 점 사이의 거리를 구함
-            val xLength = (currentX - centerX).toDouble().pow(2.0)
-            val yLength = (currentY - centerY).toDouble().pow(2.0)
-            val distance = sqrt(xLength + yLength)
+                val isWrongAnswer = distance <= (point.answerRadius / 2) + ANSWER_CORRECTION
 
-            //Todo(point.answerRadius / 2 << 검증 필요)
-            if (distance <= (point.answerRadius / 2) + ANSWER_CORRECTION) {
-                if (setting.answerHashMap[centerX] == null || setting.answerHashMap[centerX] != centerY) {
-                    (this@DiffPictureGameActivity).drawLottieAnswerCircle(
-                        x = binding.ivOrigin.x + centerX - (point.answerRadius / 2),
-                        y = binding.ivOrigin.y + centerY - (point.answerRadius / 2),
-                        speed = 2f,
-                        maxProgress = 0.35f,
-                        radius = point.answerRadius.toInt()
-                    ).also {
-                        it.playAnimation()
-                        binding.clAnswerMark.addView(it)
+                //Todo(point.answerRadius / 2 << 검증 필요)
+                if (isWrongAnswer) {
+                    isFindAnswer = true
+                    if (setting.answerHashMap[centerX] == null || setting.answerHashMap[centerX] != centerY) {
+                        (this@DiffPictureGameActivity).drawLottieAnswerCircle(
+                            x = binding.ivOrigin.x + centerX - (point.answerRadius / 2),
+                            y = binding.ivOrigin.y + centerY - (point.answerRadius / 2),
+                            rawRes = R.raw.right_answer_mark,
+                            speed = 2f,
+                            maxProgress = 1f,
+                            radius = point.answerRadius.toInt()
+                        ).also {
+                            it.playAnimation()
+                            binding.clAnswerMark.addView(it)
+                        }
+
+                        (this@DiffPictureGameActivity).drawLottieAnswerCircle(
+                            x = binding.ivCopy.x + centerX - (point.answerRadius / 2),
+                            y = binding.ivCopy.y + centerY - (point.answerRadius / 2),
+                            rawRes = R.raw.right_answer_mark,
+                            speed = 2f,
+                            maxProgress = 1f,
+                            radius = point.answerRadius.toInt()
+                        ).also {
+                            it.playAnimation()
+                            binding.clAnswerMark.addView(it)
+                        }
+
+                        setting.apply {
+                            answerHashMap[centerX] = centerY
+                            currentAnswerCount += 1
+                            binding.tvTotalAnswerCount.text = String.format(getString(R.string.diff_total_answer_count), score.toString())
+                        }
+                    } else {
+                        Timber.e("kkh 22")
                     }
-
-                    (this@DiffPictureGameActivity).drawLottieAnswerCircle(
-                        x = binding.ivCopy.x + centerX - (point.answerRadius / 2),
-                        y = binding.ivCopy.y + centerY - (point.answerRadius / 2),
-                        speed = 2f,
-                        maxProgress = 0.35f,
-                        radius = point.answerRadius.toInt()
-                    ).also {
-                        it.playAnimation()
-                        binding.clAnswerMark.addView(it)
-                    }
-
-                    setting.apply {
-                        answerHashMap[centerX] = centerY
-                        currentAnswerCount += 1
-                        binding.tvTotalAnswerCount.text = String.format(
-                            getString(R.string.diff_total_answer_count), score.toString()
-                        )
-                    }
-                    return
-                }
-            } else {
-                if (index == setting.answer?.answerPointList?.size?.minus(1)) {
-                    setting.score -= 1
-                    binding.tvTotalAnswerCount.text = String.format(
-                        getString(R.string.diff_total_answer_count), setting.score.toString()
-                    )
+                    return@run
+                } else {
+//                    if (index == setting.answer?.answerPointList?.size?.minus(1)) {
+//                        setting.score -= 1
+//                        binding.tvTotalAnswerCount.text = String.format(
+//                            getString(R.string.diff_total_answer_count), setting.score.toString()
+//                        )
+//                    }
                 }
             }
         }
+
+        if (!isFindAnswer) {
+            var lottieAnimationView: LottieAnimationView? = null
+            lottieAnimationView = (this@DiffPictureGameActivity).drawLottieAnswerCircle(
+                x = currentX - 80, // (radius / 2)
+                y = v.y + currentY - 80, // (radius / 2)
+                rawRes = R.raw.wrong_answer_mark,
+                speed = 5f,
+                maxProgress = 0.85f,
+                radius = 160,
+                onAnimationEnd = {
+                    binding.clAnswerMark.removeView(lottieAnimationView)
+                }
+            ).also {
+                it.playAnimation()
+                binding.clAnswerMark.addView(it)
+            }
+        }
     }
+
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun observeFlow() {

@@ -114,6 +114,7 @@ dependencies {
 
     // Google
     implementation(Dependency.Google.PLAY_SERVICE_AUTH)
+    implementation(Dependency.Google.PLAY_SERVICE_ADS)
 
     // Retrofit
     implementation(Dependency.Retrofit.RETROFIT)

@@ -64,7 +64,7 @@ class DiffPictureOpencvUtil {
         return diffMat
     }
 
-    fun drawCircle(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
+    fun getDiffAnswer(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
 
         if (srcBitmap == null || copyBitmap == null) {
             return null

@@ -118,5 +118,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            app:layout_constraintHeight_percent="0.1"
+            app:adSize="BANNER"
+            app:adUnitId="@string/banner_ad_unit_id_for_test"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -70,6 +70,7 @@ object Dependency {
 
     object Google {
         const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
+        const val PLAY_SERVICE_ADS = "com.google.android.gms:play-services-ads:21.3.0"
     }
 
     object Accompanist {

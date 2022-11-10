@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">game</string>
 
+    <!-- AD -->
+    <string name="admob_app_id">ca-app-pub-5813878503406225~5288452366</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5813878503406225/1232877035</string>
+    <string name="reward_ad_unit_id">ca-app-pub-5813878503406225/4218913276</string>
+
+    <string name="banner_ad_unit_id_for_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="reward_ad_unit_id_for_test">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="native_ad_unit_id_for_test">ca-app-pub-3940256099942544/2247696110</string>
+
     <!-- 공통 -->
     <string name="game_start">시작</string>
     <string name="game_prepare">준비</string>

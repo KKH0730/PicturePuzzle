@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ContextWrapper
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
+import com.google.android.gms.ads.MobileAds
 import com.pixplicity.easyprefs.library.Prefs
 import dagger.hilt.android.HiltAndroidApp
 import org.opencv.android.OpenCVLoader
@@ -31,6 +32,7 @@ class App : Application() {
             .setUseDefaultSharedPreference(true)
             .build()
 
+        MobileAds.initialize(this)
 
         OpenCVLoader.initDebug()
         if (!BuildConfig.DEBUG) {

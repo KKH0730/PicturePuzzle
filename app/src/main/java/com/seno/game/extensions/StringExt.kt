@@ -1,20 +1,11 @@
 package com.seno.game.extensions
 
 import android.content.res.Resources
-import android.graphics.Bitmap
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
-import androidx.annotation.StringRes
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.MultiFormatWriter
-import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.seno.game.App
 import com.seno.game.R
-import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.prefs.PrefsManager.nickname
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -36,23 +27,6 @@ fun String.fromHtml(): Spanned {
     }
 }
 
-fun String.createQRCode(): Bitmap? {
-    val hints = Hashtable<EncodeHintType, String>().apply {
-        put(EncodeHintType.CHARACTER_SET, "UTF-8")
-    }
-
-    val multiFormatWriter = MultiFormatWriter()
-
-    return try {
-        val bitMatrix = multiFormatWriter.encode(this@createQRCode, BarcodeFormat.QR_CODE, 1000, 1000, hints)
-        val barcodeEncoder = BarcodeEncoder()
-        val bitmap = barcodeEncoder.createBitmap(bitMatrix)
-        bitmap
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
 
 fun Resources.createRandomNickname(): String {
     val random = Random()

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -24,21 +23,16 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.pixplicity.easyprefs.library.Prefs
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureGameBinding
-import com.seno.game.extensions.bitmapFrom
 import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.screenWidth
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.game.component.GamePrepareView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 const val ANSWER_CORRECTION = 20
 

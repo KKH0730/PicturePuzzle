@@ -6,7 +6,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
-import com.seno.game.R
 
 fun Context.drawLottieAnswerCircle(
     x: Float,

@@ -8,7 +8,6 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.seno.game.R
-import timber.log.Timber
 
 const val LOGIN_FACEBOOK_REQUEST_CODE = 64206
 

@@ -2,7 +2,6 @@ package com.seno.game
 
 import android.app.Application
 import android.content.ContextWrapper
-import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.ads.MobileAds
 import com.pixplicity.easyprefs.library.Prefs

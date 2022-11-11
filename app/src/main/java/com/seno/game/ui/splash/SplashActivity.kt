@@ -2,11 +2,7 @@ package com.seno.game.ui.splash
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -23,7 +19,6 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.MainActivity
 import hideNavigationBar
-import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -51,7 +46,6 @@ class SplashActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun createRandomNickname() {
         if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {

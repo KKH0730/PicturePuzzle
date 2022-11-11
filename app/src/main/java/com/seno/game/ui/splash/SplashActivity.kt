@@ -22,6 +22,7 @@ import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.MainActivity
+import hideNavigationBar
 import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
@@ -29,7 +30,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideNavigationBar()
+        window.hideNavigationBar()
         createRandomNickname()
 
         setContent {
@@ -51,19 +52,6 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun hideNavigationBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-
-            val controller = window.insetsController
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        } else {
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
-        }
-    }
 
     private fun createRandomNickname() {
         if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {

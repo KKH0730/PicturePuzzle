@@ -16,10 +16,7 @@ import androidx.compose.ui.res.stringResource
 import com.google.firebase.auth.FacebookAuthProvider
 import com.seno.game.R
 import com.seno.game.extensions.toast
-import com.seno.game.manager.AccountManager
-import com.seno.game.manager.FacebookAccountManager
-import com.seno.game.manager.GoogleAccountManager
-import com.seno.game.manager.OnSocialSignInCallbackListener
+import com.seno.game.manager.*
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.create_account.component.SnsLoginButton
 import timber.log.Timber
@@ -46,12 +43,12 @@ fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager) {
         facebookAccountManager.login(
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
-                    Timber.e("kkh 11")
                     try {
                         idToken?.let { token ->
                             val credential = FacebookAuthProvider.getCredential(token)
                             AccountManager.signInWithCredential(
                                 credential = credential,
+                                platform = PlatForm.FACEBOOK,
                                 onSignInSucceed = {
                                     AccountManager.displayName?.let { name ->
                                         PrefsManager.nickname = name
@@ -64,12 +61,11 @@ fun FaceBookLoginModule(facebookAccountManager: FacebookAccountManager) {
                             )
                         }
                     } catch (e: Exception) {
-                        Timber.e("kkh 44 : ${e.message}")
+                        Timber.e(e)
                     }
                 }
 
                 override fun onError(e: Exception?) {
-                    Timber.e("kkh onError : ${e?.message}")
                     Timber.e(e)
                 }
             }
@@ -91,10 +87,8 @@ fun GoogleLoginModule(googleAccountManager: GoogleAccountManager) {
                         try {
                             AccountManager.signInWithCredential(
                                 credential = authCredential,
+                                platform = PlatForm.GOOGLE,
                                 onSignInSucceed = {
-                                    AccountManager.displayName?.let { name ->
-                                        PrefsManager.nickname = name
-                                    }
                                     context.toast("로그인 성공")
                                 },
                                 onSigInFailed = {
@@ -108,7 +102,7 @@ fun GoogleLoginModule(googleAccountManager: GoogleAccountManager) {
                     }
 
                     override fun onError(e: Exception?) {
-
+                        Timber.e(e)
                     }
                 }
             )

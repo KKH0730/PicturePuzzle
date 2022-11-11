@@ -24,12 +24,14 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.pixplicity.easyprefs.library.Prefs
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureGameBinding
 import com.seno.game.extensions.bitmapFrom
 import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.screenWidth
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.game.component.GamePrepareView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -117,6 +119,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
         binding.apply {
             activity = this@DiffPictureGameActivity
+            isShowAd = PrefsManager.isShowAD
         }
 
         binding.cvPrepareView.setContent {
@@ -272,9 +275,11 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun loadAD() {
-        // 배너 광고 로드
-        val adRequest = AdRequest.Builder().build()
-        binding.adView.loadAd(adRequest)
+        if (PrefsManager.isShowAD) {
+            // 배너 광고 로드
+            val adRequest = AdRequest.Builder().build()
+            binding.adView.loadAd(adRequest)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

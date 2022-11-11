@@ -2,9 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="activity"
             type="com.seno.game.ui.game.diffgame.DiffPictureGameActivity" />
+
+        <variable
+            name="isShowAd"
+            type="Boolean" />
     </data>
 
 
@@ -124,6 +129,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="5dp"
+            android:visibility="@{isShowAd ? View.VISIBLE : View.GONE}"
             app:layout_constraintHeight_percent="0.1"
             app:adSize="BANNER"
             app:adUnitId="@string/banner_ad_unit_id_for_test"

@@ -24,6 +24,7 @@ import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
+import com.seno.game.manager.AccountManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeDummyScreen
@@ -46,45 +47,37 @@ class MainActivity : AppCompatActivity() {
             SplashActivity.start(context = this@MainActivity)
             finish()
         } else {
-            setContent {
-                AppTheme {
-                    Surface(Modifier.fillMaxSize()) {
-                        HomeDummyScreen()
-                        if (checkNetworkConnectivityForComposable()) {
-                            MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
-                            MainScreen()
-                        } else {
-                            RestartDialog(
-                                title = getString(R.string.network_error_title),
-                                content = getString(R.string.network_error),
-                                confirmText = getString(R.string.alert_dialog_restart),
-                                onClickConfirm = { this@MainActivity.restartApp() }
-                            )
-                        }
+            if (!AccountManager.isUser) {
+                showMainUI()
+            } else {
+                setAuthentication {
+                    if (it) {
+                        showMainUI()
                     }
                 }
             }
         }
-//        setAuthentication {
-//            if (it) {
-//                setContent {
-//                    AppTheme {
-//                        Surface(Modifier.fillMaxSize()) {
-//                            if (checkNetworkConnectivityForComposable()) {
-//                                MainScreen()
-//                            } else {
-//                                RestartDialog(
-//                                    title = getString(R.string.network_error_title),
-//                                    content = getString(R.string.network_error),
-//                                    confirmText = getString(R.string.alert_dialog_restart),
-//                                    onClickConfirm = { this@MainActivity.restartApp() }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
+    }
+
+    private fun showMainUI() {
+        setContent {
+            AppTheme {
+                Surface(Modifier.fillMaxSize()) {
+                    HomeDummyScreen()
+                    if (checkNetworkConnectivityForComposable()) {
+                        MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
+                        MainScreen()
+                    } else {
+                        RestartDialog(
+                            title = getString(R.string.network_error_title),
+                            content = getString(R.string.network_error),
+                            confirmText = getString(R.string.alert_dialog_restart),
+                            onClickConfirm = { this@MainActivity.restartApp() }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroy() {

@@ -13,8 +13,8 @@ import com.seno.game.manager.LOGIN_FACEBOOK_REQUEST_CODE
 import com.seno.game.theme.AppTheme
 
 class CreateAccountActivity : AppCompatActivity() {
-    private val facebookAccountManager = FacebookAccountManager(activity = this@CreateAccountActivity)
-    private val googleAccountManager = GoogleAccountManager(activity = this@CreateAccountActivity)
+    private lateinit var facebookAccountManager: FacebookAccountManager
+    private lateinit var googleAccountManager: GoogleAccountManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +22,9 @@ class CreateAccountActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
+                    facebookAccountManager = FacebookAccountManager(activity = this@CreateAccountActivity)
+                    googleAccountManager = GoogleAccountManager(activity = this@CreateAccountActivity)
+
                     CreateAccountScreen(
                         facebookAccountManager = facebookAccountManager,
                         googleAccountManager = googleAccountManager

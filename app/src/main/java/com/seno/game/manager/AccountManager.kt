@@ -3,15 +3,24 @@ package com.seno.game.manager
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.toast
+import com.seno.game.prefs.PrefsManager
 import timber.log.Timber
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
+
+enum class PlatForm(name: String) {
+    KAKAO(name = "kakao"),
+    GOOGLE(name = "google"),
+    FACEBOOK(name = "facebook"),
+    NAVER(name = "naver")
+}
 
 object AccountManager {
     private var firebaseRequest: FirebaseRequest = FirebaseRequest()
@@ -30,7 +39,7 @@ object AccountManager {
         get() = currentUser == null
 
     val isUser: Boolean
-        get() = currentUser == null
+        get() = currentUser != null
 
     private val authProviderId: String
         get() {
@@ -63,6 +72,7 @@ object AccountManager {
 
     fun signInWithCredential(
         credential: AuthCredential,
+        platform: PlatForm,
         onSignInSucceed: () -> Unit,
         onSigInFailed: () -> Unit,
     ) {
@@ -75,8 +85,47 @@ object AccountManager {
                 if (!it.isSuccessful) {
                     return@addOnCompleteListener
                 }
-                onSignInSucceed.invoke()
+
+                displayName?.let { name ->
+                    PrefsManager.nickname = name
+                }
+
+                saveProfile(
+                    uid = it.result.user?.uid,
+                    platform = platform ,
+                    nickname = PrefsManager.nickname,
+                    onSignInSucceed = onSignInSucceed,
+                    onSigInFailed = onSigInFailed
+                )
             }
+    }
+
+    private fun saveProfile(
+        uid: String?,
+        platform: PlatForm,
+        nickname: String,
+        onSignInSucceed: () -> Unit,
+        onSigInFailed: () -> Unit,
+    ) {
+        uid?.let {
+            val map = HashMap<String, Any>()
+            map["platform"] = platform.name
+            map["nickname"] = nickname
+
+            val db = FirebaseFirestore.getInstance()
+            db.collection("profile")
+                .document(uid)
+                .set(map)
+                .addOnCompleteListener {
+                    if (!it.isSuccessful) {
+                        return@addOnCompleteListener
+                    }
+                    onSignInSucceed.invoke()
+                }.addOnFailureListener { e ->
+                    e.message?.let { message -> App.getInstance().applicationContext.toast(message) }
+                    onSigInFailed.invoke()
+                }
+        } ?: onSigInFailed.invoke()
     }
 
     fun startLogout(
@@ -87,20 +136,23 @@ object AccountManager {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
                 facebookAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                isCompleteLogout.invoke()
+//                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
                     logoutListener = object : GoogleAccountManager.LogoutListener {
                         override fun onSuccessLogout() {
-                            signOutFirebase(isCompleteLogout = isCompleteLogout)
+                            isCompleteLogout.invoke()
+//                            signOutFirebase(isCompleteLogout = isCompleteLogout)
                         }
                     })
             }
 
             override fun onSignOutEmail() {
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                isCompleteLogout.invoke()
+//                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
         })
     }

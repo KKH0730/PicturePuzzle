@@ -19,6 +19,7 @@ import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.MainActivity
+import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -58,7 +59,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun createRandomNickname() {
-        if (PrefsManager.nickname.isEmpty() && AccountManager.isUser) {
+        if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {
             resources.createRandomNickname()
         }
     }

@@ -19,8 +19,6 @@ import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-fun getString(@StringRes res: Int) = App.getInstance().getString(res)
-
 @OptIn(ExperimentalContracts::class)
 fun CharSequence?.isNotNullAndNotEmpty(): Boolean {
     contract {

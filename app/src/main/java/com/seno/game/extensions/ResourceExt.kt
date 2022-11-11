@@ -8,4 +8,4 @@ import com.seno.game.App
 @SuppressLint("UseCompatLoadingForDrawables")
 fun getDrawable(@DrawableRes drawableRes: Int) = App.getInstance().getDrawable(drawableRes)
 
-//fun getString(@StringRes stringRes: Int) = App.getInstance().getString(stringRes)
+fun getString(@StringRes stringRes: Int) = App.getInstance().getString(stringRes)

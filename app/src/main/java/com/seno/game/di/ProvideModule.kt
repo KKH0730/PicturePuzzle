@@ -6,6 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.seno.game.data.network.NetworkConstant
 import com.seno.game.di.network.DiffDocRef
+import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class ProvideModule {
+class ProvideSinModule {
     @Singleton
     @Provides
     fun provideStorageReference(): StorageReference {
@@ -33,4 +34,10 @@ class ProvideModule {
     fun provideDiffDocRef(): DocumentReference {
         return  FirebaseFirestore.getInstance().collection("game").document("diff_picture_room")
     }
+
+    @DiffOpenCv
+    @Singleton
+    @Provides
+    fun provideDiffOpencvUtil(): DiffPictureOpencvUtil = DiffPictureOpencvUtil()
 }
+

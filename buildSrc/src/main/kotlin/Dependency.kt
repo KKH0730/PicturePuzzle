@@ -104,7 +104,7 @@ object Dependency {
     object Etc {
         const val EASY_PREFS = "com.pixplicity.easyprefs:EasyPrefs:1.10.0"
         const val QR = "com.journeyapps:zxing-android-embedded:3.6.0"
-        const val LOTTIE = "com.airbnb.android:lottie:3.6.0"
+        const val LOTTIE = "com.airbnb.android:lottie:5.2.0"
     }
 
     object Test {

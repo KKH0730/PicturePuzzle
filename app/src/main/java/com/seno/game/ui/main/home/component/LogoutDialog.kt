@@ -56,8 +56,8 @@ fun LogoutDialog(
                 Spacer(modifier = Modifier.height(height = 11.dp))
                 Row() {
                     Spacer(modifier = Modifier.width(width = 10.dp))
-                    LogoutDialogYesButton(onClick = onClickYes)
                     LogoutDialogNoButton(onClick = onClickNo)
+                    LogoutDialogYesButton(onClick = onClickYes)
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
                 Spacer(modifier = Modifier.height(height = 25.dp))

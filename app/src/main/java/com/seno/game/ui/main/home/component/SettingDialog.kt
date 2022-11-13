@@ -29,6 +29,8 @@ fun SettingDialog(
     onClickClose: () -> Unit,
     onValueChangeBackgroundSoundSlider: (Float) -> Unit,
     onValueChangeEffectSoundSlider: (Float) -> Unit,
+    onCheckChangeVibration: (Boolean) -> Unit,
+    onCheckChangePush: (Boolean) -> Unit,
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
@@ -52,11 +54,12 @@ fun SettingDialog(
                     SoundControlPanel(
                         onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
                         onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
+                        onCheckChangeVibration = onCheckChangeVibration,
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                     )
                     Spacer(modifier = Modifier.height(height = 15.dp))
                     NotificationPanel(
-                        onCheckedChange = {},
+                        onCheckChangePush = onCheckChangePush,
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                     )
                     Spacer(modifier = Modifier.height(height = 20.dp))
@@ -107,6 +110,7 @@ fun DialogTitle(
 fun SoundControlPanel(
     onValueChangeBackgroundSoundSlider: (Float) -> Unit,
     onValueChangeEffectSoundSlider: (Float) -> Unit,
+    onCheckChangeVibration: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -137,12 +141,10 @@ fun SoundControlPanel(
             onValueChangeFinished = onValueChangeEffectSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
-        SliderUnit(
+        SwitchUnit(
             text = stringResource(id = R.string.home_setting_sound_vibration),
-            isBackgroundSlider = false,
-            onValueChangeFinished = {
-
-            }
+            isVibrationSwitch = true,
+            onCheckedChange = onCheckChangeVibration
         )
     }
 }
@@ -195,11 +197,55 @@ fun SliderUnit(
 }
 
 @Composable
+fun SwitchUnit(
+    text: String,
+    isVibrationSwitch: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    var isSwitchChecked by remember {
+        mutableStateOf(
+            if (isVibrationSwitch) {
+                PrefsManager.isVibrationOn
+            } else {
+                PrefsManager.isPushOn
+            }
+        )
+    }
+
+    CompositionLocalProvider(
+        LocalRippleTheme provides BlueRippleTheme,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = text,
+                fontSize = 14.textDp,
+                color = colorResource(id = R.color.color_b8c0ff),
+                modifier = Modifier.align(alignment = Alignment.CenterStart)
+            )
+            Switch(
+                checked = isSwitchChecked,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                    checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
+                    uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                    uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
+                ),
+                onCheckedChange = {
+                    isSwitchChecked = it
+                    onCheckedChange.invoke(it)
+                },
+                modifier = Modifier.align(alignment = Alignment.CenterEnd)
+            )
+        }
+    }
+}
+
+@Composable
 fun NotificationPanel(
-    onCheckedChange: (Boolean) -> Unit,
+    onCheckChangePush: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isSwitchChecked by remember { mutableStateOf(false) }
+//    var isSwitchChecked by remember { mutableStateOf(false) }
 
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
@@ -220,28 +266,33 @@ fun NotificationPanel(
                     .background(color = colorResource(id = R.color.color_bbd0ff))
             )
             Spacer(modifier = Modifier.height(height = 13.5.dp))
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(id = R.string.home_setting_notification_push),
-                    fontSize = 14.textDp,
-                    color = colorResource(id = R.color.color_b8c0ff),
-                    modifier = Modifier.align(alignment = Alignment.CenterStart)
-                )
-                Switch(
-                    checked = isSwitchChecked,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                        checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
-                        uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                        uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
-                    ),
-                    onCheckedChange = {
-                        isSwitchChecked = it
-                        onCheckedChange.invoke(it)
-                    },
-                    modifier = Modifier.align(alignment = Alignment.CenterEnd)
-                )
-            }
+            SwitchUnit(
+                text = stringResource(id = R.string.home_setting_notification_push),
+                isVibrationSwitch = false,
+                onCheckedChange = onCheckChangePush
+            )
+//            Box(modifier = Modifier.fillMaxWidth()) {
+//                Text(
+//                    text = stringResource(id = R.string.home_setting_notification_push),
+//                    fontSize = 14.textDp,
+//                    color = colorResource(id = R.color.color_b8c0ff),
+//                    modifier = Modifier.align(alignment = Alignment.CenterStart)
+//                )
+//                Switch(
+//                    checked = isSwitchChecked,
+//                    colors = SwitchDefaults.colors(
+//                        checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
+//                        checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
+//                        uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
+//                        uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
+//                    ),
+//                    onCheckedChange = {
+//                        isSwitchChecked = it
+//                        onCheckedChange.invoke(it)
+//                    },
+//                    modifier = Modifier.align(alignment = Alignment.CenterEnd)
+//                )
+//            }
         }
     }
 }
@@ -271,14 +322,14 @@ fun AccountPanel(
             )
             Spacer(modifier = Modifier.height(height = 18.dp))
             Text(
-                text = if (AccountManager.isSignedIn) {
+                text = if (AccountManager.isAnonymous) {
+                    stringResource(id = R.string.home_setting_account_no_member)
+                } else {
                     String.format(
                         format = stringResource(id = R.string.home_setting_account_member),
                         PrefsManager.nickname,
                         AccountManager.authProviderName
                     )
-                } else {
-                    stringResource(id = R.string.home_setting_account_no_member)
                 },
                 textAlign = TextAlign.Center,
                 fontSize = 14.textDp,
@@ -301,7 +352,27 @@ fun AccountButtonContainer(
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
 ) {
-    if (AccountManager.isSignedIn) {
+    if (AccountManager.isAnonymous) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .noRippleClickable { onClickLogin.invoke() }
+                    .align(alignment = Alignment.Center)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_login),
+                    color = Color.White,
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
+        }
+    } else {
         Row(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -333,26 +404,6 @@ fun AccountButtonContainer(
                 Text(
                     text = stringResource(id = R.string.home_setting_account_profile),
                     color = colorResource(id = R.color.color_bbd0ff),
-                    fontSize = 16.textDp,
-                    modifier = Modifier.align(alignment = Alignment.Center)
-                )
-            }
-        }
-    } else {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier
-                    .noRippleClickable { onClickLogin.invoke() }
-                    .align(alignment = Alignment.Center)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
-                    contentDescription = null,
-                    modifier = Modifier.align(alignment = Alignment.Center)
-                )
-                Text(
-                    text = stringResource(id = R.string.home_setting_account_login),
-                    color = Color.White,
                     fontSize = 16.textDp,
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )

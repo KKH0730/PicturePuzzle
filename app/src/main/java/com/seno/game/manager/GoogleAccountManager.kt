@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -14,7 +15,7 @@ import com.seno.game.R
 import com.seno.game.extensions.getString
 import timber.log.Timber
 
-class GoogleAccountManager(private val activity: Activity) {
+class GoogleAccountManager(activity: Activity) {
 
     private val signInClient: GoogleSignInClient = GoogleSignIn.getClient(
         activity,
@@ -26,6 +27,10 @@ class GoogleAccountManager(private val activity: Activity) {
     )
 
     fun login(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+        launcher.launch(signInClient.signInIntent)
+    }
+
+    fun login(launcher: ActivityResultLauncher<Intent>) {
         launcher.launch(signInClient.signInIntent)
     }
 

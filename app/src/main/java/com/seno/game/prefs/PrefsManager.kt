@@ -27,6 +27,12 @@ object PrefsManager {
             Prefs.putBoolean("isVibrationOn", isOn)
         }
 
+    var isPushOn: Boolean
+        get() = Prefs.getBoolean("isPushOn", true)
+        set(isOn) {
+            Prefs.putBoolean("isPushOn", isOn)
+        }
+
     var isShowAD: Boolean
         get() = Prefs.getBoolean("isShowAD", true)
         set(isShow) {

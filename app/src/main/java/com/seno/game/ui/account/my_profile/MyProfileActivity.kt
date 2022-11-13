@@ -8,7 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
-import com.seno.game.ui.account.create_account.CreateAccountActivity
+import com.seno.game.ui.account.sign_gate.SignGateActivity
 
 class MyProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,7 @@ class MyProfileActivity : AppCompatActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     MyProfileScreen(
                         onClickClose = { finish() },
-                        onClickLogin = { startActivity(CreateAccountActivity::class.java) },
+                        onClickLogin = { startActivity(SignGateActivity::class.java) },
                         onClickCreateAccount = {}
                     )
                 }

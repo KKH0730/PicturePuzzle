@@ -35,7 +35,7 @@ fun MyProfileHeader(
                 .noRippleClickable { onClickClose.invoke() }
         ) {
             Text(
-                text = stringResource(id = R.string.sign_gate_close),
+                text = stringResource(id = R.string.my_profile_close),
                 color = Color.White,
                 fontSize = 14.textDp,
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp)
@@ -96,7 +96,7 @@ fun LoginButton(onClick: () -> Unit) {
             modifier = Modifier.align(alignment = Alignment.Center)
         )
         Text(
-            text = stringResource(id = R.string.sign_gate_login),
+            text = stringResource(id = R.string.my_profile_login),
             color = Color.White,
             fontSize = 16.textDp,
             modifier = Modifier.align(alignment = Alignment.Center)
@@ -117,7 +117,7 @@ fun CreateAccountButton(onClick: () -> Unit) {
             modifier = Modifier.align(alignment = Alignment.Center)
         )
         Text(
-            text = stringResource(id = R.string.sign_gate_create_account),
+            text = stringResource(id = R.string.my_profile_create_account),
             color = colorResource(id = R.color.color_bbd0ff),
             fontSize = 16.textDp,
             modifier = Modifier.align(alignment = Alignment.Center)

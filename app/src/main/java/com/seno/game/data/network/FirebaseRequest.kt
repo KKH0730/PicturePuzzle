@@ -45,4 +45,7 @@ class FirebaseRequest {
     fun signOut() {
         firebaseAuth.signOut()
     }
+
+    fun signInAnonymous(): Task<AuthResult> = firebaseAuth.signInAnonymously()
+
 }

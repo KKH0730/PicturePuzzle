@@ -2,6 +2,7 @@ package com.seno.game.ui.game.diffgame
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
@@ -288,6 +289,9 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
                     resizedLength = resizedLength,
                     diff = diff
                 )
+                if (PrefsManager.isVibrationOn) {
+                    v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
             }
             false
         }
@@ -302,6 +306,9 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
                     resizedLength = resizedLength,
                     diff = diff
                 )
+                if (PrefsManager.isVibrationOn) {
+                    v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
             }
             false
         }

@@ -35,6 +35,9 @@ object AccountManager {
     val isSignedIn: Boolean
         get() = currentUser != null
 
+    val isAnonymous: Boolean
+        get() = currentUser?.isAnonymous == true
+
     val isSignedOut: Boolean
         get() = currentUser == null
 
@@ -92,7 +95,7 @@ object AccountManager {
 
                 saveProfile(
                     uid = it.result.user?.uid,
-                    platform = platform ,
+                    platform = platform,
                     nickname = PrefsManager.nickname,
                     onSignInSucceed = onSignInSucceed,
                     onSigInFailed = onSigInFailed
@@ -136,28 +139,25 @@ object AccountManager {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
                 facebookAccountManager?.logout()
-                isCompleteLogout.invoke()
-//                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
                     logoutListener = object : GoogleAccountManager.LogoutListener {
                         override fun onSuccessLogout() {
-                            isCompleteLogout.invoke()
-//                            signOutFirebase(isCompleteLogout = isCompleteLogout)
+                            signOutFirebase(isCompleteLogout = isCompleteLogout)
                         }
                     })
             }
 
             override fun onSignOutEmail() {
-                isCompleteLogout.invoke()
-//                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
         })
     }
 
-    fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
+    private fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
         if (onSignOutCallbackListener == null) {
             return
         }
@@ -171,7 +171,19 @@ object AccountManager {
 
     fun signOutFirebase(isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
-        isCompleteLogout.invoke()
+        signInAnonymous(
+            onSuccess = { isCompleteLogout.invoke() },
+            onFail = {}
+        )
+    }
+
+    fun signInAnonymous(
+        onSuccess: () -> Unit,
+        onFail: () -> Unit
+    ) {
+        firebaseRequest.signInAnonymous()
+            .addOnSuccessListener { onSuccess.invoke()}
+            .addOnFailureListener{ onFail.invoke()}
     }
 }
 

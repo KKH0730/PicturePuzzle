@@ -23,8 +23,8 @@ import com.seno.game.manager.AccountManager
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.account.create_account.CreateAccountActivity
 import com.seno.game.ui.account.my_profile.MyProfileActivity
+import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
@@ -107,7 +107,9 @@ fun HomeScreen() {
                 PrefsManager.effectVolume = it
                 MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = false)
             },
-            onClickLogin = { context.startActivity(CreateAccountActivity::class.java) },
+            onCheckChangeVibration = { PrefsManager.isVibrationOn = it },
+            onCheckChangePush = { PrefsManager.isPushOn = it },
+            onClickLogin = { context.startActivity(SignGateActivity::class.java) },
             onClickLogout = {
                 isShowSettingDialog = false
                 isShowLogoutDialog = true

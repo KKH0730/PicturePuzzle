@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.textDp
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.component.*
 
 @Composable
@@ -32,7 +33,7 @@ fun MyProfileScreen(
 @Composable
 fun GuidTextContainer() {
     Text(
-        text = stringResource(id = R.string.sign_gate_guide),
+        text = stringResource(id = R.string.my_profile_guide),
         fontSize = 14.textDp,
         color = colorResource(id = R.color.color_b8c0ff),
         modifier = Modifier.offset(x = 16.dp)
@@ -49,7 +50,7 @@ fun MyProfile(onClickClose: () -> Unit) {
         MyProfileHeader(onClickClose = onClickClose)
         NicknameContainer(
             modifier = Modifier.offset(y = 102.dp),
-            nickName = "닉네임"
+            nickName = PrefsManager.nickname
         )
         ProfileImage(modifier = Modifier.offset(x = 16.dp, y = 66.dp))
     }

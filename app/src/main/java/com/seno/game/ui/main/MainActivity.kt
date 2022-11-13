@@ -1,5 +1,6 @@
 package com.seno.game.ui.main
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +25,10 @@ import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
+import com.seno.game.manager.OnSocialSignInCallbackListener
+import com.seno.game.manager.PlatForm
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeDummyScreen
@@ -46,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             SplashActivity.start(context = this@MainActivity)
             finish()
         } else {
-            if (!AccountManager.isUser) {
+            if (AccountManager.isUser) {
                 showMainUI()
             } else {
                 setAuthentication {
@@ -85,13 +90,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAuthentication(callback: (Boolean) -> Unit) {
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser != null) {
+        if (AccountManager.isUser) {
             callback(true)
         } else {
-            auth.signInAnonymously()
-                .addOnSuccessListener { callback(true) }
-                .addOnFailureListener { callback(false) }
+            AccountManager.signInAnonymous(
+                onSuccess = { callback(true) },
+                onFail = { callback(false) }
+            )
         }
     }
 

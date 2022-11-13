@@ -45,31 +45,33 @@ fun SettingDialog(
                     .width(width = 281.dp)
                     .height(height = 430.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     DialogTitle(onClickClose = onClickClose)
-                    SoundControlPanel(
-                        onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
-                        onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
-                        onCheckChangeVibration = onCheckChangeVibration,
-                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(height = 15.dp))
-                    NotificationPanel(
-                        onCheckChangePush = onCheckChangePush,
-                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(height = 20.dp))
-                    AccountPanel(
-                        onClickLogin = onClickLogin,
-                        onClickLogout = onClickLogout,
-                        onClickManageProfile = onClickManageProfile,
-                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(height = 25.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        SoundControlPanel(
+                            onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
+                            onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
+                            onCheckChangeVibration = onCheckChangeVibration,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 15.dp))
+                        NotificationPanel(
+                            onCheckChangePush = onCheckChangePush,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 20.dp))
+                        AccountPanel(
+                            onClickLogin = onClickLogin,
+                            onClickLogout = onClickLogout,
+                            onClickManageProfile = onClickManageProfile,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 25.dp))
+                    }
                 }
             }
         }

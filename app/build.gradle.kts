@@ -112,6 +112,10 @@ dependencies {
     implementation(Dependency.Facebook.FACEBOOK_LOGIN)
     implementation(Dependency.Facebook.FACEBOOK_APP_LINK)
 
+    // Naver
+    implementation(Dependency.Naver.NAVER_JDK8)
+//    implementation(Dependency.Naver.NAVER_OAUTH)
+
     // Google
     implementation(Dependency.Google.PLAY_SERVICE_AUTH)
     implementation(Dependency.Google.PLAY_SERVICE_ADS)

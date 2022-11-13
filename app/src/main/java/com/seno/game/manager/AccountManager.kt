@@ -1,5 +1,6 @@
 package com.seno.game.manager
 
+import android.net.Uri
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -60,6 +61,12 @@ object AccountManager {
             return FirebaseAuth.getInstance().currentUser?.displayName
         }
 
+    val profileUri: Uri?
+        get() {
+            Timber.e("kkh profileUri : ${FirebaseAuth.getInstance().currentUser?.photoUrl}")
+            return FirebaseAuth.getInstance().currentUser?.photoUrl
+        }
+
     val authProviderName: String
         get() {
             var provider = ""
@@ -89,14 +96,40 @@ object AccountManager {
                     return@addOnCompleteListener
                 }
 
-                displayName?.let { name ->
-                    PrefsManager.nickname = name
+                saveProfile(
+                    uid = it.result.user?.uid,
+                    platform = platform,
+                    nickname = displayName,
+                    profileUri = profileUri?.toString(),
+                    onSignInSucceed = onSignInSucceed,
+                    onSigInFailed = onSigInFailed
+                )
+            }
+    }
+
+    fun signInWithCustomToken(
+        token: String,
+        platform: PlatForm,
+        nickname: String?,
+        profileUri: String?,
+        onSignInSucceed: () -> Unit,
+        onSigInFailed: () -> Unit,
+    ) {
+        firebaseRequest.signInWithCustomToken(fCredentialToken = token)
+            .addOnFailureListener { e ->
+                e.message?.let { message -> App.getInstance().applicationContext.toast(message) }
+                onSigInFailed.invoke()
+            }
+            .addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    return@addOnCompleteListener
                 }
 
                 saveProfile(
                     uid = it.result.user?.uid,
                     platform = platform,
-                    nickname = PrefsManager.nickname,
+                    nickname = nickname,
+                    profileUri = profileUri,
                     onSignInSucceed = onSignInSucceed,
                     onSigInFailed = onSigInFailed
                 )
@@ -106,14 +139,16 @@ object AccountManager {
     private fun saveProfile(
         uid: String?,
         platform: PlatForm,
-        nickname: String,
+        nickname: String?,
+        profileUri: String?,
         onSignInSucceed: () -> Unit,
         onSigInFailed: () -> Unit,
     ) {
         uid?.let {
             val map = HashMap<String, Any>()
             map["platform"] = platform.name
-            map["nickname"] = nickname
+            map["nickname"] = nickname ?: PrefsManager.nickname
+            map["profileUri"] = profileUri ?: PrefsManager.nickname
 
             val db = FirebaseFirestore.getInstance()
             db.collection("profile")
@@ -182,8 +217,8 @@ object AccountManager {
         onFail: () -> Unit
     ) {
         firebaseRequest.signInAnonymous()
-            .addOnSuccessListener { onSuccess.invoke()}
-            .addOnFailureListener{ onFail.invoke()}
+            .addOnSuccessListener { onSuccess.invoke() }
+            .addOnFailureListener { onFail.invoke() }
     }
 }
 

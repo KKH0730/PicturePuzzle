@@ -17,6 +17,7 @@ import timber.log.Timber
 class SignGateActivity : AppCompatActivity() {
     private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var facebookAccountManager: FacebookAccountManager
+    private lateinit var naverAccountManager: NaverAccountManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,10 +27,12 @@ class SignGateActivity : AppCompatActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     googleAccountManager = GoogleAccountManager(activity = this@SignGateActivity)
                     facebookAccountManager = FacebookAccountManager(activity = this@SignGateActivity)
+                    naverAccountManager = NaverAccountManager()
 
                    SignGateScreen(
                        googleAccountManager = googleAccountManager,
                        facebookAccountManager = facebookAccountManager,
+                       naverAccountManager = naverAccountManager,
                        onClickClose = { finish() }
                    )
                 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ContextWrapper
 import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.ads.MobileAds
+import com.navercorp.nid.NaverIdLoginSDK
 import com.pixplicity.easyprefs.library.Prefs
 import dagger.hilt.android.HiltAndroidApp
 import org.opencv.android.OpenCVLoader
@@ -32,6 +33,13 @@ class App : Application() {
             .build()
 
         MobileAds.initialize(this)
+
+        NaverIdLoginSDK.initialize(
+            context = this,
+            clientId = getString(R.string.social_login_info_naver_client_id),
+            clientSecret = getString(R.string.social_login_info_naver_client_secret),
+            clientName = getString(R.string.social_login_info_naver_client_name)
+        )
 
         OpenCVLoader.initDebug()
         if (!BuildConfig.DEBUG) {

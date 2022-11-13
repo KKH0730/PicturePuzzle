@@ -17,18 +17,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FacebookAuthProvider
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.profile.NidProfileCallback
+import com.navercorp.nid.profile.data.NidProfileResponse
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.account.sign_gate.SignGateActivity
 import timber.log.Timber
 
 @Composable
 fun SocialLoginContainer(
     googleAccountManager: GoogleAccountManager,
-    facebookAccountManager: FacebookAccountManager
+    facebookAccountManager: FacebookAccountManager,
+    naverAccountManager: NaverAccountManager
 ) {
 
     Row(
@@ -36,7 +40,7 @@ fun SocialLoginContainer(
     ) {
         GoogleLoginButton(googleAccountManager = googleAccountManager)
         KakaoLoginButton()
-        NaverLoginButton()
+        NaverLoginButton(naverAccountManager = naverAccountManager)
         FaceBookLoginButton(facebookAccountManager = facebookAccountManager)
     }
 }
@@ -46,43 +50,44 @@ fun GoogleLoginButton(
     googleAccountManager: GoogleAccountManager
 ) {
     val context = LocalContext.current
-    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            googleAccountManager.onActivityResult(
-                data = it.data,
-                onSocialSignInCallbackListener = object: OnSocialSignInCallbackListener {
-                    override fun signInWithCredential(idToken: String?) {
-                        val authCredential = googleAccountManager.getAuthCredential(idToken)
-                        try {
-                            AccountManager.signInWithCredential(
-                                credential = authCredential,
-                                platform = PlatForm.GOOGLE,
-                                onSignInSucceed = {
-                                    context.toast("로그인 성공")
-                                },
-                                onSigInFailed = {
-                                    context.toast("로그인 실패")
-                                }
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                googleAccountManager.onActivityResult(
+                    data = it.data,
+                    onSocialSignInCallbackListener = object : OnSocialSignInCallbackListener {
+                        override fun signInWithCredential(idToken: String?) {
+                            val authCredential = googleAccountManager.getAuthCredential(idToken)
+                            try {
+                                AccountManager.signInWithCredential(
+                                    credential = authCredential,
+                                    platform = PlatForm.GOOGLE,
+                                    onSignInSucceed = {
+                                        context.toast("로그인 성공")
+                                    },
+                                    onSigInFailed = {
+                                        context.toast("로그인 실패")
+                                    }
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Timber.e(e)
+                            }
+                        }
+
+                        override fun onError(e: Exception?) {
                             Timber.e(e)
                         }
                     }
-
-                    override fun onError(e: Exception?) {
-                        Timber.e(e)
-                    }
-                }
-            )
-        } else {
-            Timber.e("kkh e")
+                )
+            } else {
+                Timber.e("kkh e")
+            }
         }
-    }
 
-    SnsLoginButton(snsImage = painterResource(id = R.drawable.ic_sns_google),)
-    {
+    SnsLoginButton(snsImage = painterResource(id = R.drawable.ic_sns_google)) {
         googleAccountManager.login(launcher = launcher)
     }
 }
@@ -96,10 +101,49 @@ fun KakaoLoginButton() {
 }
 
 @Composable
-fun NaverLoginButton() {
+fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
+    val context = LocalContext.current
+    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            when (it.resultCode) {
+                Activity.RESULT_OK -> {
+                    Timber.e("kkh accessToken : ${NaverIdLoginSDK.getAccessToken()}, refreshToken : ${NaverIdLoginSDK.getRefreshToken()}")
+                    naverAccountManager.onActivityResult(
+                        onSignInSucceed = {
+                            context.toast("로그인 성공")
+                            Timber.e("kkh displat name : ${AccountManager.displayName}")
+                        },
+                        onSigInFailed =  {
+                            context.toast("로그인 실패")
+                        }
+                    )
+                }
+                Activity.RESULT_CANCELED -> {
+                    // 실패 or 에러
+                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                    val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                    Timber.e("kkh launcher errorCode:$errorCode, errorDesc:$errorDescription")
+                }
+            }
+        }
+
+
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_naver)
     ) {
+        naverAccountManager.login(
+            context = context,
+            launcher = launcher,
+            onSignInSucceed = {
+                context.toast("로그인 성공")
+                Timber.e("kkh displat name : ${AccountManager.displayName}")
+            },
+            onSigInFailed = {
+                context.toast("로그인 실패")
+            },
+        )
     }
 }
 

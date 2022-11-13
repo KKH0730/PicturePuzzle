@@ -68,6 +68,11 @@ object Dependency {
         const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:14.1.1"
     }
 
+    object Naver {
+        const val NAVER_JDK8 = "com.navercorp.nid:oauth-jdk8:5.2.0"
+//        const val NAVER_OAUTH = "com.navercorp.nid:oauth:5.2.0"
+    }
+
     object Google {
         const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
         const val PLAY_SERVICE_ADS = "com.google.android.gms:play-services-ads:21.3.0"

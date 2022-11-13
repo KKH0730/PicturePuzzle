@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Facebook-->
     <string name="facebook_app_id" translatable="false">3305115159731502</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb3305115159731502</string>
     <string name="facebook_client_token" translatable="false">35bf828b1bd00401928f15425bc332da</string>
+
+    <!--Naver-->
+    <string name="social_login_info_naver_client_id">a1HvwIMirk28AmfJ_Xoo</string>
+    <string name="social_login_info_naver_client_secret">NmqDdOIt57</string>
+    <string name="social_login_info_naver_client_name">TEST 로그인</string>
 </resources>

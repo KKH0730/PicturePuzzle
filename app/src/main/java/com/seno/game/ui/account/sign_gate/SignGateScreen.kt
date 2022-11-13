@@ -24,12 +24,14 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.manager.NaverAccountManager
 import com.seno.game.ui.account.sign_gate.component.SocialLoginContainer
 
 @Composable
 fun SignGateScreen(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
+    naverAccountManager: NaverAccountManager,
     onClickClose: () -> Unit
 ) {
     Box(
@@ -39,6 +41,7 @@ fun SignGateScreen(
         SignGateContainer(
             googleAccountManager = googleAccountManager,
             facebookAccountManager = facebookAccountManager,
+            naverAccountManager = naverAccountManager,
             modifier = Modifier.offset(y = 93.dp)
         )
         SignGateHeader(onClickClose = onClickClose)
@@ -116,6 +119,7 @@ fun CatCircleImage(modifier: Modifier = Modifier) {
 fun SignGateContainer(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
+    naverAccountManager: NaverAccountManager,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -141,7 +145,8 @@ fun SignGateContainer(
         Spacer(modifier = Modifier.height(height = 81.dp))
         SocialLoginContainer(
             googleAccountManager = googleAccountManager,
-            facebookAccountManager = facebookAccountManager
+            facebookAccountManager = facebookAccountManager,
+            naverAccountManager = naverAccountManager,
         )
     }
 }

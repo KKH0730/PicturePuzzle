@@ -13,10 +13,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -51,35 +48,36 @@ class MainActivity : AppCompatActivity() {
             SplashActivity.start(context = this@MainActivity)
             finish()
         } else {
-            if (AccountManager.isUser) {
-                showMainUI()
-            } else {
-                setAuthentication {
-                    if (it) {
-                        showMainUI()
+            setContent {
+                AppTheme {
+                    Surface(Modifier.fillMaxSize()) {
+                        if (AccountManager.isUser) {
+                            MainUI(isAuthentication = true)
+                        } else {
+                            var isAuthentication by remember { mutableStateOf(false) }
+                            reqAuthentication { isAuthentication = it }
+                            MainUI(isAuthentication = isAuthentication)
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun showMainUI() {
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    HomeDummyScreen()
-                    if (checkNetworkConnectivityForComposable()) {
-                        MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
-                        MainScreen()
-                    } else {
-                        RestartDialog(
-                            title = getString(R.string.network_error_title),
-                            content = getString(R.string.network_error),
-                            confirmText = getString(R.string.alert_dialog_restart),
-                            onClickConfirm = { this@MainActivity.restartApp() }
-                        )
-                    }
-                }
+    @Composable
+    private fun MainUI(isAuthentication: Boolean) {
+        HomeDummyScreen()
+        if (isAuthentication) {
+            if (checkNetworkConnectivityForComposable()) {
+                MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
+                MainScreen()
+            } else {
+                RestartDialog(
+                    title = getString(R.string.network_error_title),
+                    content = getString(R.string.network_error),
+                    confirmText = getString(R.string.alert_dialog_restart),
+                    onClickConfirm = { this@MainActivity.restartApp() }
+                )
             }
         }
     }
@@ -89,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun setAuthentication(callback: (Boolean) -> Unit) {
+    private fun reqAuthentication(callback: (Boolean) -> Unit) {
         if (AccountManager.isUser) {
             callback(true)
         } else {

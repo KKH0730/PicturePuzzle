@@ -128,6 +128,10 @@ dependencies {
     // Timber
     implementation(Dependency.Timber.TIMBER)
 
+    // Glide
+    implementation(Dependency.Glide.GLIDE)
+    implementation(Dependency.Glide.GLIDE_COMPILER)
+
     // Etc
     implementation(Dependency.Etc.EASY_PREFS)
     implementation(Dependency.Etc.QR)

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FacebookAuthProvider
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
+import com.navercorp.nid.oauth.view.NidOAuthLoginButton.Companion.launcher
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import com.seno.game.R
@@ -32,7 +33,7 @@ import timber.log.Timber
 fun SocialLoginContainer(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
-    naverAccountManager: NaverAccountManager
+    naverAccountManager: NaverAccountManager,
 ) {
 
     Row(
@@ -47,7 +48,7 @@ fun SocialLoginContainer(
 
 @Composable
 fun GoogleLoginButton(
-    googleAccountManager: GoogleAccountManager
+    googleAccountManager: GoogleAccountManager,
 ) {
     val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
@@ -59,18 +60,20 @@ fun GoogleLoginButton(
                     data = it.data,
                     onSocialSignInCallbackListener = object : OnSocialSignInCallbackListener {
                         override fun signInWithCredential(idToken: String?) {
-                            val authCredential = googleAccountManager.getAuthCredential(idToken)
                             try {
-                                AccountManager.signInWithCredential(
-                                    credential = authCredential,
-                                    platform = PlatForm.GOOGLE,
-                                    onSignInSucceed = {
-                                        context.toast("로그인 성공")
-                                    },
-                                    onSigInFailed = {
-                                        context.toast("로그인 실패")
-                                    }
-                                )
+                                idToken?.let { token ->
+                                    val authCredential = googleAccountManager.getAuthCredential(token)
+                                    AccountManager.signInWithCredential(
+                                        credential = authCredential,
+                                        platform = PlatForm.GOOGLE,
+                                        onSignInSucceed = {
+                                            context.toast("로그인 성공")
+                                        },
+                                        onSignInFailed = {
+                                            context.toast("로그인 실패")
+                                        }
+                                    )
+                                }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Timber.e(e)
@@ -82,8 +85,6 @@ fun GoogleLoginButton(
                         }
                     }
                 )
-            } else {
-                Timber.e("kkh e")
             }
         }
 
@@ -109,13 +110,11 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
         ) {
             when (it.resultCode) {
                 Activity.RESULT_OK -> {
-                    Timber.e("kkh accessToken : ${NaverIdLoginSDK.getAccessToken()}, refreshToken : ${NaverIdLoginSDK.getRefreshToken()}")
                     naverAccountManager.onActivityResult(
                         onSignInSucceed = {
                             context.toast("로그인 성공")
-                            Timber.e("kkh displat name : ${AccountManager.displayName}")
                         },
-                        onSigInFailed =  {
+                        onSigInFailed = {
                             context.toast("로그인 실패")
                         }
                     )
@@ -124,7 +123,6 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
                     // 실패 or 에러
                     val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                     val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                    Timber.e("kkh launcher errorCode:$errorCode, errorDesc:$errorDescription")
                 }
             }
         }
@@ -138,7 +136,6 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
             launcher = launcher,
             onSignInSucceed = {
                 context.toast("로그인 성공")
-                Timber.e("kkh displat name : ${AccountManager.displayName}")
             },
             onSigInFailed = {
                 context.toast("로그인 실패")
@@ -164,12 +161,9 @@ fun FaceBookLoginButton(facebookAccountManager: FacebookAccountManager) {
                                 credential = credential,
                                 platform = PlatForm.FACEBOOK,
                                 onSignInSucceed = {
-                                    AccountManager.displayName?.let { name ->
-                                        PrefsManager.nickname = name
-                                    }
                                     context.toast("로그인 성공")
                                 },
-                                onSigInFailed = {
+                                onSignInFailed = {
                                     context.toast("로그인 실패")
                                 }
                             )
@@ -187,11 +181,10 @@ fun FaceBookLoginButton(facebookAccountManager: FacebookAccountManager) {
     }
 }
 
-
 @Composable
 fun SnsLoginButton(
     snsImage: Painter,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Image(
         painter = snsImage,

@@ -22,6 +22,7 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.manager.NaverAccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
@@ -38,6 +39,7 @@ fun HomeScreen() {
     val context = LocalContext.current
     val facebookAccountManager = FacebookAccountManager(context as MainActivity)
     val googleAccountManager = GoogleAccountManager(context as MainActivity)
+    val naverAccountManager = NaverAccountManager()
     val homeViewModel = hiltViewModel<HomeViewModel>()
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
@@ -85,6 +87,7 @@ fun HomeScreen() {
                 AccountManager.startLogout(
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
+                    naverAccountManager = naverAccountManager,
                     isCompleteLogout = {
                         isShowLogoutDialog = false
                         nickname = context.resources.createRandomNickname()

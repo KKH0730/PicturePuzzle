@@ -64,13 +64,13 @@ object Dependency {
     }
 
     object Facebook {
-        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:14.1.1"
-        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:14.1.1"
+        private const val VERSION = "14.1.1"
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:$VERSION"
+        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:$VERSION"
     }
 
     object Naver {
         const val NAVER_JDK8 = "com.navercorp.nid:oauth-jdk8:5.2.0"
-//        const val NAVER_OAUTH = "com.navercorp.nid:oauth:5.2.0"
     }
 
     object Google {
@@ -79,8 +79,9 @@ object Dependency {
     }
 
     object Accompanist {
-        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:0.25.1"
-        const val PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
+        private const val VERSION = "0.25.1"
+        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:$VERSION"
+        const val PAGER = "com.google.accompanist:accompanist-pager:$VERSION"
     }
 
     object Hilt {
@@ -104,6 +105,12 @@ object Dependency {
 
     object Timber {
         const val TIMBER = "com.jakewharton.timber:timber:5.0.1"
+    }
+
+    object Glide {
+        private const val VERSION = "4.12.0"
+        const val GLIDE = "com.github.bumptech.glide:glide:$VERSION"
+        const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:$VERSION"
     }
 
     object Etc {

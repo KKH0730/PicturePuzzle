@@ -1,7 +1,6 @@
 package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -247,8 +246,6 @@ fun NotificationPanel(
     onCheckChangePush: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-//    var isSwitchChecked by remember { mutableStateOf(false) }
-
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
     ) {
@@ -273,28 +270,6 @@ fun NotificationPanel(
                 isVibrationSwitch = false,
                 onCheckedChange = onCheckChangePush
             )
-//            Box(modifier = Modifier.fillMaxWidth()) {
-//                Text(
-//                    text = stringResource(id = R.string.home_setting_notification_push),
-//                    fontSize = 14.textDp,
-//                    color = colorResource(id = R.color.color_b8c0ff),
-//                    modifier = Modifier.align(alignment = Alignment.CenterStart)
-//                )
-//                Switch(
-//                    checked = isSwitchChecked,
-//                    colors = SwitchDefaults.colors(
-//                        checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
-//                        checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
-//                        uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
-//                        uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
-//                    ),
-//                    onCheckedChange = {
-//                        isSwitchChecked = it
-//                        onCheckedChange.invoke(it)
-//                    },
-//                    modifier = Modifier.align(alignment = Alignment.CenterEnd)
-//                )
-//            }
         }
     }
 }

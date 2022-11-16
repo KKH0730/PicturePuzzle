@@ -9,6 +9,18 @@ object PrefsManager {
             Prefs.putString("nickname", nickname)
         }
 
+    var platform: String
+        get() = Prefs.getString("platform", "")
+        set(snsPlatform) {
+            Prefs.putString("platform", snsPlatform)
+        }
+
+    var profileUri: String
+        get() = Prefs.getString("profileUri", "")
+        set(uri) {
+            Prefs.putString("profileUri", uri)
+        }
+
     var backgroundVolume: Float
         get() = Prefs.getFloat("backgroundVolume", 0.5f)
         set(vol) {

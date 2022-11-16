@@ -30,11 +30,11 @@ class FirebaseRequest {
     fun signInWithCredential(credential: AuthCredential): Task<AuthResult> =
         firebaseAuth.signInWithCredential(credential)
 
-    fun reauthenticate(credential: AuthCredential): Task<Void> =
-        currentUser!!.reauthenticate(credential)
+    fun reauthenticate(credential: AuthCredential): Task<Void>? =
+        currentUser?.reauthenticate(credential)
 
-    fun updatePassword(password: String): Task<Void> =
-        currentUser!!.updatePassword(password)
+    fun updatePassword(password: String): Task<Void>? =
+        currentUser?.updatePassword(password)
 
     fun signInWithCustomToken(fCredentialToken: String): Task<AuthResult> =
         firebaseAuth.signInWithCustomToken(fCredentialToken)
@@ -42,9 +42,7 @@ class FirebaseRequest {
     fun sendPasswordResetEmail(email: String): Task<Void> =
         firebaseAuth.sendPasswordResetEmail(email)
 
-    fun signOut() {
-        firebaseAuth.signOut()
-    }
+    fun signOut() = firebaseAuth.signOut()
 
     fun signInAnonymous(): Task<AuthResult> = firebaseAuth.signInAnonymously()
 

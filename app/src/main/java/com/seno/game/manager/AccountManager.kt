@@ -3,18 +3,24 @@ package com.seno.game.manager
 import android.net.Uri
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
+import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.extensions.toast
 import com.seno.game.prefs.PrefsManager
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
+private const val LOGIN_TYPE_NAVER = "naver.com"
+private const val LOGIN_TYPE_KAKAO = "kakao.com"
 
 enum class PlatForm(name: String) {
     KAKAO(name = "kakao"),
@@ -25,9 +31,7 @@ enum class PlatForm(name: String) {
 
 object AccountManager {
     private var firebaseRequest: FirebaseRequest = FirebaseRequest()
-    var firebaseAuthToken: String = ""
-
-    val currentUser: FirebaseUser?
+    private val currentUser: FirebaseUser?
         get() = firebaseRequest.currentUser
 
     val firebaseUid: String?
@@ -39,136 +43,257 @@ object AccountManager {
     val isAnonymous: Boolean
         get() = currentUser?.isAnonymous == true
 
-    val isSignedOut: Boolean
-        get() = currentUser == null
-
     val isUser: Boolean
         get() = currentUser != null
 
+    val profileColRef = FirebaseFirestore.getInstance().collection("profile")
+
     private val authProviderId: String
         get() {
+            var providerId = ""
             FirebaseAuth.getInstance().currentUser?.providerData?.forEach {
-                when (val providerId = it.providerId) {
-                    "facebook.com", "google.com", "password" -> return providerId
+                providerId = when (it.providerId) {
+                    "facebook.com" -> LOGIN_TYPE_FACEBOOK
+                    "google.com" -> LOGIN_TYPE_GOOGLE
+                    "password" -> {
+                        if (currentUser?.email?.contains("naver.com") == true) {
+                            LOGIN_TYPE_NAVER
+                        } else {
+                            LOGIN_TYPE_KAKAO
+                        }
+                    }
+                    else -> ""
                 }
             }
-            return ""
-        }
-
-    val displayName: String?
-        get() {
-            Timber.e("kkh displayname : ${FirebaseAuth.getInstance().currentUser?.displayName}")
-            return FirebaseAuth.getInstance().currentUser?.displayName
-        }
-
-    val profileUri: Uri?
-        get() {
-            Timber.e("kkh profileUri : ${FirebaseAuth.getInstance().currentUser?.photoUrl}")
-            return FirebaseAuth.getInstance().currentUser?.photoUrl
+            return providerId
         }
 
     val authProviderName: String
         get() {
             var provider = ""
-            FirebaseAuth.getInstance().currentUser?.providerData?.forEach {
-                Timber.e("kkh providerId : ${it.providerId} size : ${FirebaseAuth.getInstance().currentUser?.providerData?.size}")
+            currentUser?.providerData?.forEach {
                 when (it.providerId) {
                     "facebook.com" -> provider = getString(R.string.facebook)
                     "google.com" -> provider = getString(R.string.google)
+                    "password" -> provider = if (currentUser?.email?.contains("naver.com") == true) {
+                        getString(R.string.naver)
+                    } else {
+                        getString(R.string.kakao)
+                    }
                 }
             }
             return provider
         }
 
+    private val displayName: String?
+        get() {
+            return FirebaseAuth.getInstance().currentUser?.displayName
+        }
+
+    private val profileUri: Uri?
+        get() {
+            return FirebaseAuth.getInstance().currentUser?.photoUrl
+        }
+
+
     fun signInWithCredential(
         credential: AuthCredential,
         platform: PlatForm,
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit,
+        onSignInFailed: () -> Unit,
     ) {
-        firebaseRequest.signInWithCredential(credential = credential)
-            .addOnFailureListener { e ->
-                e.message?.let { message -> App.getInstance().applicationContext.toast(message) }
-                onSigInFailed.invoke()
-            }
-            .addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    return@addOnCompleteListener
-                }
+        CoroutineScope(Dispatchers.Main).launch {
+            val uid = withContext(Dispatchers.IO) {
+                var userUid: String? = null
 
-                saveProfile(
-                    uid = it.result.user?.uid,
-                    platform = platform,
-                    nickname = displayName,
-                    profileUri = profileUri?.toString(),
-                    onSignInSucceed = onSignInSucceed,
-                    onSigInFailed = onSigInFailed
-                )
+                firebaseRequest.signInWithCredential(credential = credential)
+                    .addOnFailureListener { onSignInFailed.invoke() }
+                    .addOnCompleteListener {
+                        if (!it.isSuccessful) {
+                            onSignInFailed.invoke()
+                            return@addOnCompleteListener
+                        }
+
+                        userUid = it.result.user?.uid
+                    }.await()
+                userUid
             }
+
+            val isProfileDocExist = withContext(Dispatchers.IO) {
+                var isDocumentExist = false
+                if (uid == null) {
+                    onSignInFailed.invoke()
+                } else {
+                    profileColRef.document(uid).get()
+                        .addOnFailureListener { onSignInFailed.invoke() }
+                        .addOnCompleteListener {
+                            if (!it.isSuccessful) {
+                                onSignInFailed.invoke()
+                                return@addOnCompleteListener
+                            }
+                            isDocumentExist = it.result.exists()
+                        }.await()
+                }
+                isDocumentExist
+            }
+
+            withContext(Dispatchers.IO) {
+                if (isProfileDocExist) {
+                    getProfileInfo(
+                        uid = uid,
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                } else {
+                    saveProfileInfo(
+                        uid = uid,
+                        platform = platform,
+                        nickname = displayName,
+                        profileUri = profileUri?.toString(),
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                }
+            }
+        }
     }
 
-    fun signInWithCustomToken(
-        token: String,
+    fun createUserWithEmailAndPassword(
+        email: String,
+        password: String,
         platform: PlatForm,
         nickname: String?,
         profileUri: String?,
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit,
+        onSignInFailed: () -> Unit,
     ) {
-        firebaseRequest.signInWithCustomToken(fCredentialToken = token)
+        firebaseRequest.createUserWithEmailAndPassword(email, password)
             .addOnFailureListener { e ->
-                e.message?.let { message -> App.getInstance().applicationContext.toast(message) }
-                onSigInFailed.invoke()
+                if (e is FirebaseAuthUserCollisionException) {
+                    // 로그인이니까 프로필 가져오기
+                    signInUserWithEmailAndPassword(
+                        email = email,
+                        password = password,
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                } else {
+                    onSignInFailed.invoke()
+                }
             }
+
             .addOnCompleteListener {
                 if (!it.isSuccessful) {
+                    if (it.exception !is FirebaseAuthUserCollisionException) {
+                        onSignInFailed.invoke()
+                    }
                     return@addOnCompleteListener
                 }
 
-                saveProfile(
+                saveProfileInfo(
                     uid = it.result.user?.uid,
                     platform = platform,
                     nickname = nickname,
                     profileUri = profileUri,
                     onSignInSucceed = onSignInSucceed,
-                    onSigInFailed = onSigInFailed
+                    onSignInFailed = onSignInFailed
                 )
             }
     }
 
-    private fun saveProfile(
+    private fun signInUserWithEmailAndPassword(
+        email: String,
+        password: String,
+        onSignInSucceed: () -> Unit,
+        onSignInFailed: () -> Unit,
+    ) {
+        firebaseRequest.signInWithEmailAndPassword(email, password)
+            .addOnFailureListener { onSignInFailed.invoke() }
+            .addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    onSignInFailed.invoke()
+                    return@addOnCompleteListener
+                }
+
+
+                getProfileInfo(
+                    uid = it.result.user?.uid,
+                    onSignInSucceed = onSignInSucceed,
+                    onSignInFailed = onSignInFailed
+                )
+            }
+    }
+
+    private fun saveProfileInfo(
         uid: String?,
         platform: PlatForm,
         nickname: String?,
         profileUri: String?,
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit,
+        onSignInFailed: () -> Unit,
     ) {
-        uid?.let {
-            val map = HashMap<String, Any>()
-            map["platform"] = platform.name
-            map["nickname"] = nickname ?: PrefsManager.nickname
-            map["profileUri"] = profileUri ?: PrefsManager.nickname
 
-            val db = FirebaseFirestore.getInstance()
-            db.collection("profile")
-                .document(uid)
+        uid?.let {
+            profileUri?.saveDiskCacheData(size = null)
+
+            val userNickname = nickname ?: PrefsManager.nickname
+            val userProfileUri = profileUri ?: PrefsManager.nickname
+            val map = mutableMapOf(
+                "platform" to platform.name,
+                "uid" to uid,
+                "nickname" to userNickname,
+                "profileUri" to userProfileUri
+            )
+
+            profileColRef.document(uid)
                 .set(map)
+                .addOnFailureListener { onSignInFailed.invoke() }
                 .addOnCompleteListener {
                     if (!it.isSuccessful) {
+                        onSignInFailed.invoke()
                         return@addOnCompleteListener
                     }
+
+                    platform.let { PrefsManager.platform = it.name }
+                    nickname?.let { PrefsManager.nickname = it }
+                    profileUri?.let { PrefsManager.profileUri = it}
+
                     onSignInSucceed.invoke()
-                }.addOnFailureListener { e ->
-                    e.message?.let { message -> App.getInstance().applicationContext.toast(message) }
-                    onSigInFailed.invoke()
                 }
-        } ?: onSigInFailed.invoke()
+        } ?: onSignInFailed.invoke()
+    }
+
+    private fun getProfileInfo(
+        uid: String?,
+        onSignInSucceed: () -> Unit,
+        onSignInFailed: () -> Unit,
+    ) {
+        uid?.let {
+            profileColRef.document(uid)
+                .get()
+                .addOnFailureListener { onSignInFailed.invoke() }
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        onSignInFailed.invoke()
+                        return@addOnCompleteListener
+                    }
+
+                    val documentSnapshot = task.result
+                    PrefsManager.apply {
+                        this.platform = documentSnapshot.getString("platform") ?: ""
+                        this.nickname = documentSnapshot.getString("nickname") ?: ""
+                        this.profileUri = documentSnapshot.getString("profileUri") ?: ""
+                        this.profileUri.saveDiskCacheData(size = null)
+                    }
+                    onSignInSucceed.invoke()
+                }
+        } ?: onSignInFailed.invoke()
     }
 
     fun startLogout(
         facebookAccountManager: FacebookAccountManager?,
         googleAccountManager: GoogleAccountManager?,
+        naverAccountManager: NaverAccountManager?,
         isCompleteLogout: () -> Unit,
     ) {
         signOut(object : OnSignOutCallbackListener {
@@ -186,8 +311,13 @@ object AccountManager {
                     })
             }
 
-            override fun onSignOutEmail() {
+            override fun onSignOutNaver() {
+                naverAccountManager?.logout()
                 signOutFirebase(isCompleteLogout = isCompleteLogout)
+            }
+
+            override fun onSignOutKakao() {
+
             }
         })
     }
@@ -200,15 +330,16 @@ object AccountManager {
         when (authProviderId) {
             LOGIN_TYPE_FACEBOOK -> onSignOutCallbackListener.onSignOutFacebook()
             LOGIN_TYPE_GOOGLE -> onSignOutCallbackListener.onSignOutGoogle()
-            else -> onSignOutCallbackListener.onSignOutEmail()
+            LOGIN_TYPE_NAVER -> onSignOutCallbackListener.onSignOutNaver()
+            else -> onSignOutCallbackListener.onSignOutKakao()
         }
     }
 
     fun signOutFirebase(isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
         signInAnonymous(
-            onSuccess = { isCompleteLogout.invoke() },
-            onFail = {}
+            onSuccess = isCompleteLogout,
+            onFail = isCompleteLogout
         )
     }
 
@@ -217,8 +348,8 @@ object AccountManager {
         onFail: () -> Unit
     ) {
         firebaseRequest.signInAnonymous()
-            .addOnSuccessListener { onSuccess.invoke() }
             .addOnFailureListener { onFail.invoke() }
+            .addOnSuccessListener { onSuccess.invoke() }
     }
 }
 
@@ -230,5 +361,6 @@ interface OnSocialSignInCallbackListener {
 interface OnSignOutCallbackListener {
     fun onSignOutFacebook()
     fun onSignOutGoogle()
-    fun onSignOutEmail()
+    fun onSignOutNaver()
+    fun onSignOutKakao()
 }

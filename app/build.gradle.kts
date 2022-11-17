@@ -114,7 +114,10 @@ dependencies {
 
     // Naver
     implementation(Dependency.Naver.NAVER_JDK8)
-//    implementation(Dependency.Naver.NAVER_OAUTH)
+
+    // Kakao
+    implementation(Dependency.Kakao.KAKAO_LOGIN)
+    implementation(Dependency.Kakao.KAKAO_LOGIN_RX)
 
     // Google
     implementation(Dependency.Google.PLAY_SERVICE_AUTH)
@@ -124,6 +127,11 @@ dependencies {
     implementation(Dependency.Retrofit.RETROFIT)
     implementation(Dependency.Retrofit.GSON_CONVERTER)
     implementation(Dependency.OkHttp.LOGGING_INTERCEPTOR)
+
+    // RX
+    implementation(Dependency.Rx.RXJAVA)
+    implementation(Dependency.Rx.RXANDROID)
+    implementation(Dependency.Rx.RXKOTLIN)
 
     // Timber
     implementation(Dependency.Timber.TIMBER)

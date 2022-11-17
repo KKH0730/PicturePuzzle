@@ -1,4 +1,3 @@
-
 object Version {
     const val COMPOSE = "1.2.0"
 }
@@ -73,6 +72,11 @@ object Dependency {
         const val NAVER_JDK8 = "com.navercorp.nid:oauth-jdk8:5.2.0"
     }
 
+    object Kakao {
+        const val KAKAO_LOGIN = "com.kakao.sdk:v2-user:2.11.2"
+        const val KAKAO_LOGIN_RX = "com.kakao.sdk:v2-user-rx:2.11.2"
+    }
+
     object Google {
         const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
         const val PLAY_SERVICE_ADS = "com.google.android.gms:play-services-ads:21.3.0"
@@ -101,6 +105,12 @@ object Dependency {
         private const val VERSION = "2.9.0"
         const val RETROFIT = "com.squareup.retrofit2:retrofit:$VERSION"
         const val GSON_CONVERTER = "com.squareup.retrofit2:converter-gson:$VERSION"
+    }
+
+    object Rx {
+        const val RXJAVA = "io.reactivex.rxjava2:rxjava:2.2.21"
+        const val RXANDROID = "io.reactivex.rxjava2:rxandroid:2.1.1"
+        const val RXKOTLIN = "io.reactivex.rxjava2:rxkotlin:2.4.0"
     }
 
     object Timber {

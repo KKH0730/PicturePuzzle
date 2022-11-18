@@ -23,24 +23,24 @@ class KakaoAccountManager(private val context: Context) {
 
     fun login(
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSignInFailed: () -> Unit
     ) {
         if (isKakaoTalkInstalled) {
             loginKakaoTalk(
                 onSignInSucceed = onSignInSucceed,
-                onSigInFailed = onSigInFailed
+                onSignInFailed = onSignInFailed
             )
         } else {
             loginKakaoAccount(
                 onSignInSucceed = onSignInSucceed,
-                onSigInFailed = onSigInFailed
+                onSigInFailed = onSignInFailed
             )
         }
     }
 
     private fun loginKakaoTalk(
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSignInFailed: () -> Unit
     ) {
         // 카카오톡으로 로그인
         UserApiClient.rx.loginWithKakaoTalk(context)
@@ -59,10 +59,10 @@ class KakaoAccountManager(private val context: Context) {
             .subscribe({ token ->
                 getClientProfileInfo(
                     onSignInSucceed = onSignInSucceed,
-                    onSigInFailed = onSigInFailed,
+                    onSignInFailed = onSignInFailed,
                 )
             }, { error ->
-                onSigInFailed.invoke()
+                onSignInFailed.invoke()
             })
             .addTo(disposables)
     }
@@ -77,7 +77,7 @@ class KakaoAccountManager(private val context: Context) {
             .subscribe({
                 getClientProfileInfo(
                     onSignInSucceed = onSignInSucceed,
-                    onSigInFailed = onSigInFailed,
+                    onSignInFailed = onSigInFailed,
                 )
             }, { error -> onSigInFailed.invoke() })
             .addTo(disposables)
@@ -85,7 +85,7 @@ class KakaoAccountManager(private val context: Context) {
 
     private fun getClientProfileInfo(
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSignInFailed: () -> Unit
     ){
         UserApiClient.rx.me()
             .flatMap { user ->
@@ -129,15 +129,15 @@ class KakaoAccountManager(private val context: Context) {
                             nickname = nickname,
                             profileUri = profileUri,
                             onSignInSucceed = onSignInSucceed,
-                            onSignInFailed = onSigInFailed
+                            onSignInFailed = onSignInFailed
                         )
                     } else {
-                        onSigInFailed.invoke()
+                        onSignInFailed.invoke()
                     }
                 } else {
-                    onSigInFailed.invoke()
+                    onSignInFailed.invoke()
                 }
-            }, { onSigInFailed.invoke() })
+            }, { onSignInFailed.invoke() })
             .addTo(disposables)
     }
 

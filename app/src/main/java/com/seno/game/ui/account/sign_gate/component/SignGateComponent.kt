@@ -18,15 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FacebookAuthProvider
 import com.navercorp.nid.NaverIdLoginSDK
-import com.navercorp.nid.oauth.NidOAuthLogin
-import com.navercorp.nid.oauth.view.NidOAuthLoginButton.Companion.launcher
-import com.navercorp.nid.profile.NidProfileCallback
-import com.navercorp.nid.profile.data.NidProfileResponse
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
-import com.seno.game.prefs.PrefsManager
 import timber.log.Timber
 
 @Composable
@@ -34,22 +29,49 @@ fun SocialLoginContainer(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
-    kakaoAccountManager: KakaoAccountManager
+    kakaoAccountManager: KakaoAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
 ) {
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(space = 22.dp),
     ) {
-        GoogleLoginButton(googleAccountManager = googleAccountManager)
-        KakaoLoginButton(kakaoAccountManager = kakaoAccountManager)
-        NaverLoginButton(naverAccountManager = naverAccountManager)
-        FaceBookLoginButton(facebookAccountManager = facebookAccountManager)
+        GoogleLoginButton(
+            googleAccountManager = googleAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+        KakaoLoginButton(
+            kakaoAccountManager = kakaoAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+
+        NaverLoginButton(
+            naverAccountManager = naverAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+        FaceBookLoginButton(
+            facebookAccountManager = facebookAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
     }
 }
 
 @Composable
 fun GoogleLoginButton(
     googleAccountManager: GoogleAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
 ) {
     val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
@@ -67,12 +89,8 @@ fun GoogleLoginButton(
                                     AccountManager.signInWithCredential(
                                         credential = authCredential,
                                         platform = PlatForm.GOOGLE,
-                                        onSignInSucceed = {
-                                            context.toast("로그인 성공")
-                                        },
-                                        onSignInFailed = {
-                                            context.toast("로그인 실패")
-                                        }
+                                        onSignInSucceed = onSignInSucceed,
+                                        onSignInFailed = onSignInFailed
                                     )
                                 }
                             } catch (e: Exception) {
@@ -90,30 +108,38 @@ fun GoogleLoginButton(
         }
 
     SnsLoginButton(snsImage = painterResource(id = R.drawable.ic_sns_google)) {
+        onClickSocialLogin.invoke()
         googleAccountManager.login(launcher = launcher)
     }
 }
 
 @Composable
-fun KakaoLoginButton(kakaoAccountManager: KakaoAccountManager) {
+fun KakaoLoginButton(
+    kakaoAccountManager: KakaoAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
+) {
     val context = LocalContext.current
 
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
+        onClickSocialLogin.invoke()
         kakaoAccountManager.login(
-            onSignInSucceed = {
-                context.toast("로그인 성공")
-            },
-            onSigInFailed = {
-                context.toast("로그인 실패")
-            },
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
         )
     }
 }
 
 @Composable
-fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
+fun NaverLoginButton(
+    naverAccountManager: NaverAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
+) {
     val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
@@ -122,12 +148,8 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
             when (it.resultCode) {
                 Activity.RESULT_OK -> {
                     naverAccountManager.onActivityResult(
-                        onSignInSucceed = {
-                            context.toast("로그인 성공")
-                        },
-                        onSigInFailed = {
-                            context.toast("로그인 실패")
-                        }
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
                     )
                 }
                 Activity.RESULT_CANCELED -> {
@@ -142,6 +164,7 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_naver)
     ) {
+        onClickSocialLogin.invoke()
         naverAccountManager.login(
             context = context,
             launcher = launcher,
@@ -156,12 +179,18 @@ fun NaverLoginButton(naverAccountManager: NaverAccountManager) {
 }
 
 @Composable
-fun FaceBookLoginButton(facebookAccountManager: FacebookAccountManager) {
+fun FaceBookLoginButton(
+    facebookAccountManager: FacebookAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
+) {
     val context = LocalContext.current
 
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_facebook)
     ) {
+        onClickSocialLogin.invoke()
         facebookAccountManager.login(
             onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
                 override fun signInWithCredential(idToken: String?) {
@@ -171,12 +200,8 @@ fun FaceBookLoginButton(facebookAccountManager: FacebookAccountManager) {
                             AccountManager.signInWithCredential(
                                 credential = credential,
                                 platform = PlatForm.FACEBOOK,
-                                onSignInSucceed = {
-                                    context.toast("로그인 성공")
-                                },
-                                onSignInFailed = {
-                                    context.toast("로그인 실패")
-                                }
+                                onSignInSucceed = onSignInSucceed,
+                                onSignInFailed = onSignInFailed
                             )
                         }
                     } catch (e: Exception) {

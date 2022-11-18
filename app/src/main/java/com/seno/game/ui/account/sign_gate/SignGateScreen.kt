@@ -1,7 +1,5 @@
 package com.seno.game.ui.account.sign_gate
 
-import android.widget.Space
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +25,7 @@ import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
 import com.seno.game.ui.account.sign_gate.component.SocialLoginContainer
+import com.seno.game.ui.component.LoadingView
 
 @Composable
 fun SignGateScreen(
@@ -34,8 +33,12 @@ fun SignGateScreen(
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
     kakaoAccountManager: KakaoAccountManager,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
     onClickClose: () -> Unit
 ) {
+    var isLoading by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,6 +48,15 @@ fun SignGateScreen(
             facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
             kakaoAccountManager = kakaoAccountManager,
+            onClickSocialLogin = { isLoading = true },
+            onSignInSucceed = {
+                isLoading = false
+                onSignInSucceed.invoke()
+            },
+            onSignInFailed = {
+                isLoading = false
+                onSignInFailed.invoke()
+            },
             modifier = Modifier.offset(y = 93.dp)
         )
         SignGateHeader(onClickClose = onClickClose)
@@ -60,6 +72,9 @@ fun SignGateScreen(
                 .align(alignment = Alignment.BottomCenter)
                 .padding(bottom = 44.dp)
         )
+        if (isLoading) {
+            LoadingView()
+        }
     }
 }
 
@@ -93,7 +108,7 @@ fun SignGateHeader(
                 .offset(y = 42.dp)
                 .size(size = 96.dp)
                 .align(alignment = Alignment.TopCenter)
-        ){
+        ) {
 
         }
     }
@@ -124,6 +139,9 @@ fun SignGateContainer(
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
     kakaoAccountManager: KakaoAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -152,6 +170,9 @@ fun SignGateContainer(
             facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
             kakaoAccountManager = kakaoAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed,
         )
     }
 }

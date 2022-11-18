@@ -73,7 +73,7 @@ class NaverAccountManager {
 
     fun onActivityResult(
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSignInFailed: () -> Unit
     ) {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
             override fun onSuccess(result: NidProfileResponse) {
@@ -91,7 +91,7 @@ class NaverAccountManager {
                         nickname = name,
                         profileUri = profileImage,
                         onSignInSucceed = onSignInSucceed,
-                        onSignInFailed = onSigInFailed
+                        onSignInFailed = onSignInFailed
                     )
                 }
             }
@@ -99,7 +99,7 @@ class NaverAccountManager {
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                 val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                onSigInFailed.invoke()
+                onSignInFailed.invoke()
                 Timber.e("kkh profileCallback errorCode:$errorCode, errorDesc:$errorDescription")
             }
 

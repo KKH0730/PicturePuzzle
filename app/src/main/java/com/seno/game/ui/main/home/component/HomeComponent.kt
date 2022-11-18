@@ -41,7 +41,10 @@ fun ProfileContainer(
         if (profile.isEmpty()) {
             Image(
                 painter = painterResource(id = R.drawable.ic_profile_not_login),
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier
+                    .size(size = 30.dp)
+                    .clip(CircleShape)
             )
         } else {
             GlideImage(

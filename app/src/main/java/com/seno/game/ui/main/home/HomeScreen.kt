@@ -19,10 +19,12 @@ import androidx.lifecycle.Lifecycle
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
+import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
@@ -43,6 +45,7 @@ fun HomeScreen() {
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
 
@@ -78,6 +81,7 @@ fun HomeScreen() {
     if (isShowLogoutDialog) {
         LogoutDialog(
             onClickYes = {
+                isLoading = true
                 AccountManager.startLogout(
                     context = context,
                     facebookAccountManager = facebookAccountManager,
@@ -85,6 +89,7 @@ fun HomeScreen() {
                     naverAccountManager = naverAccountManager,
                     kakaoAccountManager = kakaoAccountManager,
                     isCompleteLogout = {
+                        isLoading = false
                         isShowLogoutDialog = false
 
                         PrefsManager.apply {
@@ -93,6 +98,8 @@ fun HomeScreen() {
                         }
                         nickname = PrefsManager.nickname
                         profile = ""
+
+                        context.toast("로그아웃 성공")
                     }
                 )
             },
@@ -177,6 +184,10 @@ fun HomeScreen() {
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(height = 56.dp))
+        }
+
+        if (isLoading) {
+            LoadingView()
         }
     }
 }

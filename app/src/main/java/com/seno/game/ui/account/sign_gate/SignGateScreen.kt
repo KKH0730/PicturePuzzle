@@ -24,6 +24,7 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
 import com.seno.game.ui.account.sign_gate.component.SocialLoginContainer
 
@@ -32,6 +33,7 @@ fun SignGateScreen(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
+    kakaoAccountManager: KakaoAccountManager,
     onClickClose: () -> Unit
 ) {
     Box(
@@ -42,6 +44,7 @@ fun SignGateScreen(
             googleAccountManager = googleAccountManager,
             facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
+            kakaoAccountManager = kakaoAccountManager,
             modifier = Modifier.offset(y = 93.dp)
         )
         SignGateHeader(onClickClose = onClickClose)
@@ -120,6 +123,7 @@ fun SignGateContainer(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
+    kakaoAccountManager: KakaoAccountManager,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -147,6 +151,7 @@ fun SignGateContainer(
             googleAccountManager = googleAccountManager,
             facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
+            kakaoAccountManager = kakaoAccountManager,
         )
     }
 }

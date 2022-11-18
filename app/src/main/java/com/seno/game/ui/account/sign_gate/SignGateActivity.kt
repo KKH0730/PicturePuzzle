@@ -18,6 +18,7 @@ class SignGateActivity : AppCompatActivity() {
     private lateinit var googleAccountManager: GoogleAccountManager
     private lateinit var facebookAccountManager: FacebookAccountManager
     private lateinit var naverAccountManager: NaverAccountManager
+    private lateinit var kakaoAccountManager: KakaoAccountManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +29,13 @@ class SignGateActivity : AppCompatActivity() {
                     googleAccountManager = GoogleAccountManager(activity = this@SignGateActivity)
                     facebookAccountManager = FacebookAccountManager(activity = this@SignGateActivity)
                     naverAccountManager = NaverAccountManager()
+                    kakaoAccountManager = KakaoAccountManager(context  = this@SignGateActivity)
 
                    SignGateScreen(
                        googleAccountManager = googleAccountManager,
                        facebookAccountManager = facebookAccountManager,
                        naverAccountManager = naverAccountManager,
+                       kakaoAccountManager = kakaoAccountManager,
                        onClickClose = { finish() }
                    )
                 }
@@ -42,6 +45,7 @@ class SignGateActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         facebookAccountManager.removeCallback()
+        kakaoAccountManager.release()
         super.onDestroy()
     }
 

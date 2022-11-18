@@ -34,13 +34,14 @@ fun SocialLoginContainer(
     googleAccountManager: GoogleAccountManager,
     facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
+    kakaoAccountManager: KakaoAccountManager
 ) {
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(space = 22.dp),
     ) {
         GoogleLoginButton(googleAccountManager = googleAccountManager)
-        KakaoLoginButton()
+        KakaoLoginButton(kakaoAccountManager = kakaoAccountManager)
         NaverLoginButton(naverAccountManager = naverAccountManager)
         FaceBookLoginButton(facebookAccountManager = facebookAccountManager)
     }
@@ -94,10 +95,20 @@ fun GoogleLoginButton(
 }
 
 @Composable
-fun KakaoLoginButton() {
+fun KakaoLoginButton(kakaoAccountManager: KakaoAccountManager) {
+    val context = LocalContext.current
+
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
+        kakaoAccountManager.login(
+            onSignInSucceed = {
+                context.toast("로그인 성공")
+            },
+            onSigInFailed = {
+                context.toast("로그인 실패")
+            },
+        )
     }
 }
 

@@ -19,10 +19,7 @@ import androidx.lifecycle.Lifecycle
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
-import com.seno.game.manager.AccountManager
-import com.seno.game.manager.FacebookAccountManager
-import com.seno.game.manager.GoogleAccountManager
-import com.seno.game.manager.NaverAccountManager
+import com.seno.game.manager.*
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
@@ -37,21 +34,17 @@ import timber.log.Timber
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
-    val facebookAccountManager = FacebookAccountManager(context as MainActivity)
-    val googleAccountManager = GoogleAccountManager(context as MainActivity)
+    val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
+    val googleAccountManager = GoogleAccountManager(activity = context as MainActivity)
     val naverAccountManager = NaverAccountManager()
+    val kakaoAccountManager = KakaoAccountManager(context = context)
+
     val homeViewModel = hiltViewModel<HomeViewModel>()
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
-
-    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val vibrator = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-        vibrator.defaultVibrator
-    } else {
-        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
+    var profile by remember { mutableStateOf("") }
 
     (context as MainActivity).LifecycleEventListener {
         when (it) {
@@ -59,6 +52,7 @@ fun HomeScreen() {
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
                 nickname = PrefsManager.nickname
+                profile = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
             }
             Lifecycle.Event.ON_PAUSE -> {
@@ -85,12 +79,20 @@ fun HomeScreen() {
         LogoutDialog(
             onClickYes = {
                 AccountManager.startLogout(
+                    context = context,
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,
+                    kakaoAccountManager = kakaoAccountManager,
                     isCompleteLogout = {
                         isShowLogoutDialog = false
-                        nickname = context.resources.createRandomNickname()
+
+                        PrefsManager.apply {
+                            PrefsManager.nickname = context.resources.createRandomNickname()
+                            profileUri = ""
+                        }
+                        nickname = PrefsManager.nickname
+                        profile = ""
                     }
                 )
             },
@@ -130,28 +132,12 @@ fun HomeScreen() {
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-//            .pointerInteropFilter {
-//                when (it.action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        if(Build.VERSION.SDK_INT >= 26) {
-//                            vibrator.vibrate(VibrationEffect.createOneShot(50, 50))
-//                        } else {    //26보다 낮으면
-//                            vibrator.vibrate(50)
-//                        }
-//                    }
-//                    MotionEvent.ACTION_MOVE -> {}
-//                    MotionEvent.ACTION_UP -> {}
-//                    else ->  false
-//                }
-//                true
-//            }
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Spacer(modifier = Modifier.height(14.dp))
-            Row() {
+            Row {
                 ProfileContainer(
                     nickname = nickname,
+                    profile = profile,
                     onClick = { context.startActivity(MyProfileActivity::class.java) }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))

@@ -73,8 +73,8 @@ object Dependency {
     }
 
     object Kakao {
-        const val KAKAO_LOGIN = "com.kakao.sdk:v2-user:2.11.2"
-        const val KAKAO_LOGIN_RX = "com.kakao.sdk:v2-user-rx:2.11.2"
+        const val KAKAO_SDK_ALL = "com.kakao.sdk:v2-all:2.11.2"
+        const val KAKAO_SDK_ALL_RX = "com.kakao.sdk:v2-all-rx:2.11.2"
     }
 
     object Google {
@@ -121,6 +121,9 @@ object Dependency {
         private const val VERSION = "4.12.0"
         const val GLIDE = "com.github.bumptech.glide:glide:$VERSION"
         const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:$VERSION"
+
+        private const val VERSION_COMPOSE = "1.4.7"
+        const val GLIDE_COMPOSE = "com.github.skydoves:landscapist-glide:$VERSION_COMPOSE"
     }
 
     object Etc {

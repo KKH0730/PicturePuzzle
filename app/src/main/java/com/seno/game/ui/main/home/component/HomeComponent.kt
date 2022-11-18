@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
@@ -12,6 +13,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -22,21 +25,35 @@ import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.MusicPlayUtil
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun ProfileContainer(
     nickname: String,
+    profile: String,
     onClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.noRippleClickable { onClick.invoke() }
     ) {
-        Spacer(modifier = Modifier.width(width = 6.dp))
-        Image(
-            painter = painterResource(id = R.drawable.ic_profile_not_login),
-            contentDescription = null
-        )
+        Spacer(modifier = Modifier.width(width = 16.dp))
+        if (profile.isEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_profile_not_login),
+                contentDescription = null
+            )
+        } else {
+            GlideImage(
+                imageModel = profile,
+                contentScale = ContentScale.Crop,
+                placeHolder =  painterResource(id = R.drawable.ic_profile_not_login),
+                modifier = Modifier
+                    .size(size = 30.dp)
+                    .clip(CircleShape)
+            )
+        }
+        Spacer(modifier = Modifier.width(width = 10.dp))
         Text(
             text = if (AccountManager.isSignedIn) {
                 nickname

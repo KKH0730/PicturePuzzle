@@ -1,5 +1,6 @@
 package com.seno.game.manager
 
+import android.content.Context
 import android.net.Uri
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -9,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.FirebaseRequest
+import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.extensions.toast
@@ -291,33 +293,36 @@ object AccountManager {
     }
 
     fun startLogout(
+        context: Context,
         facebookAccountManager: FacebookAccountManager?,
         googleAccountManager: GoogleAccountManager?,
         naverAccountManager: NaverAccountManager?,
+        kakaoAccountManager: KakaoAccountManager?,
         isCompleteLogout: () -> Unit,
     ) {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
                 facebookAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
                     logoutListener = object : GoogleAccountManager.LogoutListener {
                         override fun onSuccessLogout() {
-                            signOutFirebase(isCompleteLogout = isCompleteLogout)
+                            signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
                         }
                     })
             }
 
             override fun onSignOutNaver() {
                 naverAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutKakao() {
-
+                kakaoAccountManager?.logout()
+                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
             }
         })
     }
@@ -335,7 +340,7 @@ object AccountManager {
         }
     }
 
-    fun signOutFirebase(isCompleteLogout: () -> Unit) {
+    fun signOutFirebase(context: Context, isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
         signInAnonymous(
             onSuccess = isCompleteLogout,

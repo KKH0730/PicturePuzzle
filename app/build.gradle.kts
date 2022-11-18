@@ -116,8 +116,8 @@ dependencies {
     implementation(Dependency.Naver.NAVER_JDK8)
 
     // Kakao
-    implementation(Dependency.Kakao.KAKAO_LOGIN)
-    implementation(Dependency.Kakao.KAKAO_LOGIN_RX)
+//    implementation(Dependency.Kakao.KAKAO_SDK_ALL)
+    implementation(Dependency.Kakao.KAKAO_SDK_ALL_RX)
 
     // Google
     implementation(Dependency.Google.PLAY_SERVICE_AUTH)
@@ -139,6 +139,7 @@ dependencies {
     // Glide
     implementation(Dependency.Glide.GLIDE)
     implementation(Dependency.Glide.GLIDE_COMPILER)
+    implementation(Dependency.Glide.GLIDE_COMPOSE)
 
     // Etc
     implementation(Dependency.Etc.EASY_PREFS)

@@ -9,7 +9,7 @@
 
     <queries>
         <package android:name="com.android.chrome" />
-        <package android:name="com.kakao.talk"/>
+        <package android:name="com.kakao.talk" />
     </queries>
 
     <application
@@ -27,9 +27,15 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android?:allowBackup">
         <activity
+            android:name=".ui.game.diffgame.list.DiffPictureSingleGameListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.game.diffgame.single.DiffPictureSingleGameActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.account.my_profile.MyProfileActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="false"
@@ -57,7 +63,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.game.diffgame.DiffPictureGameActivity"
+            android:name=".ui.game.diffgame.multi.DiffPictureGameActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -95,14 +101,17 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="oauth"
+
+                <data
+                    android:host="oauth"
                     android:scheme="@string/kakao_native_app_key" />
             </intent-filter>
         </activity>

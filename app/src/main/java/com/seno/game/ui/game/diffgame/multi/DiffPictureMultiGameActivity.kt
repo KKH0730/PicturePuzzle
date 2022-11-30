@@ -1,4 +1,4 @@
-package com.seno.game.ui.game.diffgame
+package com.seno.game.ui.game.diffgame.multi
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -26,11 +26,12 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
-import com.seno.game.databinding.ActivityDiffPictureGameBinding
+import com.seno.game.databinding.ActivityDiffPictureMultiGameBinding
 import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.screenWidth
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.game.component.GamePrepareView
+import com.seno.game.ui.game.diffgame.DiffPictureGameViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -38,8 +39,8 @@ import kotlin.math.abs
 const val ANSWER_CORRECTION = 20
 
 @AndroidEntryPoint
-class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureGameBinding>(
-    layoutResId = R.layout.activity_diff_picture_game
+class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
+    layoutResId = R.layout.activity_diff_picture_multi_game
 ) {
     private val viewModel by viewModels<DiffPictureGameViewModel>()
     private var rewardedAd: RewardedAd? = null

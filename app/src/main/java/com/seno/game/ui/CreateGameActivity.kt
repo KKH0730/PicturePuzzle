@@ -18,7 +18,7 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.Player
-import com.seno.game.ui.game.diffgame.DiffPictureGameActivity
+import com.seno.game.ui.game.diffgame.multi.DiffPictureGameActivity
 import com.seno.game.ui.main.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

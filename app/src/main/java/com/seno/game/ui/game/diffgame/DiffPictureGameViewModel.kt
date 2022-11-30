@@ -10,6 +10,7 @@ import com.seno.game.extensions.getDrawable
 import com.seno.game.ui.game.diffgame.model.Answer
 import com.seno.game.ui.game.diffgame.model.DiffGameInfo
 import com.seno.game.ui.game.diffgame.model.Point
+import com.seno.game.ui.game.diffgame.multi.ANSWER_CORRECTION
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

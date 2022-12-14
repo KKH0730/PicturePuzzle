@@ -22,6 +22,7 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.game.diffgame.single.DiffPictureSingleGameActivity
 import com.seno.game.ui.main.home.HomeDummyScreen
 import com.seno.game.ui.splash.SplashActivity
 import com.seno.game.util.MusicPlayUtil
@@ -39,8 +40,9 @@ class MainActivity : AppCompatActivity() {
         printHashKey()
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
-            SplashActivity.start(context = this@MainActivity)
-            finish()
+//            SplashActivity.start(context = this@MainActivity)
+//            finish()
+            DiffPictureSingleGameActivity.start(context = this)
         } else {
             setContent {
                 AppTheme {

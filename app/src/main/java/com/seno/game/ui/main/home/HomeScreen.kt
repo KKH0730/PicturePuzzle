@@ -1,9 +1,5 @@
 package com.seno.game.ui.main.home
 
-import android.content.Context
-import android.os.Build
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -26,7 +22,6 @@ import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.game.diffgame.list.DiffPictureSingleGameListActivity
-import com.seno.game.ui.game.diffgame.multi.DiffPictureGameActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
@@ -174,7 +169,7 @@ fun HomeScreen() {
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = {
-                    context.startActivity(DiffPictureSingleGameListActivity::class.java)
+                    DiffPictureSingleGameListActivity.start(context = context)
                     (context as MainActivity).overridePendingTransition(
                         R.anim.slide_right_enter,
                         R.anim.slide_right_exit

@@ -36,7 +36,7 @@ fun GridGameLevelList() {
                 GameLevelItem(
                     index = index,
                     onClickItem = {
-                        context.startActivity(DiffPictureSingleGameActivity::class.java)
+                        DiffPictureSingleGameActivity.start(context = context)
                     }
                 )
             }

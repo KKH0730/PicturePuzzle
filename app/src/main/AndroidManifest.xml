@@ -26,6 +26,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android?:allowBackup">
+
         <activity
             android:name=".ui.game.diffgame.list.DiffPictureSingleGameListActivity"
             android:exported="false" />

@@ -77,4 +77,8 @@
 
     <string name="diff_title">틀린그림을 찾아보세요</string>
     <string name="diff_total_answer_count">점수 : %s</string>
+
+    <string name="diff_next_round_dialog_title">모든 정답을 맞추셨습니다!</string>
+    <string name="diff_finish">나가기</string>
+    <string name="diff_next">다음</string>
 </resources>

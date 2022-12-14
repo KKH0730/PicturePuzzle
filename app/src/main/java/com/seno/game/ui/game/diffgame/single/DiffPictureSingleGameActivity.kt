@@ -1,18 +1,14 @@
 package com.seno.game.ui.game.diffgame.single
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.core.view.children
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,10 +23,8 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSingleGameBinding
-import com.seno.game.extensions.drawLottieAnswerCircle
-import com.seno.game.extensions.screenWidth
+import com.seno.game.extensions.*
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.game.component.GamePrepareView
 import com.seno.game.ui.game.diffgame.DiffPictureGameViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -40,7 +34,7 @@ import kotlin.math.abs
 class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGameBinding>(
     layoutResId = R.layout.activity_diff_picture_single_game
 ) {
-    private val viewModel by viewModels<DiffPictureGameViewModel>()
+    private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
     private var rewardedAd: RewardedAd? = null
     private var isShowHint = false
     private var isLoadingVideoAD = false
@@ -116,23 +110,15 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
             isShowAd = PrefsManager.isShowAD
         }
 
-        binding.cvPrepareView.setContent {
-            var prepareVisible by remember { mutableStateOf(true) }
+        setUpPrepareView()
+        setUpCompleteGameDialog()
+        setUpTimberComposeView()
 
-            AnimatedVisibility(
-                visible = prepareVisible,
-                exit = ExitTransition.None
-            ) {
-                GamePrepareView { prepareVisible = false }
-            }
-
-            loadAD()
-            setImageTouchListener()
-            observeFlow()
-        }
+        loadAD()
+        setImageTouchListener()
+        observeFlow()
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     private fun observeFlow() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -156,6 +142,10 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                     viewModel.enableRewardADButton.collect {
                         binding.btnResult.isEnabled = it
                     }
+                }
+
+                launch {
+                    viewModel.onShowCompleteGameDialog.collect { binding.cvCompleteGameDialog.show() }
                 }
 
                 launch {
@@ -207,6 +197,8 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                             view.playAnimation()
                             binding.clAnswerMark.addView(view)
                         }
+
+                        binding.cvTimerView.onClickWrongAnswer.invoke()
                     }
                 }
 
@@ -264,10 +256,41 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
             }
         }
         rewardedAd?.fullScreenContentCallback = null
+        binding.cvTimerView.release()
         super.onDestroy()
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun setUpPrepareView() {
+        binding.cvPrepareView.onGameStart = {
+            binding.cvTimerView.timerStart()
+        }
+    }
+
+    private fun setUpCompleteGameDialog() {
+        binding.cvCompleteGameDialog.apply {
+            onClickPositiveButton = { finish() }
+            onClickNegativeButton = {
+                finish()
+            }
+        }
+    }
+
+    private fun setUpTimberComposeView() {
+        binding.cvTimerView.post {
+            binding.cvTimerView.apply {
+                onStartWrongAnswerAnimation = { decreasedTime: Int, prevTime: Int ->
+                    binding.cvTimerView.playPenaltyAnimation(
+                        rootView = binding.clRoot,
+                        yPosition = binding.cvTimerView.y,
+                        decreasedTime = decreasedTime,
+                        prevTime = prevTime
+                    )
+                }
+                onTimerOver = {  }
+            }
+        }
+    }
+
     private fun loadAD() {
         if (PrefsManager.isShowAD) {
             // 배너 광고 로드
@@ -373,5 +396,11 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                 }
             }
         )
+    }
+
+    companion object {
+        fun start(context: Context) {
+            context.startActivity(DiffPictureSingleGameActivity::class.java)
+        }
     }
 }

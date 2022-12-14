@@ -116,7 +116,6 @@ dependencies {
     implementation(Dependency.Naver.NAVER_JDK8)
 
     // Kakao
-//    implementation(Dependency.Kakao.KAKAO_SDK_ALL)
     implementation(Dependency.Kakao.KAKAO_SDK_ALL_RX)
 
     // Google
@@ -145,6 +144,7 @@ dependencies {
     implementation(Dependency.Etc.EASY_PREFS)
     implementation(Dependency.Etc.QR)
     implementation(Dependency.Etc.LOTTIE)
+    implementation(Dependency.Etc.COMPOSE_LOTTIE)
 
     // TEST
     testImplementation(Dependency.Test.JUNIT)

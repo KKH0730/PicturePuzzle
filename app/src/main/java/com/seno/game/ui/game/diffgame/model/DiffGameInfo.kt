@@ -1,6 +1,5 @@
 package com.seno.game.ui.game.diffgame.model
 
-import androidx.lifecycle.LifecycleObserver
 import kotlinx.coroutines.flow.MutableStateFlow
 
 data class DiffGameInfo(

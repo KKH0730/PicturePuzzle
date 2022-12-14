@@ -9,17 +9,26 @@
         <entry key="app/src/main/res/drawable/bg_color_blue.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/bg_color_green.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/bg_color_red.xml" value="0.1975" />
+        <entry key="app/src/main/res/drawable/bg_timer_gradient.xml" value="0.226" />
+        <entry key="app/src/main/res/drawable/bg_timer_wrong_answer.xml" value="0.22" />
+        <entry key="app/src/main/res/drawable/bg_timer_wrong_answer_fff1d170.xml" value="0.221" />
         <entry key="app/src/main/res/drawable/img_circle_answer.xml" value="0.228" />
+        <entry key="app/src/main/res/drawable/rounded_corners_progress_bar.xml" value="0.226" />
         <entry key="app/src/main/res/layout/activity_area_game.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/activity_create_game.xml" value="0.1724137931034483" />
         <entry key="app/src/main/res/layout/activity_diff_picture_game.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/activity_diff_picture_single_game.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_find_game.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_new_game.xml" value="0.32314814814814813" />
         <entry key="app/src/main/res/layout/activity_sign_gate.xml" value="0.1648148148148148" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.203125" />
+        <entry key="app/src/main/res/layout/dialog_complete_game.xml" value="0.22" />
         <entry key="app/src/main/res/layout/humin_layout.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/layout_complete_game_dialog.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/layout_timer_view.xml" value="0.33" />
         <entry key="app/src/main/res/layout/loading_view_all_ready.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/partial_complete_game_dialog.xml" value="0.25" />
         <entry key="app/src/main/res/layout/viewholder_diff.xml" value="0.375" />
         <entry key="app/src/main/res/layout/viewholder_diff_picture_wating.xml" value="0.33240740740740743" />
       </map>

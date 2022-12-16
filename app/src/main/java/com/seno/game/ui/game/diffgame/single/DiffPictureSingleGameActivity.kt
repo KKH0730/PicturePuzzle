@@ -2,17 +2,19 @@ package com.seno.game.ui.game.diffgame.single
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.core.view.children
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -25,7 +27,7 @@ import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSingleGameBinding
 import com.seno.game.extensions.*
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.game.diffgame.DiffPictureGameViewModel
+import com.seno.game.ui.game.diffgame.single.adapter.AnswerMarkAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -35,6 +37,7 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
     layoutResId = R.layout.activity_diff_picture_single_game
 ) {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
+
     private var rewardedAd: RewardedAd? = null
     private var isShowHint = false
     private var isLoadingVideoAD = false
@@ -68,10 +71,6 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
 
 
     private val fullScreenContentCallback = object: FullScreenContentCallback() {
-        override fun onAdClicked() {
-            super.onAdClicked()
-        }
-
         override fun onAdDismissedFullScreenContent() {
             super.onAdDismissedFullScreenContent()
             if (isShowHint) {
@@ -92,10 +91,6 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
             binding.clLoadingView.visibility = View.GONE
         }
 
-        override fun onAdImpression() {
-            super.onAdImpression()
-        }
-
         override fun onAdShowedFullScreenContent() {
             super.onAdShowedFullScreenContent()
             binding.clLoadingView.visibility = View.GONE
@@ -110,9 +105,10 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
             isShowAd = PrefsManager.isShowAD
         }
 
-        setUpPrepareView()
-        setUpCompleteGameDialog()
-        setUpTimberComposeView()
+        setPrepareView()
+        setCompleteGameDialog()
+        setTimberView()
+        setRecyclerView()
 
         loadAD()
         setImageTouchListener()
@@ -129,12 +125,18 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                 }
 
                 launch {
+                    viewModel.answerMarkList.collect {
+                        (binding.rvAnswerMark.adapter as AnswerMarkAdapter).submitList(it)
+                    }
+                }
+
+                launch {
                     viewModel.onClearAnswer.collect { binding.clAnswerMark.removeAllViews() }
                 }
 
                 launch {
-                    viewModel.totalScore.collect { totalScroe ->
-                        binding.tvTotalAnswerCount.text = String.format(getString(R.string.diff_total_answer_count), totalScroe.toString())
+                    viewModel.totalScore.collect { totalScore ->
+                        binding.tvTotalAnswerCount.text = String.format(getString(R.string.diff_total_answer_count), totalScore.toString())
                     }
                 }
 
@@ -178,6 +180,17 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
                         }
+
+                        val list = (binding.rvAnswerMark.adapter as AnswerMarkAdapter).currentList.toMutableList()
+                        for (i in list.size - 1 downTo 0) {
+                            if (!list[i].isAnswer) {
+                                val copyAnswerMark = list[i].copy()
+                                copyAnswerMark.isAnswer = true
+                                list[i] = copyAnswerMark
+                                break
+                            }
+                        }
+                        (binding.rvAnswerMark.adapter as AnswerMarkAdapter).submitList(list.toList())
                     }
                 }
 
@@ -260,22 +273,27 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
         super.onDestroy()
     }
 
-    private fun setUpPrepareView() {
+    private fun setPrepareView() {
         binding.cvPrepareView.onGameStart = {
             binding.cvTimerView.timerStart()
         }
     }
 
-    private fun setUpCompleteGameDialog() {
+    private fun setCompleteGameDialog() {
         binding.cvCompleteGameDialog.apply {
-            onClickPositiveButton = { finish() }
+            onClickPositiveButton = {
+                this.dismiss()
+                setResult(RESULT_OK)
+                finish()
+            }
             onClickNegativeButton = {
+                this.dismiss()
                 finish()
             }
         }
     }
 
-    private fun setUpTimberComposeView() {
+    private fun setTimberView() {
         binding.cvTimerView.post {
             binding.cvTimerView.apply {
                 onStartWrongAnswerAnimation = { decreasedTime: Int, prevTime: Int ->
@@ -287,6 +305,15 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
                     )
                 }
                 onTimerOver = {  }
+            }
+        }
+    }
+
+    private fun setRecyclerView() {
+        binding.rvAnswerMark.adapter = AnswerMarkAdapter()
+        binding.rvAnswerMark.itemAnimator.run {
+            if (this is SimpleItemAnimator) {
+                this.supportsChangeAnimations = false
             }
         }
     }
@@ -399,8 +426,10 @@ class DiffPictureSingleGameActivity : BaseActivity<ActivityDiffPictureSingleGame
     }
 
     companion object {
-        fun start(context: Context) {
-            context.startActivity(DiffPictureSingleGameActivity::class.java)
+        fun start(context: Context, position: Int, launcher: ActivityResultLauncher<Intent?>) {
+            context.startActivity(DiffPictureSingleGameActivity::class.java, launcher) {
+                putExtra("position", position)
+            }
         }
     }
 }

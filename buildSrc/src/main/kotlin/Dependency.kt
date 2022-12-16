@@ -26,12 +26,12 @@ object Dependency {
 
     object KTX {
         const val CORE = "androidx.core:core-ktx:1.7.0"
+        const val ACTIVITY_KTX = "androidx.activity:activity-ktx:1.4.0"
     }
 
     object Compose {
         private const val VERSION = "1.2.0"
         const val ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.0"
-        const val ACTIVITY_KTX = "androidx.activity:activity-ktx:1.4.0"
 
         const val COMPOSE_MATERIAL = "androidx.compose.material:material:$VERSION"
         const val PREVIEW = "androidx.compose.ui:ui-tooling-preview:$VERSION"
@@ -53,8 +53,13 @@ object Dependency {
     }
 
     object Lifecycle {
+        const val lifecycle = "2.4.1"
         const val VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
         const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha01"
+        const val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
+        const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+        const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+        const val process = "androidx.lifecycle:lifecycle-process:$lifecycle"
     }
 
     object Paging {
@@ -131,6 +136,7 @@ object Dependency {
         const val QR = "com.journeyapps:zxing-android-embedded:3.6.0"
         const val LOTTIE = "com.airbnb.android:lottie:5.2.0"
         const val COMPOSE_LOTTIE = "com.airbnb.android:lottie-compose:5.2.0"
+        const val RECYCLERVIEW_DIVIDER = "com.github.fondesa:recycler-view-divider:3.0.0"
     }
 
     object Test {

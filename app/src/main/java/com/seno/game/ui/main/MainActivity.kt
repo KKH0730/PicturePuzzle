@@ -40,9 +40,9 @@ class MainActivity : AppCompatActivity() {
         printHashKey()
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
-//            SplashActivity.start(context = this@MainActivity)
-//            finish()
-            DiffPictureSingleGameActivity.start(context = this)
+            SplashActivity.start(context = this@MainActivity)
+            finish()
+//            DiffPictureSingleGameActivity.start(context = this)
         } else {
             setContent {
                 AppTheme {

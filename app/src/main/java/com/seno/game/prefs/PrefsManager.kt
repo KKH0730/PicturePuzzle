@@ -50,4 +50,14 @@ object PrefsManager {
         set(isShow) {
             Prefs.putBoolean("isShowAD", isShow)
         }
+
+    var diffPictureCompleteGameSingle: String = ""
+        get() = Prefs.getString("diffPictureCompleteGameSingle", "")
+        set(value) {
+            if (field.isEmpty()) {
+                Prefs.putString("isShowAD", value)
+            } else {
+                Prefs.putString("isShowAD", ",$value")
+            }
+        }
 }

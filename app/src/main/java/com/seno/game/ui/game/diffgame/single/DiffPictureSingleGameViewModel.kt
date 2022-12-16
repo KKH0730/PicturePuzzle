@@ -11,6 +11,7 @@ import com.seno.game.ui.game.diffgame.model.Answer
 import com.seno.game.ui.game.diffgame.model.DiffGameInfo
 import com.seno.game.ui.game.diffgame.model.Point
 import com.seno.game.ui.game.diffgame.multi.ANSWER_CORRECTION
+import com.seno.game.ui.game.diffgame.single.model.AnswerMark
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -47,6 +47,9 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _diffImagePair = MutableStateFlow(imageList[0].first to imageList[0].second)
     val diffImagePair = _diffImagePair.asStateFlow()
 
+    private val _answerMarkList = MutableStateFlow(initialAnswerMarkList)
+    val answerMarkList = _answerMarkList.asStateFlow()
+
     private val _drawRightAnswerMark = MutableSharedFlow<Point>()
     val drawRightAnswerMark = _drawRightAnswerMark.asSharedFlow()
 
@@ -71,6 +74,32 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _onShowCompleteGameDialog = MutableSharedFlow<Any>()
     val onShowCompleteGameDialog = _onShowCompleteGameDialog.asSharedFlow()
 
+    private val initialAnswerMarkList: List<AnswerMark>?
+        get() {
+            val size = gameInfo.answer?.answerPointList?.size
+            return if (size == null) {
+                null
+            } else {
+                return (0 until size).map { id -> AnswerMark(id = id, isAnswer = false) }
+            }
+        }
+
+    private val modifiedAnswerMarkList: List<AnswerMark>?
+        get() {
+            val list = _answerMarkList.value?.toMutableList()
+            if (list != null) {
+                for (i in list.size - 1 downTo 0) {
+                    if (!list[i].isAnswer) {
+                        val copyAnswerMark = list[i].copy()
+                        copyAnswerMark.isAnswer = true
+                        list[i] = copyAnswerMark
+                        break
+                    }
+                }
+            }
+            return list
+        }
+
     init {
         viewModelScope.launch {
             launch {
@@ -84,6 +113,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                                     copyBitmap = getDrawable(imageList[it].second)?.toBitmap()
                                 )
                             )
+
+                            _answerMarkList.emit(initialAnswerMarkList)
                             _diffImagePair.value = imageList[it].first to imageList[it].second
                         } else {
                             _onShowCompleteGameDialog.emit(Any())
@@ -147,6 +178,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                         if (answerHashMap[answerCenterX] == null || answerHashMap[answerCenterX] != answerCenterY) {
                             answerHashMap[answerCenterX] = answerCenterY
                             _drawRightAnswerMark.emit(point)
+                            _answerMarkList.value = modifiedAnswerMarkList
+
                             onClickRightAnswer()
                         }
                     }

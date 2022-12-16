@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -76,6 +77,7 @@ dependencies {
 
     // KTX
     implementation(Dependency.KTX.CORE)
+    implementation(Dependency.KTX.ACTIVITY_KTX)
 
     // Compose
     implementation(Dependency.Compose.ACTIVITY_COMPOSE)
@@ -145,6 +147,7 @@ dependencies {
     implementation(Dependency.Etc.QR)
     implementation(Dependency.Etc.LOTTIE)
     implementation(Dependency.Etc.COMPOSE_LOTTIE)
+    implementation(Dependency.Etc.RECYCLERVIEW_DIVIDER)
 
     // TEST
     testImplementation(Dependency.Test.JUNIT)

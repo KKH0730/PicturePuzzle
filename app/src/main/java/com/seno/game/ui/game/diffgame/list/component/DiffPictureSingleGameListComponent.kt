@@ -14,14 +14,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.seno.game.extensions.noRippleClickable
-import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.textDp
-import com.seno.game.ui.game.diffgame.single.DiffPictureSingleGameActivity
+import com.seno.game.ui.game.diffgame.list.model.DPSingleGame
+import com.seno.game.ui.game.diffgame.list.model.DPSingleGameLevel
 
 @Composable
-fun GridGameLevelList() {
+fun GridGameLevelList(
+    gameList: List<DPSingleGame>,
+    onClickItem: (position: Int) -> Unit
+) {
     val state = rememberLazyGridState()
-    val context = LocalContext.current
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = 4),
@@ -31,32 +33,28 @@ fun GridGameLevelList() {
         horizontalArrangement = Arrangement.spacedBy(space = 10.dp),
         modifier = Modifier.fillMaxSize(),
     ) {
-        (0..100).forEach { index ->
+        gameList.forEach {
             item {
                 GameLevelItem(
-                    index = index,
-                    onClickItem = {
-                        DiffPictureSingleGameActivity.start(context = context)
-                    }
+                    dpSingleGame = it,
+                    onClickItem = onClickItem
                 )
             }
         }
     }
 }
 
-val levelArray = arrayOf("쉬움", "보통", "어려움", "지옥")
-
 @Composable
 fun GameLevelItem(
-    index: Int,
-    onClickItem: () -> Unit,
+    dpSingleGame: DPSingleGame,
+    onClickItem: (position: Int) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier
             .height(100.dp)
             .fillMaxWidth(0.3f)
-            .noRippleClickable { onClickItem.invoke() }
+            .noRippleClickable { onClickItem.invoke(dpSingleGame.id) }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,18 +62,13 @@ fun GameLevelItem(
         ) {
             Spacer(modifier = Modifier.height(height = 20.dp))
             Text(
-                text = "Lv $index",
+                text = "Lv ${dpSingleGame.id}",
                 fontSize = 18.textDp,
                 color = Color.Black
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
             Text(
-                text = when {
-                    index < 25 -> levelArray[0]
-                    index < 50 -> levelArray[1]
-                    index < 75 -> levelArray[2]
-                    else -> levelArray[3]
-                },
+                text = DPSingleGameLevel.getLevelValue(dpSingleGame.level),
                 fontSize = 14.textDp,
                 color = Color.Black
             )

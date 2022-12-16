@@ -75,10 +75,16 @@
     <string name="hummin_submit">제출</string>
     <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
 
+    <!-- single gmale -->
     <string name="diff_title">틀린그림을 찾아보세요</string>
     <string name="diff_total_answer_count">점수 : %s</string>
 
     <string name="diff_next_round_dialog_title">모든 정답을 맞추셨습니다!</string>
     <string name="diff_finish">나가기</string>
     <string name="diff_next">다음</string>
+
+    <string name="diff_level_low">쉬움</string>
+    <string name="diff_level_middle">보통</string>
+    <string name="diff_level_high">어려움</string>
+    <string name="diff_level_hell">지옥</string>
 </resources>

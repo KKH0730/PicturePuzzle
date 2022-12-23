@@ -1,13 +1,20 @@
+import java.io.FileInputStream
+import java.util.*
 
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("dagger.hilt.android.plugin")
 }
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreFileInputStream = FileInputStream(keystorePropertiesFile)
+val keystoreProperties = Properties()
+keystoreProperties.load(keystoreFileInputStream)
 
 android {
     compileSdk = 32
@@ -20,6 +27,16 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+
+    signingConfigs {
+        create("release") {
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"] as String?
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+        }
     }
 
     buildTypes {
@@ -41,6 +58,8 @@ android {
         }
 
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

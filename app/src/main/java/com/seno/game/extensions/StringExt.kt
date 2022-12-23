@@ -1,9 +1,11 @@
 package com.seno.game.extensions
 
+import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.prefs.PrefsManager
 import java.util.*
@@ -38,3 +40,15 @@ fun Resources.createRandomNickname(): String {
     return nickname
 }
 
+fun Int.saveCompleteDPGameRound() {
+    if (!PrefsManager.diffPictureCompleteGameRound.split(",").contains(this.toString())) {
+        PrefsManager.diffPictureCompleteGameRound = this.toString()
+    }
+}
+
+fun String.getDrawableResourceId(): Int {
+    val context = App.getInstance()
+    val resName = "@drawable/$this"
+    val packName = context.packageName
+    return context.resources.getIdentifier(resName, "drawable", packName)
+}

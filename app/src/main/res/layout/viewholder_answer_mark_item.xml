@@ -6,10 +6,10 @@
         <import type="android.view.View"/>
         <variable
             name="viewholder"
-            type="com.seno.game.ui.game.diffgame.single.adapter.AnswerMarkAdapter.AnswerMarkViewHolder" />
+            type="com.seno.game.ui.game.diff_picture.single.adapter.AnswerMarkAdapter.AnswerMarkViewHolder" />
         <variable
             name="answerMark"
-            type="com.seno.game.ui.game.diffgame.single.model.AnswerMark" />
+            type="com.seno.game.ui.game.diff_picture.single.model.AnswerMark" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,7 +38,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:lottie_rawRes="@raw/checked_answer"
             app:lottie_autoPlay="true"
-            app:lottie_loop="false" />
+            app:lottie_loop="false"
+            app:lottie_speed="2.5"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

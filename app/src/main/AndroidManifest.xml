@@ -28,10 +28,10 @@
         tools:replace="android?:allowBackup">
 
         <activity
-            android:name=".ui.game.diffgame.list.DiffPictureSingleGameListActivity"
+            android:name=".ui.game.diff_picture.list.DiffPictureSingleGameListActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.game.diffgame.single.DiffPictureSingleGameActivity"
+            android:name=".ui.game.diff_picture.single.DPSinglePlayActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -64,7 +64,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.game.diffgame.multi.DiffPictureGameActivity"
+            android:name=".ui.game.diff_picture.multi.DiffPictureGameActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

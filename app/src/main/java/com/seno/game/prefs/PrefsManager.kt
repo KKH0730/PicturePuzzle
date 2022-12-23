@@ -1,6 +1,7 @@
 package com.seno.game.prefs
 
 import com.pixplicity.easyprefs.library.Prefs
+import timber.log.Timber
 
 object PrefsManager {
     var nickname: String
@@ -51,13 +52,13 @@ object PrefsManager {
             Prefs.putBoolean("isShowAD", isShow)
         }
 
-    var diffPictureCompleteGameSingle: String = ""
-        get() = Prefs.getString("diffPictureCompleteGameSingle", "")
+    var diffPictureCompleteGameRound: String
+        get() = Prefs.getString("diffPictureCompleteGameRound", "")
         set(value) {
-            if (field.isEmpty()) {
-                Prefs.putString("isShowAD", value)
+            if (Prefs.getString("diffPictureCompleteGameRound").isEmpty()) {
+                Prefs.putString("diffPictureCompleteGameRound", value)
             } else {
-                Prefs.putString("isShowAD", ",$value")
+                Prefs.putString("diffPictureCompleteGameRound", "${Prefs.getString("diffPictureCompleteGameRound")},$value")
             }
         }
 }

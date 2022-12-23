@@ -29,6 +29,7 @@
         <entry key="app/src/main/res/layout/layout_timer_view.xml" value="0.33" />
         <entry key="app/src/main/res/layout/loading_view_all_ready.xml" value="0.375" />
         <entry key="app/src/main/res/layout/partial_complete_game_dialog.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/viewholder_answer_mark_item.xml" value="0.12" />
         <entry key="app/src/main/res/layout/viewholder_diff.xml" value="0.375" />
         <entry key="app/src/main/res/layout/viewholder_diff_picture_wating.xml" value="0.33240740740740743" />
       </map>

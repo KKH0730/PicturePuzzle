@@ -32,7 +32,7 @@ class GameTimerView @JvmOverloads constructor(
         true
     )
 
-    var maxTime = 180 // 180초(3분)
+    var maxTime = 120 // 120초(2분)
     val decreasePerSecond = 1 // 1초씩 감소
     var penaltyValueSecond = 10 // 10초
 
@@ -43,10 +43,12 @@ class GameTimerView @JvmOverloads constructor(
     private var timerTask: TimerTask? = null
 
     var onTimerOver: (() -> Unit)? = null
+    var onTimerChanged: ((Int) -> Unit)? = null
     var onStartWrongAnswerAnimation: ((decreasedTime: Int, prevTime: Int) -> Unit)? = null
     var onClickWrongAnswer: () -> Unit = {
         CoroutineScope(Dispatchers.IO).launch { decreaseTime.emit(penaltyValueSecond) }
     }
+
     private var animatorSet: AnimatorSet? = null
 
     init {
@@ -86,6 +88,7 @@ class GameTimerView @JvmOverloads constructor(
                         }
                     }
                 }
+                onTimerChanged?.invoke(remainingTime)
             }
         }
     }
@@ -104,8 +107,21 @@ class GameTimerView @JvmOverloads constructor(
         }
     }
 
+    fun stopTimer() {
+        timer?.cancel()
+    }
+
     fun timerStart() {
         timer?.schedule(timerTask, 0, 1000)
+    }
+
+    fun timerRestart() {
+        setTimer()
+        timerStart()
+    }
+
+    fun resetTimer() {
+        remainingTime = maxTime
     }
 
     @SuppressLint("Recycle")
@@ -169,11 +185,9 @@ class GameTimerView @JvmOverloads constructor(
         val rotateAnimator = ObjectAnimator.ofFloat(
             frameLayout,
             "rotation",
-            15f,
-            -15f,
-            0f
+            13f, -13f, 13f, -13f, 13f, -13f, 0f
         ).apply {
-            duration = 300
+            duration = 400
         }
 
         animatorSet = AnimatorSet().apply {

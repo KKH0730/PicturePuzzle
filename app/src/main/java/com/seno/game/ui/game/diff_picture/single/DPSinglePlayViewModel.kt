@@ -69,14 +69,7 @@ class DPSinglePlayViewModel @Inject constructor(
     private val _onClearAnswer = MutableSharedFlow<Any>()
     val onClearAnswer = _onClearAnswer.asSharedFlow()
 
-    private val _enableRewardADButton = MutableStateFlow(true)
-    val enableRewardADButton = _enableRewardADButton.asStateFlow()
-
-    private val _totalScore = MutableStateFlow(0)
-    val totalScore = _totalScore.asStateFlow()
-
-    private val _currentAnswerCount = MutableStateFlow(0)
-    val currentAnswerCount = _currentAnswerCount.asStateFlow()
+    private var currentAnswerCount = 0
 
     private val _onShowCompleteGameDialog = MutableSharedFlow<Any>()
     val onShowCompleteGameDialog = _onShowCompleteGameDialog.asSharedFlow()
@@ -108,27 +101,23 @@ class DPSinglePlayViewModel @Inject constructor(
         }
 
     private fun onClickRightAnswer() {
-        _totalScore.value += 1
-
         viewModelScope.launch {
             launch(Dispatchers.Main) {
                 gameInfo.answer?.answerPointList?.let {
-                    if (_currentAnswerCount.value == it.size - 1) {
+                    if (currentAnswerCount == it.size - 1) {
                         _onShowCompleteGameDialog.emit(Any())
                     } else {
-                        _currentAnswerCount.value += 1
+                        currentAnswerCount += 1
                     }
                 }
             }
         }
     }
-    fun onClickRewardAdButton() {
-//        isLoadingRewardAD.emit()
-    }
 
     fun getAnswer(): Answer? = gameInfo.answer
 
     fun drawAnswerCircle(
+        containerY: Float,
         currentX: Float,
         currentY: Float,
         viewY: Float,
@@ -140,7 +129,7 @@ class DPSinglePlayViewModel @Inject constructor(
             withContext(Dispatchers.Default) {
                 val isFindAnswer = gameInfo.answer?.answerPointList?.any { point ->
                     val answerCenterX = (imageViewWidth * point.centerX / point.srcWidth)
-                    val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
+                    val answerCenterY = containerY + (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
                     // 두 점 사이의 거리를 구함
                     val xLength = (currentX - answerCenterX).toDouble().pow(2.0)

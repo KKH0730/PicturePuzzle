@@ -6,27 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import com.seno.game.R
-import com.seno.game.databinding.DialogCompleteGameBinding
+import com.seno.game.databinding.DialogGameCompleteBinding
 
-class CompleteGameDialog @JvmOverloads constructor(
+class GameCompleteDialog @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding = DialogCompleteGameBinding.inflate(
+    private val binding = DialogGameCompleteBinding.inflate(
         LayoutInflater.from(context),
         this,
         true
     )
 
-    var isGameSuccess: Boolean = true
     var onClickPositiveButton: (() -> Unit)? = null
     var onClickNegativeButton: (() -> Unit)? = null
 
     init {
         binding.apply {
-            dialog = this@CompleteGameDialog
+            dialog = this@GameCompleteDialog
         }
         initView()
     }

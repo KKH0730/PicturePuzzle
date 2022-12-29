@@ -51,8 +51,6 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
             }
         }
 
-
-
     fun startGame(selectedItem: DPSingleGame) {
         viewModelScope.launch { _currentGameRound.emit(selectedItem) }
     }

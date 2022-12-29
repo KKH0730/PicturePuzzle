@@ -45,9 +45,7 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     DiffPictureSingleGameListScreen(
                         gameList = viewModel.gameList.collectAsState().value,
-                        onClickItem = {
-                            viewModel.startGame(selectedItem = it)
-                        }
+                        onClickItem = { viewModel.startGame(selectedItem = it) }
                     )
                 }
             }

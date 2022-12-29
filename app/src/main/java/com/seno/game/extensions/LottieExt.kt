@@ -10,6 +10,7 @@ import com.airbnb.lottie.LottieAnimationView
 fun Context.drawLottieAnswerCircle(
     x: Float,
     y: Float,
+    imageContainerY: Int = 0,
     @RawRes rawRes: Int,
     speed: Float,
     maxProgress: Float,
@@ -27,9 +28,9 @@ fun Context.drawLottieAnswerCircle(
             x
         }
         this.y = if (isWrongAnswer) {
-            y - (radius / 2)
+            y - (radius / 2) + imageContainerY
         } else {
-            y
+            y + imageContainerY
         }
         this.scaleX = 2.5f
         this.scaleY = 2.5f

@@ -83,6 +83,11 @@
     <string name="diff_finish">나가기</string>
     <string name="diff_next">다음</string>
 
+    <string name="diff_fail_dialog_content">앗! 제한시간이 끝났어요</string>
+    <string name="diff_fail_dialog_sub_content">광고를 보면 이어서 할 수 있어요</string>
+    <string name="diff_fail_dialog_give_up">포기할래</string>
+    <string name="diff_fail_dialog_show_ad">이어서 할래</string>
+
     <string name="diff_level_low">쉬움</string>
     <string name="diff_level_middle">보통</string>
     <string name="diff_level_high">어려움</string>

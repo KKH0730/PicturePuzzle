@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="dialog"
+            type="com.seno.game.ui.game.diff_picture.view.GameFailDialog" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_804D4C4C"
+        android:onClick="@{() -> dialog.clickBackground()}">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:cardCornerRadius="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="35dp"
+                android:paddingBottom="25dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivCharacter"
+                    android:layout_width="64dp"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:elevation="3dp"
+                    android:src="@drawable/ic_dialog_cat_wow"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center"
+                    android:text="@string/diff_fail_dialog_content"
+                    android:textColor="@color/color_b8c0ff"
+                    android:textSize="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ivCharacter" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtSubMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:gravity="center"
+                    android:text="@string/diff_fail_dialog_sub_content"
+                    android:textColor="@color/color_b8c0ff"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txtMessage" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtShowADButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="11dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/bg_dialog_button_n"
+                    android:gravity="center"
+                    android:text="@string/diff_fail_dialog_show_ad"
+                    android:textColor="@color/color_bbd0ff"
+                    android:textSize="16dp"
+                    android:onClick="@{() -> dialog.clickShowAD()}"
+                    app:layout_constraintEnd_toStartOf="@+id/txtGivUpButton"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txtSubMessage" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/txtGivUpButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="11dp"
+                    android:background="@drawable/bg_dialog_button_y"
+                    android:gravity="center"
+                    android:text="@string/diff_fail_dialog_give_up"
+                    android:textColor="@color/white"
+                    android:textSize="16dp"
+                    android:onClick="@{() -> dialog.clickGiveUpButton()}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/txtShowADButton"
+                    app:layout_constraintTop_toBottomOf="@+id/txtSubMessage" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

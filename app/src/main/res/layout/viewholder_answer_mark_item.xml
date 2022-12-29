@@ -19,27 +19,24 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivBackground"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/bg_circle_answer_mark"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <com.airbnb.lottie.LottieAnimationView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/lottieView"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:visibility="@{answerMark.answer ? View.VISIBLE : View.INVISIBLE}"
+            android:src="@drawable/ic_cat_hand"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:lottie_rawRes="@raw/checked_answer"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="false"
-            app:lottie_speed="1.5"/>
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

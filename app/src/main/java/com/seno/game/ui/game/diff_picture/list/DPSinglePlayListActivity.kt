@@ -19,16 +19,16 @@ import com.seno.game.ui.game.diff_picture.list.component.GridGameLevelList
 import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class DiffPictureSingleGameListActivity : AppCompatActivity() {
+class DPSinglePlayListActivity : AppCompatActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
     private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             viewModel.refreshGameList()
 
             result.data
-                .takeIf { it != null }
-                .let { intent.getIntExtra("roundPosition", -1) }
+                .takeIf { it != null }?.getIntExtra("roundPosition", -1)
                 .takeIf { it != -1 }
                 ?.run { viewModel.startNextGame(currentGameRound = this) }
         }
@@ -59,7 +59,7 @@ class DiffPictureSingleGameListActivity : AppCompatActivity() {
             launch {
                 viewModel.currentGameRound.collect {
                     DPSinglePlayActivity.start(
-                        context = this@DiffPictureSingleGameListActivity,
+                        context = this@DPSinglePlayListActivity,
                         roundPosition = it.id,
                         launcher = launcher
                     )
@@ -71,7 +71,7 @@ class DiffPictureSingleGameListActivity : AppCompatActivity() {
 
     companion object {
         fun start(context: Context) {
-            context.startActivity(DiffPictureSingleGameListActivity::class.java)
+            context.startActivity(DPSinglePlayListActivity::class.java)
         }
     }
 }

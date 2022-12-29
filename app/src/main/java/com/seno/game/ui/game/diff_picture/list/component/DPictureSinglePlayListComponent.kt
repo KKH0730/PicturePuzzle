@@ -2,6 +2,7 @@ package com.seno.game.ui.game.diff_picture.list.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.*
 import com.seno.game.R
@@ -73,8 +77,8 @@ fun GameLevelItem(
     LaunchedEffect(composition) {
         lottieAnimatable.animate(
             composition = composition,
-            clipSpec = LottieClipSpec.Frame(0, 100),
-            speed = 2f,
+            clipSpec = LottieClipSpec.Frame(35, 60),
+            speed = 1f,
             initialProgress = lottieAnimatable.progress,
         )
     }
@@ -98,27 +102,38 @@ fun GameLevelItem(
                 modifier = Modifier.fillMaxSize()
             )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Spacer(modifier = Modifier.height(height = 20.dp))
-                Text(
-                    text = "Lv ${dpSingleGame.id + 1}",
-                    fontSize = 18.textDp,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.weight(weight = 1f))
-                Text(
-                    text = DPSingleGameLevel.getLevelValue(dpSingleGame.level),
-                    fontSize = 14.textDp,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.height(height = 10.dp))
-            }
-
             if (isNeedLock) {
-                LottieAnimation(composition = composition, progress = { lottieAnimatable.progress })
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = if (isNeedLock){
+                            colorResource(id = R.color.color_D3737372)
+                        } else {
+                            colorResource(id = R.color.transparent)
+                        })
+                ) {
+                    Spacer(modifier = Modifier.height(height = 10.dp))
+                    Text(
+                        text = "Lv ${dpSingleGame.id + 1}",
+                        fontSize = 20.textDp,
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+                    Text(
+                        text = DPSingleGameLevel.getLevelValue(dpSingleGame.level),
+                        fontSize = 16.textDp,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(height = 10.dp))
+                }
+
+                LottieAnimation(
+                    composition = composition,
+                    progress = { lottieAnimatable.progress },
+                    contentScale = ContentScale.Fit
+                )
             }
         }
     }

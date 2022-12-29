@@ -62,12 +62,6 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
             if(currentGameRound <= TOTAL_GAME_ROUND - 2) {
                 _currentGameRound.emit(_gameList.value[currentGameRound + 1])
             }
-            _gameList.value.toMutableList().let {
-                it[currentGameRound] = it[currentGameRound].copy(isComplete = true)
-                it
-            }.run {
-                _gameList.value = this
-            }
         }
     }
 

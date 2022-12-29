@@ -28,7 +28,7 @@
         tools:replace="android?:allowBackup">
 
         <activity
-            android:name=".ui.game.diff_picture.list.DiffPictureSingleGameListActivity"
+            android:name=".ui.game.diff_picture.list.DPSinglePlayListActivity"
             android:exported="false" />
         <activity
             android:name=".ui.game.diff_picture.single.DPSinglePlayActivity"

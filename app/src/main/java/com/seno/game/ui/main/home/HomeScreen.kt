@@ -21,7 +21,7 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.component.LoadingView
-import com.seno.game.ui.game.diff_picture.list.DiffPictureSingleGameListActivity
+import com.seno.game.ui.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
@@ -168,7 +168,7 @@ fun HomeScreen() {
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = {
-                    DiffPictureSingleGameListActivity.start(context = context)
+                    DPSinglePlayListActivity.start(context = context)
                     (context as MainActivity).overridePendingTransition(
                         R.anim.slide_right_enter,
                         R.anim.slide_right_exit

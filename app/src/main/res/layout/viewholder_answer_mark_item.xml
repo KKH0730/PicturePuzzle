@@ -39,7 +39,7 @@
             app:lottie_rawRes="@raw/checked_answer"
             app:lottie_autoPlay="true"
             app:lottie_loop="false"
-            app:lottie_speed="2.5"/>
+            app:lottie_speed="1.5"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -289,21 +289,16 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 this.dismiss()
 
                 (roundPosition + 1).saveCompleteDPGameRound()
-                Intent().apply {
-                    putExtra("roundPosition", roundPosition)
-                    putExtra("isMoveNextGame", true)
-                }.also {
-                    setResult(RESULT_OK, intent)
-                }.run { finish() }
+                Intent()
+                    .apply { putExtra("roundPosition", roundPosition) }
+                    .also { setResult(RESULT_OK, it) }
+                    .run { finish() }
             }
             onClickNegativeButton = {
                 this.dismiss()
                 (roundPosition + 1).saveCompleteDPGameRound()
-                Intent().apply {
-                    putExtra("roundPosition", roundPosition)
-                }.also {
-                    setResult(RESULT_OK, intent)
-                }.run { finish() }
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
     }

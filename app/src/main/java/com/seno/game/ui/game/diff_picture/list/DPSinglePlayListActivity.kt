@@ -9,17 +9,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.seno.game.R
 import com.seno.game.extensions.startActivity
 import com.seno.game.theme.AppTheme
-import com.seno.game.ui.game.diff_picture.list.component.GridGameLevelList
-import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
+import com.seno.game.ui.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class DPSinglePlayListActivity : AppCompatActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
@@ -43,7 +41,7 @@ class DPSinglePlayListActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    DiffPictureSingleGameListScreen(
+                    DPSinglePlayListScreen(
                         gameList = viewModel.gameList.collectAsState().value,
                         onClickItem = { viewModel.startGame(selectedItem = it) }
                     )
@@ -72,9 +70,4 @@ class DPSinglePlayListActivity : AppCompatActivity() {
             context.startActivity(DPSinglePlayListActivity::class.java)
         }
     }
-}
-
-@Composable
-fun DiffPictureSingleGameListScreen(gameList: List<DPSingleGame>, onClickItem: (DPSingleGame) -> Unit) {
-    GridGameLevelList(gameList = gameList, onClickItem = onClickItem)
 }

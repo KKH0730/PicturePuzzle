@@ -10,7 +10,6 @@ import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 class GameListState(
     val gridState: LazyGridState,
     val gameList: MutableState<List<DPSingleGame>>,
-    val lottieAnimatableList: MutableState<List<LottieAnimatable>>
 ) {
 }
 
@@ -18,11 +17,9 @@ class GameListState(
 fun rememberGameListState(
     gridState: LazyGridState,
     gameList: MutableState<List<DPSingleGame>>,
-    lottieAnimatableList: MutableState<List<LottieAnimatable>>,
 ) = remember(gameList) {
     GameListState(
         gridState = gridState,
         gameList = gameList,
-        lottieAnimatableList = lottieAnimatableList
     )
 }

@@ -35,10 +35,6 @@ class GameCompleteDialog @JvmOverloads constructor(
         visibility = View.GONE
     }
 
-    fun clickBackground() {
-        visibility = View.GONE
-    }
-
     fun clickPositiveButton() {
         onClickPositiveButton?.invoke()
     }
@@ -54,5 +50,17 @@ class GameCompleteDialog @JvmOverloads constructor(
 
     fun dismiss() {
         visibility = View.GONE
+    }
+
+    fun handleButtonUI(isFinalGame: Boolean) {
+        if (isFinalGame) {
+            binding.txtYesButton.visibility = View.GONE
+            binding.txtNoButton.visibility = View.GONE
+            binding.txtClose.visibility = View.VISIBLE
+        } else {
+            binding.txtYesButton.visibility = View.VISIBLE
+            binding.txtNoButton.visibility = View.VISIBLE
+            binding.txtClose.visibility = View.GONE
+        }
     }
 }

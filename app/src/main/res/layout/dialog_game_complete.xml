@@ -13,8 +13,7 @@
         android:id="@+id/clRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_804D4C4C"
-        android:onClick="@{() -> dialog.clickBackground()}">
+        android:background="@color/color_804D4C4C">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clDialog"
@@ -84,6 +83,26 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/txtNoButton"
                         app:layout_constraintTop_toBottomOf="@+id/txtMessage" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtClose"
+                        android:layout_width="150dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="28dp"
+                        android:background="@drawable/bg_22dp_rounding_2dp_border_color_b8c0ff"
+                        android:gravity="center"
+                        android:text="@string/diff_complete"
+                        android:textColor="@color/color_b8c0ff"
+                        android:textSize="16dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="10dp"
+                        android:onClick="@{() -> dialog.clickNegativeButton()}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:contentDescription="@string/game_prepare"
+                        app:layout_constraintTop_toBottomOf="@+id/txtMessage"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>

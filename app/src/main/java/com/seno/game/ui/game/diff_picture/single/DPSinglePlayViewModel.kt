@@ -14,7 +14,7 @@ import com.seno.game.ui.game.diff_picture.model.Answer
 import com.seno.game.ui.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.game.diff_picture.model.Point
 import com.seno.game.ui.game.diff_picture.multi.ANSWER_CORRECTION
-import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity.Companion.ROUND_POSITION
+import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity.Companion.CURRENT_ROUND_POSITION
 import com.seno.game.ui.game.diff_picture.single.model.AnswerMark
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +33,7 @@ class DPSinglePlayViewModel @Inject constructor(
     @DiffOpenCv private val opencvUtil: DiffPictureOpencvUtil,
 ) : ViewModel() {
 
-    var roundPosition: Int? = savedStateHandle[ROUND_POSITION]
+    var roundPosition: Int? = savedStateHandle[CURRENT_ROUND_POSITION]
 
     private val images: Pair<Int, Int>
     get() {
@@ -114,10 +114,7 @@ class DPSinglePlayViewModel @Inject constructor(
         }
     }
 
-    fun getAnswer(): Answer? = gameInfo.answer
-
     fun drawAnswerCircle(
-        containerY: Float,
         currentX: Float,
         currentY: Float,
         viewY: Float,
@@ -129,7 +126,7 @@ class DPSinglePlayViewModel @Inject constructor(
             withContext(Dispatchers.Default) {
                 val isFindAnswer = gameInfo.answer?.answerPointList?.any { point ->
                     val answerCenterX = (imageViewWidth * point.centerX / point.srcWidth)
-                    val answerCenterY = containerY + (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
+                    val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
                     // 두 점 사이의 거리를 구함
                     val xLength = (currentX - answerCenterX).toDouble().pow(2.0)

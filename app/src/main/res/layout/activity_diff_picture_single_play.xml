@@ -22,6 +22,7 @@
         tools:context=".ui.game.diff_picture.DiffPictureGameActivity">
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_left_white"
@@ -30,6 +31,7 @@
             android:paddingTop="34dp"
             android:paddingEnd="16dp"
             android:paddingBottom="10dp"
+            android:onClick="@{() -> activity.finish()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 

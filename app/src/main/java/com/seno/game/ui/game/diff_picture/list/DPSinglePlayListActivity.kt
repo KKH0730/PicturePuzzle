@@ -18,19 +18,24 @@ import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class DPSinglePlayListActivity : AppCompatActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
-    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            viewModel.refreshGameList()
+    private val launcher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                viewModel.refreshGameList()
 
-            result.data
-                .takeIf { it != null }?.getIntExtra("roundPosition", -1)
-                .takeIf { it != -1 }
-                ?.run { viewModel.startNextGame(currentGameRound = this) }
+                result.data?.let { intent ->
+                    val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
+                    val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
+                    if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                        viewModel.startNextGame(currentRoundPosition = currentRoundPosition, finalRoundPosition = finalRoundPosition)
+                    }
+                }
+            }
         }
-    }
 
     @SuppressLint("StateFlowValueCalledInComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,15 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     DPSinglePlayListScreen(
                         gameList = viewModel.gameList.collectAsState().value,
-                        onClickItem = { viewModel.startGame(selectedItem = it) }
+                        onClickBack = { finish() },
+                        onClickGameItem = { dPSingleGame, currentGameRound, finalGameRound ->
+                            viewModel.startGame(
+                                selectedItem = dPSingleGame,
+                                currentRoundPosition = currentGameRound,
+                                finalGameRoundPosition = finalGameRound
+                            )
+                        },
+                        onClickPlayButton = { viewModel.startGame() }
                     )
                 }
             }
@@ -56,7 +69,8 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                 viewModel.currentGameRound.collect {
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,
-                        roundPosition = it.id,
+                        currentRoundPosition = it.currentRoundPosition,
+                        finalRoundPosition = it.finalRoundPosition,
                         launcher = launcher
                     )
                     overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)

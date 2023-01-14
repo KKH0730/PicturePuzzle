@@ -1,9 +1,7 @@
 package com.seno.game.ui.game.diff_picture.list.component
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,7 +31,9 @@ import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.game.diff_picture.list.rememberGameListState
 
 @Composable
-fun GameListHeader() {
+fun GameListHeader(
+    onClickBack: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxWidth()) {
         GamePlayHeartPoint(modifier = Modifier.align(alignment = Alignment.Center))
         Row(
@@ -44,6 +44,7 @@ fun GameListHeader() {
             Image(
                 painter = painterResource(id = R.drawable.ic_arrow_left_white),
                 contentDescription = "left_arrow",
+                modifier = Modifier.noRippleClickable { onClickBack.invoke() }
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayHeartTimer(modifier = Modifier.align(alignment = Alignment.Bottom))
@@ -59,11 +60,26 @@ fun GamePlayHeartPoint(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(space = 5.dp),
         modifier = modifier
     ) {
-        Image(painter = painterResource(id = R.drawable.ic_heart_full), contentDescription = "heart1")
-        Image(painter = painterResource(id = R.drawable.ic_heart_full), contentDescription = "heart2")
-        Image(painter = painterResource(id = R.drawable.ic_heart_full), contentDescription = "heart3")
-        Image(painter = painterResource(id = R.drawable.ic_heart_full), contentDescription = "heart4")
-        Image(painter = painterResource(id = R.drawable.ic_heart_full), contentDescription = "heart5")
+        Image(
+            painter = painterResource(id = R.drawable.ic_heart_full),
+            contentDescription = "heart1"
+        )
+        Image(
+            painter = painterResource(id = R.drawable.ic_heart_full),
+            contentDescription = "heart2"
+        )
+        Image(
+            painter = painterResource(id = R.drawable.ic_heart_full),
+            contentDescription = "heart3"
+        )
+        Image(
+            painter = painterResource(id = R.drawable.ic_heart_full),
+            contentDescription = "heart4"
+        )
+        Image(
+            painter = painterResource(id = R.drawable.ic_heart_full),
+            contentDescription = "heart5"
+        )
     }
 }
 
@@ -86,7 +102,7 @@ fun LifePointGuideTerm() {
         Text(
             text = "SOLO PLAY MODE",
             fontSize = 24.textDp,
-            fontWeight = FontWeight.Bold ,
+            fontWeight = FontWeight.Bold,
             color = Color.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -109,7 +125,7 @@ fun LifePointGuideTerm() {
 @Composable
 fun SingleGameGridList(
     gameList: List<DPSingleGame>,
-    onClickItem: (DPSingleGame) -> Unit,
+    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentStage: DPSingleGame? = try {
@@ -136,7 +152,7 @@ fun SingleGameGridList(
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 36.dp),
                 state = gameListState.gridState,
-                contentPadding = PaddingValues(vertical = 24.dp, horizontal = 19.dp),
+                contentPadding = PaddingValues(top = 40.dp, bottom = 24.dp, start = 20.dp, end = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(space = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(space = 14.dp),
                 modifier = Modifier.width(width = 244.dp)
@@ -145,12 +161,13 @@ fun SingleGameGridList(
                     items = gameListState.gameList.value,
                     key = { _, item: DPSingleGame -> item.id },
                 ) { index: Int, dpSingleGame: DPSingleGame ->
-                    GameLevelItem(
-                        index = index,
+                    GameItem(
+                        currentGameRound = index,
+                        finalGameRound = gameListState.gameList.value.size - 1,
                         dpSingleGame = dpSingleGame,
                         isComplete = dpSingleGame.isComplete,
                         isCurrentStage = dpSingleGame.id == currentStage?.id,
-                        onClickItem = onClickItem
+                        onClickGameItem = onClickGameItem
                     )
                 }
             }
@@ -167,6 +184,8 @@ fun SingleGameGridList(
             Text(
                 text = "STAGE PAGE 01",
                 color = colorResource(id = R.color.color_c8b6ff),
+                fontSize = 14.textDp,
+                fontWeight = FontWeight.W500,
                 modifier = Modifier
                     .padding(paddingValues = PaddingValues(vertical = 5.dp, horizontal = 13.dp))
                     .align(alignment = Alignment.Center)
@@ -176,12 +195,13 @@ fun SingleGameGridList(
 }
 
 @Composable
-fun GameLevelItem(
-    index: Int,
+fun GameItem(
+    currentGameRound: Int,
+    finalGameRound: Int,
     dpSingleGame: DPSingleGame,
     isComplete: Boolean,
     isCurrentStage: Boolean,
-    onClickItem: (DPSingleGame) -> Unit,
+    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
 ) {
 
     if (isComplete) {
@@ -195,22 +215,24 @@ fun GameLevelItem(
                     .clip(CircleShape)
                     .background(color = colorResource(id = R.color.color_B5EAEAE8))
                     .align(alignment = Alignment.Center)
-                    .noRippleClickable {
-                        onClickItem
+                    .clickable {
+                        onClickGameItem
                             .takeIf { isComplete }
-                            ?.invoke(dpSingleGame)
+                            ?.invoke(dpSingleGame, currentGameRound, finalGameRound)
                     }
             )
         }
     } else {
         if (isCurrentStage) {
             CurrentStateCircle(
-                index = index,
+                index = currentGameRound,
                 isCurrentStage = isCurrentStage,
-                modifier = Modifier.noRippleClickable { onClickItem.invoke(dpSingleGame) }
-                )
+                modifier = Modifier.noRippleClickable {
+                    onClickGameItem.invoke(dpSingleGame, currentGameRound, finalGameRound)
+                }
+            )
         } else {
-            StageCircle(index = index)
+            StageCircle(index = currentGameRound)
         }
     }
 }
@@ -275,5 +297,31 @@ fun CurrentStateCircle(
                     .align(alignment = Alignment.Center)
             )
         }
+    }
+}
+
+@Composable
+fun PlayButton(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .border(
+                border = BorderStroke(
+                    width = 2.dp,
+                    color = Color.White
+                ),
+                shape = RoundedCornerShape(size = 22.dp)
+            )
+            .padding(vertical = 10.dp, horizontal = 40.dp)
+            .noRippleClickable { onClick.invoke() }
+    ) {
+        Text(
+            text = "PLAY",
+            color = colorResource(id = R.color.color_fbf8cc),
+            fontSize = 20.textDp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(alignment = Alignment.Center)
+        )
     }
 }

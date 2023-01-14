@@ -38,7 +38,7 @@ class GamePrepareView @JvmOverloads constructor(
         setOnTouchListener { _, _ -> true }
         setBackgroundColor(context.getColor(R.color.color_804D4C4C))
         setCountDownText()
-        setTimer()
+        startTimer()
     }
 
     private fun startObserve() {
@@ -72,7 +72,7 @@ class GamePrepareView @JvmOverloads constructor(
         }
     }
     
-    private fun setTimer() {
+    private fun startTimer() {
         timer = Timer()
         timerTask = object: TimerTask() {
             override fun run() {

@@ -41,7 +41,8 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     layoutResId = R.layout.activity_diff_picture_single_play
 ) {
     private val viewModel by viewModels<DPSinglePlayViewModel>()
-    private val roundPosition: Int by lazy { intent.getIntExtra("roundPosition", 0) }
+    private val currentRoundPosition: Int by lazy { intent.getIntExtra(CURRENT_ROUND_POSITION, -1) }
+    private val finalRoundPosition: Int by lazy { intent.getIntExtra(FINAL_ROUND_POSITION, -1) }
     private var animatorSet: AnimatorSet? = null
 
     private var rewardedAd: RewardedAd? = null
@@ -277,18 +278,25 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
     private fun setGameCompleteDialog() {
         binding.cvGameCompleteDialog.apply {
+            if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                handleButtonUI(isFinalGame = currentRoundPosition == finalRoundPosition)
+            }
+
             onClickPositiveButton = {
                 this.dismiss()
 
-                (roundPosition + 1).saveCompleteDPGameRound()
+                currentRoundPosition.saveCompleteDPGameRound()
                 Intent()
-                    .apply { putExtra("roundPosition", roundPosition) }
+                    .apply {
+                        putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
+                        putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
+                    }
                     .also { setResult(RESULT_OK, it) }
                     .run { finish() }
             }
             onClickNegativeButton = {
                 this.dismiss()
-                (roundPosition + 1).saveCompleteDPGameRound()
+                currentRoundPosition.saveCompleteDPGameRound()
                 setResult(RESULT_OK)
                 finish()
             }
@@ -420,7 +428,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         binding.ivOrigin.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 viewModel.drawAnswerCircle(
-                    containerY = -78.dpToPx().toFloat(),
                     currentX = event.x,
                     currentY = event.y,
                     viewY = v.y,
@@ -438,7 +445,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         binding.ivCopy.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 viewModel.drawAnswerCircle(
-                    containerY = 0f,
                     currentX = event.x,
                     currentY = event.y,
                     viewY = v.y,
@@ -548,11 +554,18 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 //    }
 
     companion object {
-        const val ROUND_POSITION = "roundPosition"
+        const val CURRENT_ROUND_POSITION = "currentRoundPosition"
+        const val FINAL_ROUND_POSITION = "finalRoundPosition"
 
-        fun start(context: Context, roundPosition: Int, launcher: ActivityResultLauncher<Intent?>) {
+        fun start(
+            context: Context,
+            currentRoundPosition: Int,
+            finalRoundPosition: Int,
+            launcher: ActivityResultLauncher<Intent?>
+        ) {
             context.startActivity(DPSinglePlayActivity::class.java, launcher) {
-                putExtra(ROUND_POSITION, roundPosition)
+                putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
+                putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
             }
         }
     }

@@ -16,11 +16,17 @@ import com.seno.game.R
 import com.seno.game.extensions.textDp
 import com.seno.game.ui.game.diff_picture.list.component.GameListHeader
 import com.seno.game.ui.game.diff_picture.list.component.LifePointGuideTerm
+import com.seno.game.ui.game.diff_picture.list.component.PlayButton
 import com.seno.game.ui.game.diff_picture.list.component.SingleGameGridList
 import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 
 @Composable
-fun DPSinglePlayListScreen(gameList: List<DPSingleGame>, onClickItem: (DPSingleGame) -> Unit) {
+fun DPSinglePlayListScreen(
+    gameList: List<DPSingleGame>,
+    onClickBack: () -> Unit,
+    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
+    onClickPlayButton: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.ic_home_background),
@@ -33,16 +39,17 @@ fun DPSinglePlayListScreen(gameList: List<DPSingleGame>, onClickItem: (DPSingleG
             modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(height = 30.dp))
-            GameListHeader()
+            GameListHeader(onClickBack = onClickBack)
             Spacer(modifier = Modifier.height(height = 53.dp))
             LifePointGuideTerm()
             Spacer(modifier = Modifier.height(height = 33.dp))
             SingleGameGridList(
                 gameList = gameList,
-                onClickItem = onClickItem,
+                onClickGameItem = onClickGameItem,
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
             )
+            Spacer(modifier = Modifier.height(height = 40.dp))
+            PlayButton(onClick = onClickPlayButton)
         }
     }
-
 }

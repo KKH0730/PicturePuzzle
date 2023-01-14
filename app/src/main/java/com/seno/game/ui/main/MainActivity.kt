@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 //            SplashActivity.start(context = this@MainActivity)
 //            finish()
             DPSinglePlayListActivity.start(context = this)
-//            DiffPictureSingleGameActivity.start(context = this)
         } else {
             setContent {
                 AppTheme {

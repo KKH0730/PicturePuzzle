@@ -14,6 +14,7 @@ import com.seno.game.R
 import com.seno.game.databinding.LayoutTimerViewBinding
 import com.seno.game.extensions.dpToPx
 import com.seno.game.extensions.screenWidth
+import com.seno.game.util.AnimationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,7 +55,7 @@ class GameTimerView @JvmOverloads constructor(
     init {
         initView()
         startObserve()
-        setTimer()
+//        setTimer()
     }
 
     private fun initView() {
@@ -112,6 +113,7 @@ class GameTimerView @JvmOverloads constructor(
     }
 
     fun timerStart() {
+        setTimer()
         timer?.schedule(timerTask, 0, 1000)
     }
 
@@ -206,32 +208,8 @@ class GameTimerView @JvmOverloads constructor(
         timerTask = null
     }
 
-    private fun stopAnimationSet(animatorSet: AnimatorSet?) {
-        animatorSet?.let {
-            it.childAnimations.forEach { animator ->
-                stopAnimator(animator)
-            }
-
-            it.run {
-                cancel()
-                removeAllListeners()
-                end()
-            }
-        }
-    }
-
-    private fun stopAnimator(animator: Animator?) {
-        animator?.let {
-            it.run {
-                cancel()
-                removeAllListeners()
-                end()
-            }
-        }
-    }
-
     fun release() {
         releaseTimer()
-        stopAnimationSet(animatorSet)
+        AnimationUtils.stopAnimation(animatorSet)
     }
 }

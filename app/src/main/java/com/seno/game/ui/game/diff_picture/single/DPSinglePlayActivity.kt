@@ -271,8 +271,13 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     }
 
     private fun setPrepareView() {
-        binding.cvPrepareView.onGameStart = {
-            binding.cvTimerView.timerStart()
+        binding.cvPrepareView.apply {
+            setStage("STAGE ${String.format("%02d", currentRoundPosition + 1)}")
+            onGameStart = {
+                binding.cvTimerView.timerStart()
+            }
+        }.run {
+            startTranslateAnimation()
         }
     }
 

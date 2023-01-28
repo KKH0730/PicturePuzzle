@@ -66,8 +66,7 @@
     <string name="home_setting_account_profile">프로필 관리</string>
 
 
-    <string name="game_prepare_ready">준비</string>
-    <string name="game_prepare_start">시작!</string>
+    <string name="game_prepare_start">START!</string>
 
     <string name="hummin_correct">정답!</string>
     <string name="hummin_incorrect">일치하는 단어가 없어요…</string>

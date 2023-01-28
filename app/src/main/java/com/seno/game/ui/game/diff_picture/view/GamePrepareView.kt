@@ -1,21 +1,29 @@
 package com.seno.game.ui.game.diff_picture.view
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import com.seno.game.R
+import com.seno.game.extensions.dpToPx
 import com.seno.game.extensions.getString
+import com.seno.game.util.AnimationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
+@SuppressLint("Recycle", "CustomViewStyleable")
 class GamePrepareView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -23,7 +31,13 @@ class GamePrepareView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private lateinit var tvCountDown: AppCompatTextView
-    private var prepareCount = MutableStateFlow(1)
+    private lateinit var tvStage: AppCompatTextView
+    private lateinit var stageContainer: LinearLayoutCompat
+
+    private var translateYAnimator: ObjectAnimator? = null
+    private var animatorSet: AnimatorSet? = null
+    private var prepareCount = MutableStateFlow(3)
+
     private var timer: Timer? = null
     private var timerTask: TimerTask? = null
     var onGameStart: (() -> Unit)? = null
@@ -38,43 +52,144 @@ class GamePrepareView @JvmOverloads constructor(
         setOnTouchListener { _, _ -> true }
         setBackgroundColor(context.getColor(R.color.color_804D4C4C))
         setCountDownText()
-        startTimer()
     }
 
     private fun startObserve() {
         CoroutineScope(Dispatchers.Main).launch {
-            prepareCount.collect {
-                if (it < 0) {
-                    this@GamePrepareView.visibility = View.GONE
-                    releaseTimer()
-                    onGameStart?.invoke()
-                } else if(it == 0) {
-                    tvCountDown.text = getString(R.string.game_start)
+            prepareCount.collect { count ->
+                if (count < 0) {
+                    startTranslateAndFadeOutAnimation()
+                } else if (count == 0) {
+                    tvCountDown.text = getString(R.string.game_prepare_start)
                 } else {
-                    tvCountDown.text = getString(R.string.game_prepare)
+                    tvCountDown.text = count.toString()
                 }
             }
         }
     }
 
     private fun setCountDownText() {
-        tvCountDown = AppCompatTextView(context)
-        tvCountDown.apply {
-            textSize = 48f
+        tvStage = AppCompatTextView(context).apply {
+            setBackgroundResource(R.drawable.bg_28dp_rounding_2dp_stroke_fffef1)
+            setPadding(25.dpToPx(), 7.dpToPx(), 25.dpToPx(), 7.dpToPx())
+            setTextColor(context.getColor(R.color.color_fffef1))
+            textSize = 24f
+            typeface = Typeface.DEFAULT
+            layoutParams = ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        tvCountDown = AppCompatTextView(context).apply {
+            textSize = 64f
             text = prepareCount.value.toString()
-            setTextColor(context.getColor(R.color.white))
+            setTextColor(context.getColor(R.color.color_fffef1))
             typeface = Typeface.DEFAULT_BOLD
-        }.also { textView ->
-            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER)
-                .also {
-                    this@GamePrepareView.addView(textView, it)
-                }
+            setPadding(0, 55.dpToPx(),0,0)
+            layoutParams = ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        stageContainer = LinearLayoutCompat(context).apply {
+            orientation = LinearLayoutCompat.VERTICAL
+            visibility = View.GONE
+            setHorizontalGravity(Gravity.CENTER)
+            layoutParams = LinearLayoutCompat.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            )
+        }.also { stageContainer ->
+            stageContainer.addView(tvStage)
+            stageContainer.addView(tvCountDown)
+        }
+
+        this@GamePrepareView.addView(
+            stageContainer,
+            LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_HORIZONTAL
+            )
+        )
+    }
+
+    fun setStage(stage: String) {
+        tvStage.text = stage
+    }
+
+    fun startTranslateAnimation() {
+        translateYAnimator = ObjectAnimator
+            .ofFloat(
+                stageContainer,
+                "translationY",
+                -400f,
+                181.dpToPx().toFloat()
+            )
+            .apply {
+                startDelay = 500
+                duration = 1250
+                addListener(
+                    object: Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator?) {
+                            stageContainer.visibility = View.VISIBLE
+                        }
+                        override fun onAnimationCancel(p0: Animator?) {}
+                        override fun onAnimationRepeat(p0: Animator?) {}
+                        override fun onAnimationEnd(p0: Animator?) {
+                            startTimer()
+                        }
+                    }
+                )
+            }
+        translateYAnimator?.start()
+    }
+
+    private fun startTranslateAndFadeOutAnimation() {
+        animatorSet = AnimatorSet()
+
+        val translateYAnimator = ObjectAnimator
+            .ofFloat(stageContainer, "translationY", 181.dpToPx().toFloat(), -581.dpToPx().toFloat())
+            .apply {
+                startDelay = 500
+                duration = 1000
+                addListener(
+                    object: Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator?) {}
+                        override fun onAnimationCancel(p0: Animator?) {}
+                        override fun onAnimationRepeat(p0: Animator?) {}
+                        override fun onAnimationEnd(p0: Animator?) {
+                            stageContainer.visibility = View.GONE
+                        }
+                    }
+                )
+            }
+
+
+        val fadeOutAnimator = ObjectAnimator
+            .ofFloat(this@GamePrepareView, "alpha", 1f, 0f)
+            .apply {
+                startDelay = 800
+                duration = 1000
+                addListener(
+                    object: Animator.AnimatorListener {
+                        override fun onAnimationStart(p0: Animator?) {}
+                        override fun onAnimationCancel(p0: Animator?) {}
+                        override fun onAnimationRepeat(p0: Animator?) {}
+                        override fun onAnimationEnd(p0: Animator?) {
+                            this@GamePrepareView.visibility = View.GONE
+                            onGameStart?.invoke()
+                            release()
+                        }
+                    }
+                )
+            }
+
+        animatorSet?.run {
+            playTogether(translateYAnimator, fadeOutAnimator)
+            start()
         }
     }
-    
+
     private fun startTimer() {
         timer = Timer()
-        timerTask = object: TimerTask() {
+        timerTask = object : TimerTask() {
             override fun run() {
                 try {
                     prepareCount.value -= 1
@@ -84,7 +199,7 @@ class GamePrepareView @JvmOverloads constructor(
                 }
             }
         }
-        timer?.schedule(timerTask, 1500, 1000)
+        timer?.schedule(timerTask, 500, 1000)
     }
 
     private fun releaseTimer() {
@@ -93,5 +208,11 @@ class GamePrepareView @JvmOverloads constructor(
 
         timerTask?.cancel()
         timerTask = null
+    }
+
+    fun release() {
+        releaseTimer()
+        AnimationUtils.stopAnimation(translateYAnimator)
+        AnimationUtils.stopAnimation(animatorSet)
     }
 }

@@ -58,7 +58,16 @@ object PrefsManager {
             if (Prefs.getString("diffPictureCompleteGameRound").isEmpty()) {
                 Prefs.putString("diffPictureCompleteGameRound", value)
             } else {
-                Prefs.putString("diffPictureCompleteGameRound", "${Prefs.getString("diffPictureCompleteGameRound")},$value")
+                Prefs.putString(
+                    "diffPictureCompleteGameRound",
+                    "${Prefs.getString("diffPictureCompleteGameRound")},$value"
+                )
             }
+        }
+
+    var diifPictureStage: Int
+        get() = Prefs.getInt("diifPictureStage", 0)
+        set(stage) {
+            Prefs.putInt("diifPictureStage", stage)
         }
 }

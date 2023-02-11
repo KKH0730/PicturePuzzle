@@ -37,8 +37,8 @@ class DPSinglePlayViewModel @Inject constructor(
 
     private val images: Pair<Int, Int>
     get() {
-        val diffImages = getArrays(R.array.diff_picture_single_game_images)
-        val diffCopyImages = getArrays(R.array.diff_picture_single_game_copy_images)
+        val diffImages = getArrays(R.array.diff_picture_stage1)
+        val diffCopyImages = getArrays(R.array.diff_picture_copy_stage1)
         return diffImages[roundPosition!!].getDrawableResourceId() to diffCopyImages[roundPosition!!].getDrawableResourceId()
     }
 

@@ -47,10 +47,10 @@ class DPSinglePlayListActivity : AppCompatActivity() {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     DPSinglePlayListScreen(
-                        gameList = viewModel.gameList.collectAsState().value,
+                        stageInfos = viewModel.gameList.collectAsState().value,
                         onClickBack = { finish() },
                         onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
-                        onClickPlayButton = { viewModel.startGame() }
+                        onClickPlayButton = { viewModel.startGame() },
                     )
                 }
             }

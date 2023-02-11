@@ -11,8 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,11 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.game.diff_picture.list.rememberGameListState
+import kotlinx.coroutines.launch
 
 @Composable
 fun GameListHeader(
@@ -121,58 +124,115 @@ fun LifePointGuideTerm() {
 }
 
 
+@OptIn(ExperimentalPagerApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun SingleGameGridList(
-    gameList: List<DPSingleGame>,
+    stageInfos: List<List<DPSingleGame>>,
     onClickGameItem: (DPSingleGame) -> Unit,
+    pagerPage: Int,
     modifier: Modifier = Modifier,
 ) {
-    val isFistIsNotComplete = try {
-        gameList.first { !it.isComplete }
-    } catch (e: Exception) {
-        null
+    var fistIsNotCompleteGame: DPSingleGame? = null
+    run {
+        stageInfos.forEach { gameList ->
+            val firstIsNotCompleteGameModel = try {
+                gameList.first { !it.isComplete }
+            } catch (e: Exception) {
+                null
+            }
+            if (firstIsNotCompleteGameModel != null) {
+                fistIsNotCompleteGame = firstIsNotCompleteGameModel
+                return@run
+            }
+        }
     }
 
     val gameListState = rememberGameListState(
         gridState = rememberLazyGridState(),
-        gameList = mutableStateOf(gameList),
+        pagerState = rememberPagerState(initialPage = pagerPage),
+        stageInfos = mutableStateOf(stageInfos),
     )
 
+
+    LaunchedEffect(key1 = gameListState.pagerState) {
+        snapshotFlow { gameListState.pagerState.currentPage }.collect {
+
+        }
+    }
+
     Box(modifier = modifier) {
-        Card(
-            elevation = 0.dp,
-            backgroundColor = Color.Transparent,
-            shape = RoundedCornerShape(size = 14.dp),
-            border = BorderStroke(width = 3.dp, color = Color.White),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(space = 21.dp),
             modifier = Modifier
                 .offset(y = 15.dp)
                 .align(alignment = Alignment.TopCenter)
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 36.dp),
-                state = gameListState.gridState,
-                contentPadding = PaddingValues(top = 40.dp, bottom = 24.dp, start = 20.dp, end = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(space = 14.dp),
-                modifier = Modifier.width(width = 244.dp)
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_arrow_left_white),
+                contentDescription = "left_arrow",
+                modifier = Modifier.noRippleClickable {
+                    if (gameListState.pagerState.currentPage > 0) {
+                        gameListState.coroutineScope.launch {
+                            gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage - 1)
+                        }
+                    }
+                }
+            )
+            Card(
+                elevation = 0.dp,
+                backgroundColor = Color.Transparent,
+                shape = RoundedCornerShape(size = 14.dp),
+                border = BorderStroke(width = 3.dp, color = Color.White),
             ) {
-                itemsIndexed(
-                    items = gameListState.gameList.value,
-                    key = { _, item: DPSingleGame -> item.id },
-                ) { index: Int, dpSingleGame: DPSingleGame ->
-                    GameItem(
-                        currentGameRound = index,
-                        dpSingleGame = dpSingleGame,
-                        isComplete = dpSingleGame.isComplete,
-                        isFistIsNotCompleteIndex = isFistIsNotComplete?.id,
-                        isSelected = dpSingleGame.isSelect,
-                        onClickGameItem = onClickGameItem
-                    )
+                HorizontalPager(
+                    count = stageInfos.size,
+                    state = gameListState.pagerState,
+                    userScrollEnabled = false,
+                    modifier = Modifier.width(width = 264.dp)
+                ) { page ->
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 36.dp),
+                        state = gameListState.gridState,
+                        contentPadding = PaddingValues(
+                            top = 40.dp,
+                            bottom = 24.dp,
+                            start = 20.dp,
+                            end = 20.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(space = 5.dp),
+                    ) {
+                        itemsIndexed(
+                            items = gameListState.stageInfos.value[page],
+                            key = { _, item: DPSingleGame -> item.id },
+                        ) { index: Int, dpSingleGame: DPSingleGame ->
+                            GameItem(
+                                index = index,
+                                dpSingleGame = dpSingleGame,
+                                isComplete = dpSingleGame.isComplete,
+                                isFistIsNotCompleteIndex = fistIsNotCompleteGame?.id,
+                                isSelected = dpSingleGame.isSelect,
+                                onClickGameItem = onClickGameItem
+                            )
+                        }
+                    }
                 }
             }
+            Image(
+                painter = painterResource(id = R.drawable.ic_arrow_right_white),
+                contentDescription = "right_arrow",
+                modifier = Modifier.noRippleClickable {
+                    if (gameListState.pagerState.currentPage < stageInfos.size - 1) {
+                        gameListState.coroutineScope.launch {
+                            gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage + 1)
+                        }
+                    }
+                }
+            )
         }
-
         Card(
             elevation = 0.dp,
             backgroundColor = Color.White,
@@ -182,7 +242,12 @@ fun SingleGameGridList(
                 .align(alignment = Alignment.TopCenter)
         ) {
             Text(
-                text = "STAGE PAGE 01",
+                text = "STAGE PAGE ${
+                    String.format(
+                        "%02d",
+                        (gameListState.pagerState.currentPage + 1)
+                    )
+                }",
                 color = colorResource(id = R.color.color_c8b6ff),
                 fontSize = 14.textDp,
                 fontWeight = FontWeight.W500,
@@ -196,7 +261,7 @@ fun SingleGameGridList(
 
 @Composable
 fun GameItem(
-    currentGameRound: Int,
+    index: Int,
     dpSingleGame: DPSingleGame,
     isComplete: Boolean,
     isFistIsNotCompleteIndex: Int?,
@@ -204,7 +269,7 @@ fun GameItem(
     onClickGameItem: (DPSingleGame) -> Unit,
 ) {
     StageCircle(
-        index = currentGameRound,
+        index = index,
         isComplete = isComplete,
         isSelected = isSelected,
         isFistIsNotCompleteIndex = isFistIsNotCompleteIndex,
@@ -258,9 +323,11 @@ fun StageCircle(
                     .background(color = colorResource(id = R.color.color_B5EAEAE8))
                     .align(alignment = Alignment.Center)
                     .noRippleClickable {
-                        onClickGameItem.takeIf {
-                            isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex
-                        }?.invoke(dpSingleGame)
+                        onClickGameItem
+                            .takeIf {
+                                isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex
+                            }
+                            ?.invoke(dpSingleGame)
                     }
             ) {
                 Text(

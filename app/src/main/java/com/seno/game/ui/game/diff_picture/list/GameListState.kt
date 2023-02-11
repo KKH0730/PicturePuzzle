@@ -1,25 +1,34 @@
 package com.seno.game.ui.game.diff_picture.list
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.airbnb.lottie.compose.LottieAnimatable
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
+import kotlinx.coroutines.CoroutineScope
 
-class GameListState(
+class GameListState @OptIn(ExperimentalPagerApi::class) constructor(
     val gridState: LazyGridState,
-    val gameList: MutableState<List<DPSingleGame>>,
+    val pagerState: PagerState,
+    val stageInfos: MutableState<List<List<DPSingleGame>>>,
+    val coroutineScope: CoroutineScope
 ) {
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun rememberGameListState(
     gridState: LazyGridState,
-    gameList: MutableState<List<DPSingleGame>>,
-) = remember(gameList) {
+    pagerState: PagerState,
+    stageInfos: MutableState<List<List<DPSingleGame>>>,
+    coroutineScope: CoroutineScope = rememberCoroutineScope()
+) = remember(stageInfos) {
     GameListState(
         gridState = gridState,
-        gameList = gameList,
+        pagerState = pagerState,
+        stageInfos = stageInfos,
+        coroutineScope = coroutineScope,
     )
 }

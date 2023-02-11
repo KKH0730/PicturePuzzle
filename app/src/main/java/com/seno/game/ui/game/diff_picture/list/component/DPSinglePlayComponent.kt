@@ -43,7 +43,7 @@ fun GameListHeader(
             Spacer(modifier = Modifier.width(width = 16.dp))
             Image(
                 painter = painterResource(id = R.drawable.ic_arrow_left_white),
-                contentDescription = "left_arrow",
+                contentDescription = "back_arrow",
                 modifier = Modifier.noRippleClickable { onClickBack.invoke() }
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
@@ -125,10 +125,10 @@ fun LifePointGuideTerm() {
 @Composable
 fun SingleGameGridList(
     gameList: List<DPSingleGame>,
-    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
+    onClickGameItem: (DPSingleGame) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val currentStage: DPSingleGame? = try {
+    val isFistIsNotComplete = try {
         gameList.first { !it.isComplete }
     } catch (e: Exception) {
         null
@@ -163,10 +163,10 @@ fun SingleGameGridList(
                 ) { index: Int, dpSingleGame: DPSingleGame ->
                     GameItem(
                         currentGameRound = index,
-                        finalGameRound = gameListState.gameList.value.size - 1,
                         dpSingleGame = dpSingleGame,
                         isComplete = dpSingleGame.isComplete,
-                        isCurrentStage = dpSingleGame.id == currentStage?.id,
+                        isFistIsNotCompleteIndex = isFistIsNotComplete?.id,
+                        isSelected = dpSingleGame.isSelect,
                         onClickGameItem = onClickGameItem
                     )
                 }
@@ -197,80 +197,34 @@ fun SingleGameGridList(
 @Composable
 fun GameItem(
     currentGameRound: Int,
-    finalGameRound: Int,
     dpSingleGame: DPSingleGame,
     isComplete: Boolean,
-    isCurrentStage: Boolean,
-    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
+    isFistIsNotCompleteIndex: Int?,
+    isSelected: Boolean,
+    onClickGameItem: (DPSingleGame) -> Unit,
 ) {
-
-    if (isComplete) {
-        Box(modifier = Modifier.size(size = 36.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_stage_done),
-                contentDescription = "state_done",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(color = colorResource(id = R.color.color_B5EAEAE8))
-                    .align(alignment = Alignment.Center)
-                    .clickable {
-                        onClickGameItem
-                            .takeIf { isComplete }
-                            ?.invoke(dpSingleGame, currentGameRound, finalGameRound)
-                    }
-            )
-        }
-    } else {
-        if (isCurrentStage) {
-            CurrentStateCircle(
-                index = currentGameRound,
-                isCurrentStage = isCurrentStage,
-                modifier = Modifier.noRippleClickable {
-                    onClickGameItem.invoke(dpSingleGame, currentGameRound, finalGameRound)
-                }
-            )
-        } else {
-            StageCircle(index = currentGameRound)
-        }
-    }
+    StageCircle(
+        index = currentGameRound,
+        isComplete = isComplete,
+        isSelected = isSelected,
+        isFistIsNotCompleteIndex = isFistIsNotCompleteIndex,
+        dpSingleGame = dpSingleGame,
+        onClickGameItem = onClickGameItem
+    )
 }
 
 @Composable
 fun StageCircle(
     index: Int,
+    isComplete: Boolean,
+    isSelected: Boolean,
+    isFistIsNotCompleteIndex: Int?,
+    dpSingleGame: DPSingleGame,
+    onClickGameItem: (DPSingleGame) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = Modifier.size(size = 36.dp)) {
-        Box(
-            modifier = modifier
-                .clip(shape = CircleShape)
-                .size(30.dp)
-                .background(color = colorResource(id = R.color.color_B5EAEAE8))
-                .align(alignment = Alignment.Center)
-        ) {
-            Text(
-                text = "${index + 1}",
-                color = colorResource(id = R.color.color_b8c0ff),
-                fontSize = 14.textDp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(shape = CircleShape)
-                    .align(alignment = Alignment.Center)
-            )
-        }
-    }
-}
-
-@Composable
-fun CurrentStateCircle(
-    index: Int,
-    isCurrentStage: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier.size(size = 36.dp)) {
-        if (isCurrentStage) {
+        if (isSelected) {
             Image(
                 painter = painterResource(id = R.drawable.img_stage_selection_ring),
                 contentDescription = null,
@@ -280,22 +234,45 @@ fun CurrentStateCircle(
             )
         }
 
-        Box(
-            modifier = modifier
-                .clip(shape = CircleShape)
-                .size(30.dp)
-                .background(color = colorResource(id = R.color.color_B5EAEAE8))
-                .align(alignment = Alignment.Center)
-        ) {
-            Text(
-                text = "${index + 1}",
-                color = colorResource(id = R.color.color_b8c0ff),
-                fontSize = 14.textDp,
-                textAlign = TextAlign.Center,
+        if (isComplete) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_stage_done),
+                contentDescription = "state_done",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .clip(shape = CircleShape)
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .background(color = colorResource(id = R.color.color_B5EAEAE8))
                     .align(alignment = Alignment.Center)
+                    .noRippleClickable {
+                        onClickGameItem
+                            .takeIf { isComplete }
+                            ?.invoke(dpSingleGame)
+                    }
             )
+        } else {
+            Box(
+                modifier = modifier
+                    .clip(shape = CircleShape)
+                    .size(30.dp)
+                    .background(color = colorResource(id = R.color.color_B5EAEAE8))
+                    .align(alignment = Alignment.Center)
+                    .noRippleClickable {
+                        onClickGameItem.takeIf {
+                            isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex
+                        }?.invoke(dpSingleGame)
+                    }
+            ) {
+                Text(
+                    text = "${index + 1}",
+                    color = colorResource(id = R.color.color_b8c0ff),
+                    fontSize = 14.textDp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .clip(shape = CircleShape)
+                        .align(alignment = Alignment.Center)
+                )
+            }
         }
     }
 }

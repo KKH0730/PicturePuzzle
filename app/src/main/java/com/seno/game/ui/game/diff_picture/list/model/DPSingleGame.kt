@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 
 data class DPSingleGame(
     val id: Int,
-    val level: DPSingleGameLevel,
-    @DrawableRes val thumbnail: Int,
-    var isComplete: Boolean = false
+    var isComplete: Boolean = false,
+    var isSelect: Boolean = false
 )

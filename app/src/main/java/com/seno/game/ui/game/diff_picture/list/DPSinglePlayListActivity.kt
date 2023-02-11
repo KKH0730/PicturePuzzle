@@ -49,13 +49,7 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                     DPSinglePlayListScreen(
                         gameList = viewModel.gameList.collectAsState().value,
                         onClickBack = { finish() },
-                        onClickGameItem = { dPSingleGame, currentGameRound, finalGameRound ->
-                            viewModel.startGame(
-                                selectedItem = dPSingleGame,
-                                currentRoundPosition = currentGameRound,
-                                finalGameRoundPosition = finalGameRound
-                            )
-                        },
+                        onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
                         onClickPlayButton = { viewModel.startGame() }
                     )
                 }

@@ -2,18 +2,13 @@ package com.seno.game.ui.game.diff_picture.list.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
-import com.seno.game.extensions.textDp
 import com.seno.game.ui.game.diff_picture.list.component.GameListHeader
 import com.seno.game.ui.game.diff_picture.list.component.LifePointGuideTerm
 import com.seno.game.ui.game.diff_picture.list.component.PlayButton
@@ -24,7 +19,7 @@ import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 fun DPSinglePlayListScreen(
     gameList: List<DPSingleGame>,
     onClickBack: () -> Unit,
-    onClickGameItem: (DPSingleGame, Int, Int) -> Unit,
+    onClickGameItem: (DPSingleGame) -> Unit,
     onClickPlayButton: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {

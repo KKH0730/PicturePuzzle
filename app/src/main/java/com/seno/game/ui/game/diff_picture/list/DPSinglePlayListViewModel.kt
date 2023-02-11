@@ -34,32 +34,42 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
     private val singleGameList: List<DPSingleGame>
         get() {
             val completeGameList = PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()
-            return (imageList.indices).mapIndexed { index, i ->
-                val dpSingleGameLevel = when {
-                    i < 25 -> DPSingleGameLevel.LOW
-                    i < 50 -> DPSingleGameLevel.MIDDLE
-                    i < 75 -> DPSingleGameLevel.HIGH
-                    else -> DPSingleGameLevel.HELL
-                }
-
-                DPSingleGame(id = i, level = dpSingleGameLevel, thumbnail = imageList[index].first).apply {
+            val gameList = (imageList.indices).mapIndexed { index, i ->
+                DPSingleGame(id = i).apply {
                     if (completeGameList.contains(i.toString())) {
                         this.isComplete = true
                     }
                 }
             }
+
+            try {
+                gameList.first { !it.isComplete }
+            } catch (e: Exception) {
+                null
+            }.also {
+                it?.isSelect = true
+                selectedGame = it
+            }
+
+            return gameList
         }
 
-    fun startGame(selectedItem: DPSingleGame, currentRoundPosition: Int, finalGameRoundPosition: Int) {
-        viewModelScope.launch {
-            _currentGameRound.emit(
-                StartGameModel(
-                    currentGameModel = selectedItem,
-                    currentRoundPosition = currentRoundPosition,
-                    finalRoundPosition = finalGameRoundPosition
-                )
-            )
+    private var selectedGame: DPSingleGame? = null
+
+    fun syncGameItem(selectedItem: DPSingleGame) {
+        if (selectedGame?.id == selectedItem.id) {
+            return
         }
+        val gameList = _gameList.value.toMutableList()
+        gameList.indexOf(selectedItem)
+            .takeIf { it != -1 }
+            ?.let {
+                selectedGame?.isSelect = false
+                gameList[it] = gameList[it].copy().apply { isSelect = true }
+                selectedGame = gameList[it]
+            }.run {
+                _gameList.value = gameList
+            }
     }
 
     fun startGame() {
@@ -106,8 +116,25 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
     }
 
     fun refreshGameList() {
-        singleGameList
+        val completeGameList = PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()
+
+        (imageList.indices).mapIndexed { index, i ->
+            DPSingleGame(id = i).apply {
+                if (completeGameList.contains(i.toString())) {
+                    this.isComplete = true
+                }
+            }
+        }
             .map { it.copy() }
-            .run { _gameList.value = this }
+            .runCatching {
+                this.first { !it.isComplete}
+                    .let {
+                        it.isSelect = true
+                        selectedGame = it
+                    }
+                this
+            }
+            .onSuccess { gameList -> _gameList.value = gameList }
+            .onFailure { selectedGame = null }
     }
 }

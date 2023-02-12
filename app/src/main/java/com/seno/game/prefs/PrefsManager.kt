@@ -65,9 +65,9 @@ object PrefsManager {
             }
         }
 
-    var diifPictureStage: Int
-        get() = Prefs.getInt("diifPictureStage", 0)
+    var diffPictureStage: Int
+        get() = Prefs.getInt("diffPictureStage", 0)
         set(stage) {
-            Prefs.putInt("diifPictureStage", stage)
+            Prefs.putInt("diffPictureStage", stage)
         }
 }

@@ -40,10 +40,18 @@ fun Resources.createRandomNickname(): String {
     return nickname
 }
 
-fun Int.saveCompleteDPGameRound() {
-    if (!PrefsManager.diffPictureCompleteGameRound.split(",").contains(this.toString())) {
-        PrefsManager.diffPictureCompleteGameRound = this.toString()
+fun Int.saveCompleteDPGameRound(currentStagePosition: Int) {
+    if (!PrefsManager.diffPictureCompleteGameRound.split(",").contains("$currentStagePosition-$this")) {
+        PrefsManager.diffPictureCompleteGameRound = "$currentStagePosition-$this"
     }
+}
+
+fun saveCompleteDPGameRound() {
+    PrefsManager.diffPictureCompleteGameRound = ""
+    PrefsManager.diffPictureCompleteGameRound = "0-0"
+    PrefsManager.diffPictureCompleteGameRound = "0-1"
+    PrefsManager.diffPictureCompleteGameRound = "0-2"
+    PrefsManager.diffPictureCompleteGameRound = "0-3"
 }
 
 fun String.getDrawableResourceId(): Int {

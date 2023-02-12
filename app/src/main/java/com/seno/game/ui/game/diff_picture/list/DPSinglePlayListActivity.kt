@@ -18,20 +18,27 @@ import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class DPSinglePlayListActivity : AppCompatActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
-                viewModel.refreshGameList()
-
                 result.data?.let { intent ->
+                    val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
                     val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
                     val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
-                    if (currentRoundPosition != -1 && finalRoundPosition != -1) {
-                        viewModel.startNextGame(currentRoundPosition = currentRoundPosition, finalRoundPosition = finalRoundPosition)
+                    viewModel.setNextStage(currentRoundPosition = currentRoundPosition, finalRoundPosition = finalRoundPosition)
+
+                    if (isStartNextGame) {
+                        if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                            viewModel.startNextGame(
+                                currentRoundPosition = currentRoundPosition,
+                                finalRoundPosition = finalRoundPosition
+                            )
+                        }
+                    } else {
+                        viewModel.refreshGameList()
                     }
                 }
             }
@@ -48,6 +55,8 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     DPSinglePlayListScreen(
                         stageInfos = viewModel.gameList.collectAsState().value,
+                        stage = viewModel.currentStage.collectAsState().value,
+                        onChangedStage = viewModel::onChangedPage,
                         onClickBack = { finish() },
                         onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
                         onClickPlayButton = { viewModel.startGame() },
@@ -63,6 +72,7 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                 viewModel.currentGameRound.collect {
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,
+                        stagePosition = it.currentStagePosition,
                         currentRoundPosition = it.currentRoundPosition,
                         finalRoundPosition = it.finalRoundPosition,
                         launcher = launcher

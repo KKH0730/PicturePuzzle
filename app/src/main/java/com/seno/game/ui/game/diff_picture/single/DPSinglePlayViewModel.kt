@@ -4,12 +4,15 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pixplicity.easyprefs.library.Prefs
 import com.seno.game.R
 import com.seno.game.di.DiffOpenCv
 import com.seno.game.domain.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.game.diff_picture.model.Answer
 import com.seno.game.ui.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.game.diff_picture.model.Point
@@ -22,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -100,12 +104,23 @@ class DPSinglePlayViewModel @Inject constructor(
             return list
         }
 
-    private fun onClickRightAnswer() {
+    private fun onClickRightAnswer(
+        currentStagePosition: Int,
+        currentRoundPosition: Int,
+        finalRoundPosition: Int
+    ) {
         viewModelScope.launch {
             launch(Dispatchers.Main) {
                 gameInfo.answer?.answerPointList?.let {
                     if (currentAnswerCount == it.size - 1) {
                         _onShowCompleteGameDialog.emit(Any())
+
+                        if (PrefsManager.diffPictureStage < currentStagePosition
+                            && currentRoundPosition == finalRoundPosition) {
+                            if (PrefsManager.diffPictureStage < TOTAL_STAGE - 1) {
+                                PrefsManager.diffPictureStage += 1
+                            }
+                        }
                     } else {
                         currentAnswerCount += 1
                     }
@@ -121,6 +136,9 @@ class DPSinglePlayViewModel @Inject constructor(
         imageViewWidth: Float,
         resizedLength: Float,
         diff: Float,
+        currentStagePosition: Int,
+        currentRoundPosition: Int,
+        finalRoundPosition: Int
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
@@ -141,7 +159,11 @@ class DPSinglePlayViewModel @Inject constructor(
                             _drawRightAnswerMark.emit(point)
                             _answerMarkList.value = modifiedAnswerMarkList
 
-                            onClickRightAnswer()
+                            onClickRightAnswer(
+                                currentStagePosition = currentStagePosition,
+                                currentRoundPosition = currentRoundPosition,
+                                finalRoundPosition = finalRoundPosition
+                            )
                         }
                     }
                     isRightAnswer

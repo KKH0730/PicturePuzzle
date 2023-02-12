@@ -20,12 +20,14 @@ import com.seno.game.ui.game.diff_picture.list.model.DPSingleGame
 @Composable
 fun DPSinglePlayListScreen(
     stageInfos: List<List<DPSingleGame>>,
+    stage: Int,
+    onChangedStage: (Int) -> Unit,
     onClickBack: () -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
     onClickPlayButton: () -> Unit
 ) {
 
-    var pagerPage by remember { mutableStateOf(PrefsManager.diifPictureStage) }
+    val pagerPage by rememberUpdatedState(newValue = stage)
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.ic_home_background),
@@ -44,6 +46,7 @@ fun DPSinglePlayListScreen(
             Spacer(modifier = Modifier.height(height = 33.dp))
             SingleGameGridList(
                 stageInfos = stageInfos,
+                onChangedStage = onChangedStage,
                 onClickGameItem = onClickGameItem,
                 pagerPage = pagerPage,
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally)

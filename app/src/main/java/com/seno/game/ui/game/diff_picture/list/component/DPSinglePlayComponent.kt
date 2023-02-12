@@ -125,10 +125,11 @@ fun LifePointGuideTerm() {
 
 
 @OptIn(ExperimentalPagerApi::class)
-@SuppressLint("UnrememberedMutableState")
+@SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @Composable
 fun SingleGameGridList(
     stageInfos: List<List<DPSingleGame>>,
+    onChangedStage: (Int) -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
     pagerPage: Int,
     modifier: Modifier = Modifier,
@@ -154,10 +155,13 @@ fun SingleGameGridList(
         stageInfos = mutableStateOf(stageInfos),
     )
 
+    gameListState.coroutineScope.launch() {
+        gameListState.pagerState.scrollToPage(pagerPage)
+    }
 
     LaunchedEffect(key1 = gameListState.pagerState) {
         snapshotFlow { gameListState.pagerState.currentPage }.collect {
-
+            onChangedStage.invoke(it)
         }
     }
 
@@ -357,7 +361,6 @@ fun PlayButton(
                 ),
                 shape = RoundedCornerShape(size = 22.dp)
             )
-            .padding(vertical = 10.dp, horizontal = 40.dp)
             .noRippleClickable { onClick.invoke() }
     ) {
         Text(
@@ -365,7 +368,9 @@ fun PlayButton(
             color = colorResource(id = R.color.color_fbf8cc),
             fontSize = 20.textDp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(alignment = Alignment.Center)
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 40.dp)
+                .align(alignment = Alignment.Center)
         )
     }
 }

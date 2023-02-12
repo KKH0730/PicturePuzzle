@@ -58,7 +58,7 @@ class GamePrepareView @JvmOverloads constructor(
         CoroutineScope(Dispatchers.Main).launch {
             prepareCount.collect { count ->
                 if (count < 0) {
-                    startTranslateAndFadeOutAnimation()
+                    startTopMoveAndFadeOutAnimation()
                 } else if (count == 0) {
                     tvCountDown.text = getString(R.string.game_prepare_start)
                 } else {
@@ -114,7 +114,7 @@ class GamePrepareView @JvmOverloads constructor(
         tvStage.text = stage
     }
 
-    fun startTranslateAnimation() {
+    fun startMoveBottomAnimation() {
         translateYAnimator = ObjectAnimator
             .ofFloat(
                 stageContainer,
@@ -124,7 +124,7 @@ class GamePrepareView @JvmOverloads constructor(
             )
             .apply {
                 startDelay = 500
-                duration = 1250
+                duration = 1000
                 addListener(
                     object: Animator.AnimatorListener {
                         override fun onAnimationStart(p0: Animator?) {
@@ -141,14 +141,14 @@ class GamePrepareView @JvmOverloads constructor(
         translateYAnimator?.start()
     }
 
-    private fun startTranslateAndFadeOutAnimation() {
+    private fun startTopMoveAndFadeOutAnimation() {
         animatorSet = AnimatorSet()
 
         val translateYAnimator = ObjectAnimator
             .ofFloat(stageContainer, "translationY", 181.dpToPx().toFloat(), -581.dpToPx().toFloat())
             .apply {
                 startDelay = 500
-                duration = 1000
+                duration = 700
                 addListener(
                     object: Animator.AnimatorListener {
                         override fun onAnimationStart(p0: Animator?) {}
@@ -166,7 +166,7 @@ class GamePrepareView @JvmOverloads constructor(
             .ofFloat(this@GamePrepareView, "alpha", 1f, 0f)
             .apply {
                 startDelay = 800
-                duration = 1000
+                duration = 700
                 addListener(
                     object: Animator.AnimatorListener {
                         override fun onAnimationStart(p0: Animator?) {}

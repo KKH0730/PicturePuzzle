@@ -29,11 +29,13 @@ import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
 import com.seno.game.extensions.*
 import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.game.diff_picture.single.adapter.AnswerMarkAdapter
 import com.seno.game.util.AnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -41,6 +43,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     layoutResId = R.layout.activity_diff_picture_single_play
 ) {
     private val viewModel by viewModels<DPSinglePlayViewModel>()
+    private val currentStagePosition: Int by lazy { intent.getIntExtra(STAGE_POSITION, -1) }
     private val currentRoundPosition: Int by lazy { intent.getIntExtra(CURRENT_ROUND_POSITION, -1) }
     private val finalRoundPosition: Int by lazy { intent.getIntExtra(FINAL_ROUND_POSITION, -1) }
     private var animatorSet: AnimatorSet? = null
@@ -80,6 +83,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         super.onCreate(savedInstanceState)
 
         initSetting()
+//        saveCompleteDPGameRound()
 
         setPrepareView()
         setGameCompleteDialog()
@@ -256,8 +260,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         super.onDestroy()
     }
 
-
-
     @SuppressLint("SetTextI18n")
     private fun initSetting() {
         binding.apply {
@@ -272,38 +274,49 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
     private fun setPrepareView() {
         binding.cvPrepareView.apply {
-            setStage("STAGE ${String.format("%02d", currentRoundPosition + 1)}")
+            setStage("ROUND ${String.format("%02d", currentRoundPosition + 1)}")
             onGameStart = {
                 binding.cvTimerView.timerStart()
             }
         }.run {
-            startTranslateAnimation()
+            startMoveBottomAnimation()
         }
     }
 
     private fun setGameCompleteDialog() {
         binding.cvGameCompleteDialog.apply {
             if (currentRoundPosition != -1 && finalRoundPosition != -1) {
-                handleButtonUI(isFinalGame = currentRoundPosition == finalRoundPosition)
+                handleButtonUI(isFinalGame = currentRoundPosition == finalRoundPosition
+                        && currentStagePosition == TOTAL_STAGE - 1)
             }
 
             onClickPositiveButton = {
                 this.dismiss()
 
-                currentRoundPosition.saveCompleteDPGameRound()
+                currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
                 Intent()
                     .apply {
                         putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
                         putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
+                        putExtra("isStartNextGame", true)
                     }
                     .also { setResult(RESULT_OK, it) }
                     .run { finish() }
             }
             onClickNegativeButton = {
                 this.dismiss()
-                currentRoundPosition.saveCompleteDPGameRound()
-                setResult(RESULT_OK)
-                finish()
+                currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
+//                setResult(RESULT_OK)
+//                finish()
+
+                Intent()
+                    .apply {
+                        putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
+                        putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
+                        putExtra("isStartNextGame", false)
+                    }
+                    .also { setResult(RESULT_OK, it) }
+                    .run { finish() }
             }
         }
     }
@@ -438,7 +451,10 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                     viewY = v.y,
                     imageViewWidth = binding.ivOrigin.width.toFloat(),
                     resizedLength = resizedLength,
-                    diff = diff
+                    diff = diff,
+                    currentStagePosition = currentStagePosition,
+                    currentRoundPosition = currentRoundPosition,
+                    finalRoundPosition = finalRoundPosition
                 )
                 if (PrefsManager.isVibrationOn) {
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
@@ -455,7 +471,10 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                     viewY = v.y,
                     imageViewWidth = binding.ivOrigin.width.toFloat(),
                     resizedLength = resizedLength,
-                    diff = diff
+                    diff = diff,
+                    currentStagePosition = currentStagePosition,
+                    currentRoundPosition = currentRoundPosition,
+                    finalRoundPosition = finalRoundPosition
                 )
                 if (PrefsManager.isVibrationOn) {
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
@@ -561,14 +580,17 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     companion object {
         const val CURRENT_ROUND_POSITION = "currentRoundPosition"
         const val FINAL_ROUND_POSITION = "finalRoundPosition"
+        const val STAGE_POSITION = "stagePosition"
 
         fun start(
             context: Context,
+            stagePosition: Int,
             currentRoundPosition: Int,
             finalRoundPosition: Int,
             launcher: ActivityResultLauncher<Intent?>
         ) {
             context.startActivity(DPSinglePlayActivity::class.java, launcher) {
+                putExtra(STAGE_POSITION, stagePosition)
                 putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
                 putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
             }

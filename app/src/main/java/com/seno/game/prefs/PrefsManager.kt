@@ -58,10 +58,12 @@ object PrefsManager {
             if (Prefs.getString("diffPictureCompleteGameRound").isEmpty()) {
                 Prefs.putString("diffPictureCompleteGameRound", value)
             } else {
-                Prefs.putString(
-                    "diffPictureCompleteGameRound",
-                    "${Prefs.getString("diffPictureCompleteGameRound")},$value"
-                )
+                if (!Prefs.getString("diffPictureCompleteGameRound").split(",").contains(value)) {
+                    Prefs.putString(
+                        "diffPictureCompleteGameRound",
+                        "${Prefs.getString("diffPictureCompleteGameRound")},$value"
+                    )
+                }
             }
         }
 

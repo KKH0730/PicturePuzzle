@@ -115,9 +115,9 @@ class DPSinglePlayViewModel @Inject constructor(
                     if (currentAnswerCount == it.size - 1) {
                         _onShowCompleteGameDialog.emit(Any())
 
-                        if (PrefsManager.diffPictureStage < currentStagePosition
+                        if (PrefsManager.diffPictureStage == currentStagePosition
                             && currentRoundPosition == finalRoundPosition) {
-                            if (PrefsManager.diffPictureStage < TOTAL_STAGE - 1) {
+                            if (PrefsManager.diffPictureStage < TOTAL_STAGE - 2) {
                                 PrefsManager.diffPictureStage += 1
                             }
                         }

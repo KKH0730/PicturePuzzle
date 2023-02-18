@@ -13,7 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.seno.game.R
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.*
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.game.diff_picture.single.DPSinglePlayActivity

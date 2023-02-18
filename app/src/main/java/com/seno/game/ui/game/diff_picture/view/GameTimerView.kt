@@ -55,7 +55,6 @@ class GameTimerView @JvmOverloads constructor(
     init {
         initView()
         startObserve()
-//        setTimer()
     }
 
     private fun initView() {

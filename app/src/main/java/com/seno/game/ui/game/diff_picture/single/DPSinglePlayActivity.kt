@@ -83,7 +83,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         super.onCreate(savedInstanceState)
 
         initSetting()
-//        saveCompleteDPGameRound()
 
         setPrepareView()
         setGameCompleteDialog()
@@ -275,9 +274,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     private fun setPrepareView() {
         binding.cvPrepareView.apply {
             setStage("ROUND ${String.format("%02d", currentRoundPosition + 1)}")
-            onGameStart = {
-                binding.cvTimerView.timerStart()
-            }
+            onGameStart = { binding.cvTimerView.timerStart() }
         }.run {
             startMoveBottomAnimation()
         }
@@ -306,8 +303,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             onClickNegativeButton = {
                 this.dismiss()
                 currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
-//                setResult(RESULT_OK)
-//                finish()
 
                 Intent()
                     .apply {

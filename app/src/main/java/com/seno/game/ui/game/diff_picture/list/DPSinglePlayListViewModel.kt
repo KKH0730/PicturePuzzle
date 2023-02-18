@@ -45,10 +45,12 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
             var id = 0
             val completeGameList =
                 "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
+
             val stageInfos: List<List<DPSingleGame>> = stageInfos.mapIndexed { stage, list ->
-                list.map {
+                list.mapIndexed { index, _ ->
+
                     DPSingleGame(id = id, stage = stage).apply {
-                        if (completeGameList.contains("$stage-$id")) {
+                        if (completeGameList.contains("$stage-$index")) {
                             this.isComplete = true
                         }
                         id += 1
@@ -56,13 +58,13 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
                 }
             }
 
-            try {
+            kotlin.runCatching {
                 stageInfos[_currentStage.value].first { !it.isComplete }
-            } catch (e: Exception) {
-                null
-            }.also {
-                it?.isSelect = true
+            }.onSuccess {
+                it.isSelect = true
                 selectedGame = it
+            }.onFailure {
+                it.printStackTrace()
             }
 
             return stageInfos
@@ -95,31 +97,17 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
 
     fun startGame() {
         viewModelScope.launch {
-            run {
-                _gameList.value[_currentStage.value].forEachIndexed { index, dpSingleGame ->
-                    if (!dpSingleGame.isComplete) {
-                        _currentGameRound.emit(
-                            StartGameModel(
-                                currentGameModel = dpSingleGame,
-                                currentStagePosition = _currentStage.value,
-                                currentRoundPosition = index,
-                                finalRoundPosition = _gameList.value[_currentStage.value].size - 1
-                            )
-                        )
-                        return@run
-                    }
-
-                    if (index == _gameList.value[_currentStage.value].size - 1) {
-                        _currentGameRound.emit(
-                            StartGameModel(
-                                currentGameModel = dpSingleGame,
-                                currentStagePosition = _currentStage.value,
-                                currentRoundPosition = index,
-                                finalRoundPosition = index
-                            )
-                        )
-                    }
-                }
+            val gameList = _gameList.value[_currentStage.value]
+            val selectedGameIndex = gameList.indexOf(selectedGame)
+            if (selectedGameIndex != -1) {
+                _currentGameRound.emit(
+                    StartGameModel(
+                        currentGameModel = gameList[selectedGameIndex],
+                        currentStagePosition = _currentStage.value,
+                        currentRoundPosition = selectedGameIndex,
+                        finalRoundPosition = _gameList.value[_currentStage.value].size - 1
+                    )
+                )
             }
         }
     }
@@ -143,22 +131,22 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
         val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
         var id = 0
         val stageInfos = stageInfos.mapIndexed { stage, list ->
-            val gameList = list.map {
+            val gameList = list.mapIndexed { index, pair ->
                 DPSingleGame(id = id, stage = stage).apply {
-                    if (completeGameList.contains("$stage-$id")) {
+                    if (completeGameList.contains("$stage-$index")) {
                         this.isComplete = true
                     }
                     id += 1
                 }
             }
-            try {
-                gameList.first { !it.isComplete }.apply {
-                    this.isSelect = true
-                }.also { selectedGame = it }
-            } catch (e: Exception) {
+            kotlin.runCatching {
+                gameList.first { !it.isComplete }
+                    .apply { this.isSelect = true }
+                    .also { selectedGame = it }
+            }.onFailure {
                 selectedGame = null
+                it.printStackTrace()
             }
-
             gameList
         }
         _gameList.value = stageInfos

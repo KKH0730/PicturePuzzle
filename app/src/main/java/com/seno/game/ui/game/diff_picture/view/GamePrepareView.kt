@@ -192,7 +192,13 @@ class GamePrepareView @JvmOverloads constructor(
         timerTask = object : TimerTask() {
             override fun run() {
                 try {
-                    prepareCount.value -= 1
+                    prepareCount.value
+                        ?.takeIf { prepareCount.value != -1 }
+                        ?.run {
+                            prepareCount.value -= 1
+                        } ?: run {
+                        releaseTimer()
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     releaseTimer()

@@ -7,17 +7,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.FirebaseRequest
-import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.saveDiskCacheData
-import com.seno.game.extensions.toast
 import com.seno.game.prefs.PrefsManager
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
@@ -241,10 +240,15 @@ object AccountManager {
             val userNickname = nickname ?: PrefsManager.nickname
             val userProfileUri = profileUri ?: PrefsManager.nickname
             val map = mutableMapOf(
-                "platform" to platform.name,
                 "uid" to uid,
                 "nickname" to userNickname,
-                "profileUri" to userProfileUri
+                "platform" to platform.name,
+                "profileUri" to userProfileUri,
+                "backgroundVolume" to PrefsManager.backgroundVolume,
+                "effectVolume" to PrefsManager.effectVolume,
+                "isVibrationOn" to PrefsManager.isVibrationOn,
+                "isPushOn" to PrefsManager.isPushOn,
+                "isShowAD" to PrefsManager.isShowAD
             )
 
             profileColRef.document(uid)
@@ -260,7 +264,18 @@ object AccountManager {
                     nickname?.let { PrefsManager.nickname = it }
                     profileUri?.let { PrefsManager.profileUri = it}
 
-                    onSignInSucceed.invoke()
+                    val savedGameInfoMap = mutableMapOf<String, Any>(
+                        "diffPictureGameCurrentStage" to 0,
+                        "completeGameRound" to ""
+                    )
+
+                    profileColRef
+                        .document(uid)
+                        .collection("save_game_info")
+                        .document("diff_picture")
+                        .set(savedGameInfoMap)
+                        .addOnSuccessListener { onSignInSucceed.invoke() }
+                        .addOnFailureListener { onSignInFailed.invoke() }
                 }
         } ?: onSignInFailed.invoke()
     }
@@ -282,12 +297,30 @@ object AccountManager {
 
                     val documentSnapshot = task.result
                     PrefsManager.apply {
-                        this.platform = documentSnapshot.getString("platform") ?: ""
                         this.nickname = documentSnapshot.getString("nickname") ?: ""
+                        this.platform = documentSnapshot.getString("platform") ?: ""
                         this.profileUri = documentSnapshot.getString("profileUri") ?: ""
+                        this.backgroundVolume = documentSnapshot.getString("backgroundVolume")?.toFloat() ?: backgroundVolume
+                        this.effectVolume = documentSnapshot.getString("effectVolume")?.toFloat() ?: effectVolume
+                        this.isVibrationOn = documentSnapshot.getBoolean("isVibrationOn") ?: isVibrationOn
+                        this.isPushOn = documentSnapshot.getBoolean("isPushOn") ?: isPushOn
+                        this.isShowAD = documentSnapshot.getBoolean("isShowAD") ?: isShowAD
                         this.profileUri.saveDiskCacheData(size = null)
                     }
-                    onSignInSucceed.invoke()
+
+
+                    val savedGameInfoMap = mutableMapOf<String, Any>(
+                        "diffPictureGameCurrentStage" to 0,
+                        "completeGameRound" to ""
+                    )
+
+                    profileColRef
+                        .document(uid)
+                        .collection("save_game_info")
+                        .document("diff_picture")
+                        .set(savedGameInfoMap)
+                        .addOnSuccessListener { onSignInSucceed.invoke() }
+                        .addOnFailureListener { onSignInFailed.invoke() }
                 }
         } ?: onSignInFailed.invoke()
     }

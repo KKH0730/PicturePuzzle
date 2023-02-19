@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.seno.game.model.Result
 
-abstract class UseCase<P, R>(private val dispatcher: CoroutineDispatcher) {
+abstract class BaseUseCase2<P, R>(private val dispatcher: CoroutineDispatcher) {
 
     suspend operator fun invoke(params: P): Result<R> {
         return try {

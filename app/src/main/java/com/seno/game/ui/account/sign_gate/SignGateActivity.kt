@@ -1,10 +1,8 @@
 package com.seno.game.ui.account.sign_gate
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
@@ -12,7 +10,6 @@ import androidx.compose.ui.Modifier
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
-import timber.log.Timber
 
 class SignGateActivity : AppCompatActivity() {
     private lateinit var googleAccountManager: GoogleAccountManager
@@ -38,12 +35,17 @@ class SignGateActivity : AppCompatActivity() {
                         naverAccountManager = naverAccountManager,
                         kakaoAccountManager = kakaoAccountManager,
                         onSignInSucceed = {
-                            toast("로그인 성공")
-                            finish()
+                            runOnUiThread {
+                                toast("로그인 성공")
+                                finish()
+                            }
+
                         },
                         onSignInFailed = {
-                            toast("로그인 실패")
-                            finish()
+                            runOnUiThread {
+                                toast("로그인 실패")
+                                finish()
+                            }
                         },
                         onClickClose = { finish() }
                     )

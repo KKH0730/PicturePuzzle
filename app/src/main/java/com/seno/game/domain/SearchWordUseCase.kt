@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SearchWordUseCase @Inject constructor(
     private val hunMinJeongEumRepository: HunMinJeongEumRepository,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
-) : UseCase<String, HumMinJeongEumResponse>(ioDispatcher) {
+) : BaseUseCase2<String, HumMinJeongEumResponse>(ioDispatcher) {
 
     override suspend fun execute(params: String): HumMinJeongEumResponse {
         return hunMinJeongEumRepository.searchWord(input = params)

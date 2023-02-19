@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.seno.game.R
 
 @Composable
-fun HomeDummyScreen() {
+fun HomeLoadingScreen() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier

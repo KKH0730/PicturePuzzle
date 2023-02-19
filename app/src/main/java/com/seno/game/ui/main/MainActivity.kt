@@ -15,65 +15,133 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
+import com.seno.game.model.SavedGameInfo
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
-import com.seno.game.ui.game.diff_picture.list.DPSinglePlayListActivity
-import com.seno.game.ui.main.home.HomeDummyScreen
+import com.seno.game.ui.main.home.HomeLoadingScreen
 import com.seno.game.ui.splash.SplashActivity
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val viewModel by viewModels<MainViewModel>()
+    private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
 
+
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
-//            SplashActivity.start(context = this@MainActivity)
-//            finish()
-            DPSinglePlayListActivity.start(context = this)
+            SplashActivity.start(context = this@MainActivity)
+            finish()
         } else {
             setContent {
                 AppTheme {
                     Surface(Modifier.fillMaxSize()) {
+                        var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
+                        var isNetworkError by remember { mutableStateOf(false) }
+                        var isAuthentication by remember { mutableStateOf(false) }
+
+
                         if (AccountManager.isUser) {
-                            MainUI(isAuthentication = true)
+                            isAuthentication = true
                         } else {
-                            var isAuthentication by remember { mutableStateOf(false) }
                             reqAuthentication { isAuthentication = it }
-                            MainUI(isAuthentication = isAuthentication)
                         }
+
+                        if (isAuthentication && savedGameInfo == null) {
+                            AccountManager.firebaseUid?.let {
+                                mainViewModel.getSavedGameInfo(uid = it)
+                            } ?: run {
+                                isNetworkError = true
+                            }
+                        }
+
+                        MainUI(
+                            isAuthentication = isAuthentication,
+                            savedGameInfo = savedGameInfo,
+                            isNetworkError = isNetworkError
+                        )
+
+                        startObserve(
+                            onCallbackSavedGameInfo = { savedGameInfo = it },
+                            onCallbackNetworkError = { isNetworkError = it }
+                        )
                     }
                 }
             }
         }
     }
 
+    private fun startObserve(
+        onCallbackSavedGameInfo: (SavedGameInfo) -> Unit,
+        onCallbackNetworkError: (Boolean) -> Unit
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { mainViewModel.savedGameInfoToLocalDB.collect(onCallbackSavedGameInfo::invoke)}
+                launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
+            }
+        }
+    }
+
     @Composable
-    private fun MainUI(isAuthentication: Boolean) {
-        HomeDummyScreen()
-        if (isAuthentication) {
-            if (checkNetworkConnectivityForComposable()) {
-                MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
-                MainScreen()
-            } else {
-                RestartDialog(
-                    title = getString(R.string.network_error_title),
-                    content = getString(R.string.network_error),
-                    confirmText = getString(R.string.alert_dialog_restart),
-                    onClickConfirm = { this@MainActivity.restartApp() }
-                )
+    private fun MainUI(
+        isAuthentication: Boolean,
+        savedGameInfo: SavedGameInfo?,
+        isNetworkError: Boolean
+    ) {
+        if (savedGameInfo == null) {
+            HomeLoadingScreen()
+            return
+        }
+
+        if (isNetworkError) {
+            RestartDialog(
+                title = getString(R.string.network_error_title),
+                content = getString(R.string.network_error),
+                confirmText = getString(R.string.alert_dialog_restart),
+                onClickConfirm = { this@MainActivity.restartApp() }
+            )
+        } else {
+            // 저장된 게임 데이터 Load
+            savedGameInfoToLocalDB(savedGameInfo = savedGameInfo)
+
+            HomeLoadingScreen()
+            if (isAuthentication) {
+                if (checkNetworkConnectivityForComposable()) {
+                    MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
+                    MainScreen()
+                } else {
+                    RestartDialog(
+                        title = getString(R.string.network_error_title),
+                        content = getString(R.string.network_error),
+                        confirmText = getString(R.string.alert_dialog_restart),
+                        onClickConfirm = { this@MainActivity.restartApp() }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun savedGameInfoToLocalDB(savedGameInfo: SavedGameInfo?) {
+        savedGameInfo?.let {
+            PrefsManager.apply {
+                diffPictureStage = it.diffPictureGameCurrentStage
+                diffPictureCompleteGameRound = it.completeGameRound
             }
         }
     }
@@ -94,9 +162,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun printHashKey() {
+    private fun printHashKey() {
         try {
-            val info: PackageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            val info: PackageInfo =
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
             for (signature in info.signatures) {
                 val md: MessageDigest = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())

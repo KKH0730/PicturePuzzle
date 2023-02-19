@@ -18,7 +18,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
-import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
@@ -53,35 +52,69 @@ class MainActivity : AppCompatActivity() {
                     Surface(Modifier.fillMaxSize()) {
                         var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
                         var isNetworkError by remember { mutableStateOf(false) }
-                        var isAuthentication by remember { mutableStateOf(false) }
-
-
-                        if (AccountManager.isUser) {
-                            isAuthentication = true
-                        } else {
-                            reqAuthentication { isAuthentication = it }
-                        }
-
-                        if (isAuthentication && savedGameInfo == null) {
-                            AccountManager.firebaseUid?.let {
-                                mainViewModel.getSavedGameInfo(uid = it)
-                            } ?: run {
-                                isNetworkError = true
-                            }
-                        }
-
-                        MainUI(
-                            isAuthentication = isAuthentication,
-                            savedGameInfo = savedGameInfo,
-                            isNetworkError = isNetworkError
-                        )
 
                         startObserve(
                             onCallbackSavedGameInfo = { savedGameInfo = it },
                             onCallbackNetworkError = { isNetworkError = it }
                         )
+
+                        setOrReqAuthentication(callback = { isAuthenticated ->
+                            if (isAuthenticated) {
+                                reqSavedGameInfo(
+                                    savedGameInfo = savedGameInfo,
+                                    isTaskSuccess = { isTaskSuccess ->
+                                        if (!isTaskSuccess) {
+                                            isNetworkError = true
+                                        }
+                                    }
+                                )
+                            }
+                        })
+
+                        if (isNetworkError) {
+                            RestartDialog(
+                                title = getString(R.string.network_error_title),
+                                content = getString(R.string.network_error),
+                                confirmText = getString(R.string.alert_dialog_restart),
+                                onClickConfirm = { this@MainActivity.restartApp() }
+                            )
+                        } else {
+                            if (savedGameInfo != null) {
+                                // 저장된 게임 데이터 Load
+                                savedGameInfoToLocalDB(savedGameInfo = savedGameInfo)
+
+                                // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
+                                HomeLoadingScreen()
+                                MainScreen()
+                            } else {
+                                HomeLoadingScreen()
+                            }
+
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    private fun setOrReqAuthentication(callback: (Boolean) -> Unit) {
+        if (AccountManager.isUser) {
+            callback.invoke(true)
+        } else {
+            reqAuthentication { callback.invoke(it) }
+        }
+    }
+
+    private fun reqSavedGameInfo(
+        savedGameInfo: SavedGameInfo?,
+        isTaskSuccess: (Boolean) -> Unit
+    ) {
+        if (savedGameInfo == null) {
+            AccountManager.firebaseUid?.let {
+                mainViewModel.getSavedGameInfo(uid = it)
+                isTaskSuccess.invoke(true)
+            } ?: run {
+                isTaskSuccess.invoke(false)
             }
         }
     }
@@ -94,45 +127,6 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { mainViewModel.savedGameInfoToLocalDB.collect(onCallbackSavedGameInfo::invoke)}
                 launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
-            }
-        }
-    }
-
-    @Composable
-    private fun MainUI(
-        isAuthentication: Boolean,
-        savedGameInfo: SavedGameInfo?,
-        isNetworkError: Boolean
-    ) {
-        if (savedGameInfo == null) {
-            HomeLoadingScreen()
-            return
-        }
-
-        if (isNetworkError) {
-            RestartDialog(
-                title = getString(R.string.network_error_title),
-                content = getString(R.string.network_error),
-                confirmText = getString(R.string.alert_dialog_restart),
-                onClickConfirm = { this@MainActivity.restartApp() }
-            )
-        } else {
-            // 저장된 게임 데이터 Load
-            savedGameInfoToLocalDB(savedGameInfo = savedGameInfo)
-
-            HomeLoadingScreen()
-            if (isAuthentication) {
-                if (checkNetworkConnectivityForComposable()) {
-                    MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
-                    MainScreen()
-                } else {
-                    RestartDialog(
-                        title = getString(R.string.network_error_title),
-                        content = getString(R.string.network_error),
-                        confirmText = getString(R.string.alert_dialog_restart),
-                        onClickConfirm = { this@MainActivity.restartApp() }
-                    )
-                }
             }
         }
     }

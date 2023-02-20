@@ -244,8 +244,8 @@ object AccountManager {
                 "nickname" to userNickname,
                 "platform" to platform.name,
                 "profileUri" to userProfileUri,
-                "backgroundVolume" to PrefsManager.backgroundVolume,
-                "effectVolume" to PrefsManager.effectVolume,
+                "backgroundVolume" to PrefsManager.backgroundVolume.toString(),
+                "effectVolume" to PrefsManager.effectVolume.toString(),
                 "isVibrationOn" to PrefsManager.isVibrationOn,
                 "isPushOn" to PrefsManager.isPushOn,
                 "isShowAD" to PrefsManager.isShowAD

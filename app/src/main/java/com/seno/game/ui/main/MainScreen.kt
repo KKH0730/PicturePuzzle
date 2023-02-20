@@ -51,12 +51,3 @@ fun MainUI() {
         )
     }
 }
-
-private fun savedGameInfoToLocalDB(savedGameInfo: SavedGameInfo?) {
-    savedGameInfo?.let {
-        PrefsManager.apply {
-            diffPictureStage = it.diffPictureGameCurrentStage
-            diffPictureCompleteGameRound = it.completeGameRound
-        }
-    }
-}

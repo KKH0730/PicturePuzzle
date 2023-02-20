@@ -12,6 +12,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
@@ -26,23 +28,55 @@ import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.util.MusicPlayUtil
+import timber.log.Timber
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen() {
+    val homeViewModel = hiltViewModel<HomeViewModel>()
+    HomeUI(
+        backgroundVolume = homeViewModel.backgroundVolume.collectAsStateWithLifecycle().value,
+        onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
+        onChangeFinishedBackgroundVolume = {
+            homeViewModel.reqUpdateBackgroundVolume(
+                uid = AccountManager.firebaseUid,
+                volume = it.toString()
+            )
+        },
+        effectVolume = homeViewModel.effectVolume.collectAsStateWithLifecycle().value,
+        onChangedEffectVolume = homeViewModel::updateEffectVolume,
+        onChangeFinishedEffectVolume = {
+            homeViewModel.reqUpdateEffectVolume(
+                uid = AccountManager.firebaseUid,
+                volume = it.toString()
+            )
+        }
+    )
+}
+
+@Composable
+fun HomeUI(
+    backgroundVolume: Float,
+    onChangedBackgroundVolume: (Float) -> Unit,
+    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    effectVolume: Float,
+    onChangedEffectVolume: (Float) -> Unit,
+    onChangeFinishedEffectVolume: (Float) -> Unit,
+) {
     val context = LocalContext.current
     val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
     val googleAccountManager = GoogleAccountManager(activity = context as MainActivity)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
-    val homeViewModel = hiltViewModel<HomeViewModel>()
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
+
+
 
     (context as MainActivity).LifecycleEventListener {
         when (it) {
@@ -106,14 +140,12 @@ fun HomeScreen() {
     if (isShowSettingDialog) {
         SettingDialog(
             onClickClose = { isShowSettingDialog = false },
-            onValueChangeBackgroundSoundSlider = {
-                PrefsManager.backgroundVolume = it
-                MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = true)
-            },
-            onValueChangeEffectSoundSlider = {
-                PrefsManager.effectVolume = it
-                MusicPlayUtil.setVol(leftVol = it, rightVol = it, isBackgroundSound = false)
-            },
+            backgroundVolume = backgroundVolume,
+            onChangedBackgroundVolume = onChangedBackgroundVolume,
+            onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+            effectVolume = effectVolume,
+            onChangedEffectVolume = onChangedEffectVolume,
+            onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
             onCheckChangeVibration = { PrefsManager.isVibrationOn = it },
             onCheckChangePush = { PrefsManager.isPushOn = it },
             onClickLogin = { context.startActivity(SignGateActivity::class.java) },
@@ -186,86 +218,3 @@ fun HomeScreen() {
         }
     }
 }
-
-//    Column(Modifier.fillMaxSize()) {
-//        Text(text = if (isUser) {
-//            "로그인 O"
-//        } else {
-//            "로그인 X"
-//        })
-//        Button(
-//            onClick = {
-//                context.startActivity(SignGateActivity::class.java)
-//                (context as MainActivity).overridePendingTransition(
-//                    R.anim.slide_right_enter,
-//                    R.anim.slide_right_exit
-//                )
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "로그인 화면")
-//        }
-//
-//        Button(
-//            onClick = {
-//                context.startActivity(HunMinJeongEumActivity::class.java)
-//                (context as MainActivity).overridePendingTransition(
-//                    R.anim.slide_right_enter,
-//                    R.anim.slide_right_exit
-//                )
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "훈민정음")
-//        }
-//
-//        Button(
-//            onClick = {
-//                context.startActivity(AreaGameActivity::class.java)
-//                (context as MainActivity).overridePendingTransition(R.anim.slide_right_enter,
-//                    R.anim.slide_right_exit)
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "땅따먹기")
-//        }
-//
-//        Button(
-//            onClick = {
-//                context.startActivity(DiffPictureGameActivity::class.java)
-//                (context as MainActivity).overridePendingTransition(R.anim.slide_right_enter,
-//                    R.anim.slide_right_exit)
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "틀린그림찾기")
-//        }
-//
-//        Button(
-//            onClick = {
-//                AccountManager.firebaseUid?.let { uid ->
-//                    val date = Date(Calendar.getInstance().timeInMillis)
-//                    context.startActivity(CreateGameActivity::class.java) {
-//                        putExtra("date", date.getTodayDate())
-//                        putExtra("uid", uid)
-//                        putExtra("roomUid", "$uid${date.time}")
-//                        putExtra("isChief", true)
-//                    }
-//                }
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "방 생성")
-//        }
-//
-//        Button(
-//            onClick = {
-//                AccountManager.firebaseUid?.let {
-//                    context.startActivity(FindGameActivity::class.java)
-//                }
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text(text = "방 찾기")
-//        }
-//    }

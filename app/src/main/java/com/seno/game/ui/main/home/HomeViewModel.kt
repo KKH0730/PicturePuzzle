@@ -1,30 +1,25 @@
 package com.seno.game.ui.main.home
 
 import androidx.lifecycle.*
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.ListenerRegistration
 import com.seno.game.R
-import com.seno.game.di.network.DiffDocRef
-import com.seno.game.domain.DiffPictureUseCase
+import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
+import com.seno.game.domain.usecase.user.UserInfoUseCase
 import com.seno.game.extensions.getString
 import com.seno.game.model.DiffPictureGame
-import com.seno.game.model.Player
 import com.seno.game.model.Result
-import com.seno.game.model.data
+import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.base.BaseViewModel
+import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import timber.log.Timber
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val diffPictureUseCase: DiffPictureUseCase,
-) : ViewModel() {
+    private val userInfoUseCase: UserInfoUseCase
+) : BaseViewModel() {
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
@@ -44,6 +39,11 @@ class HomeViewModel @Inject constructor(
     private val _gameReadySharedFlow = MutableSharedFlow<Unit>()
     val gameReadySharedFlow = _gameReadySharedFlow.asSharedFlow()
 
+    private val _backgroundVolume = MutableStateFlow(PrefsManager.backgroundVolume)
+    val backgroundVolume: StateFlow<Float> get() = _backgroundVolume.asStateFlow()
+
+    private val _effectVolume = MutableStateFlow(PrefsManager.effectVolume)
+    val effectVolume: StateFlow<Float> get() = _effectVolume.asStateFlow()
 
     fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
         viewModelScope.launch {
@@ -112,6 +112,48 @@ class HomeViewModel @Inject constructor(
             } else {
                 _gameReadySharedFlow.emit(Unit)
                 _message.emit(getString(R.string.network_request_error))
+            }
+        }
+    }
+
+    fun updateBackgroundVolume(volume: Float) {
+        PrefsManager.backgroundVolume = volume
+        MusicPlayUtil.setVol(leftVol = volume, rightVol = volume, isBackgroundSound = true)
+
+        _backgroundVolume.value = volume
+    }
+
+    fun updateEffectVolume(volume: Float) {
+        PrefsManager.effectVolume = volume
+        MusicPlayUtil.setVol(leftVol = volume, rightVol = volume, isBackgroundSound = false)
+
+        _effectVolume.value = volume
+    }
+
+    fun reqUpdateBackgroundVolume(uid: String?, volume: String) {
+        viewModelScope.launch {
+            uid?.let {
+                userInfoUseCase.updateBackgroundVolume(uid = uid, volume = volume).collect { result ->
+                    when (result) {
+                        is Result.Success -> { _backgroundVolume.emit(result.data) }
+                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    fun reqUpdateEffectVolume(uid: String?, volume: String) {
+        viewModelScope.launch {
+            uid?.let {
+                userInfoUseCase.updateEffectVolume(uid = uid, volume = volume).collect { result ->
+                    when (result) {
+                        is Result.Success -> { _effectVolume.emit(result.data) }
+                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
+                        else -> {}
+                    }
+                }
             }
         }
     }

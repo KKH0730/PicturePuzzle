@@ -1,32 +1,42 @@
 package com.seno.game.ui.main
 
 import androidx.lifecycle.viewModelScope
-import com.seno.game.domain.GetSavedGameInfoUseCase
+import com.seno.game.domain.usecase.user.UserInfoUseCase
 import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getSavedGameInfoUseCase: GetSavedGameInfoUseCase
+    private val userInfoUseCase: UserInfoUseCase
 ): BaseViewModel() {
-    private val _showNetworkErrorEvent = MutableStateFlow<Boolean>(false)
+
+    private val _showNetworkErrorEvent = MutableStateFlow(false)
     val showNetworkErrorEvent: StateFlow<Boolean> get() = _showNetworkErrorEvent.asStateFlow()
 
-    private val _savedGameInfoToLocalDB = MutableSharedFlow<SavedGameInfo>()
-    val savedGameInfoToLocalDB: SharedFlow<SavedGameInfo> get() = _savedGameInfoToLocalDB.asSharedFlow()
+    private val _savedGameInfoToLocalDB = MutableSharedFlow<SavedGameInfo?>()
+    val savedGameInfoToLocalDB: SharedFlow<SavedGameInfo?> get() = _savedGameInfoToLocalDB.asSharedFlow()
 
     fun getSavedGameInfo(uid: String) {
         viewModelScope.launch {
-            getSavedGameInfoUseCase(params = uid).collect { result: Result<SavedGameInfo> ->
-                when (result) {
-                    is Result.Success -> { _savedGameInfoToLocalDB.emit(result.data) }
-                    is Result.Error -> {  _showNetworkErrorEvent.value = true }
-                    else -> {}
+            withContext(Dispatchers.IO) {
+                val savedUserInfoResponse = async { userInfoUseCase(params = uid) }.await()
+                savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
+                    when (result) {
+                        is Result.Success -> {
+                            _savedGameInfoToLocalDB.emit(result.data)
+                        }
+                        is Result.Error -> { _showNetworkErrorEvent.value = true }
+                        else -> {}
+                    }
                 }
             }
         }

@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startObserve(
-        onCallbackSavedGameInfo: (SavedGameInfo) -> Unit,
+        onCallbackSavedGameInfo: (SavedGameInfo?) -> Unit,
         onCallbackNetworkError: (Boolean) -> Unit
     ) {
         lifecycleScope.launch {
@@ -134,6 +134,13 @@ class MainActivity : AppCompatActivity() {
     private fun savedGameInfoToLocalDB(savedGameInfo: SavedGameInfo?) {
         savedGameInfo?.let {
             PrefsManager.apply {
+                nickname = it.nickname
+                profileUri = it.profileUri
+                backgroundVolume = it.backgroundVolume
+                effectVolume = it.effectVolume
+                isVibrationOn = it.isVibrationOn
+                isPushOn = it.isPushOn
+                isShowAD = it.isShowAD
                 diffPictureStage = it.diffPictureGameCurrentStage
                 diffPictureCompleteGameRound = it.completeGameRound
             }

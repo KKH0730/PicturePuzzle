@@ -107,7 +107,6 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
 
             launch {
                 homeViewModel.exitRoomFlow.collect {
-                    Timber.e("kkh exitRoomFlow : $it")
                 }
             }
 

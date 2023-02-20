@@ -1,4 +1,4 @@
-package com.seno.game.domain
+package com.seno.game.domain.usecase.diff_game
 
 import android.net.Uri
 import com.seno.game.data.diff_picture.DiffPictureRepository

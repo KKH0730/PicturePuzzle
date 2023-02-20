@@ -46,7 +46,6 @@ class NaverAccountManager {
                         val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                         val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
                         onSigInFailed.invoke()
-                        Timber.e("kkh profileCallback errorCode:$errorCode, errorDesc:$errorDescription")
                     }
 
                     override fun onError(errorCode: Int, message: String) {
@@ -58,7 +57,6 @@ class NaverAccountManager {
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                 val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                Timber.e("kkh oauthLoginCallback errorCode:$errorCode, errorDesc:$errorDescription")
             }
 
             override fun onError(errorCode: Int, message: String) {
@@ -99,8 +97,6 @@ class NaverAccountManager {
             override fun onFailure(httpStatus: Int, message: String) {
                 val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                 val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                onSignInFailed.invoke()
-                Timber.e("kkh profileCallback errorCode:$errorCode, errorDesc:$errorDescription")
             }
 
             override fun onError(errorCode: Int, message: String) {

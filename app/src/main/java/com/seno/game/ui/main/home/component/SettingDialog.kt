@@ -21,13 +21,18 @@ import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.BlueRippleTheme
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingDialog(
     onClickClose: () -> Unit,
-    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
-    onValueChangeEffectSoundSlider: (Float) -> Unit,
+    backgroundVolume: Float,
+    onChangedBackgroundVolume: (Float) -> Unit,
+    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    effectVolume: Float,
+    onChangedEffectVolume: (Float) -> Unit,
+    onChangeFinishedEffectVolume: (Float) -> Unit,
     onCheckChangeVibration: (Boolean) -> Unit,
     onCheckChangePush: (Boolean) -> Unit,
     onClickLogin: () -> Unit,
@@ -52,8 +57,12 @@ fun SettingDialog(
                             .verticalScroll(rememberScrollState())
                     ) {
                         SoundControlPanel(
-                            onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
-                            onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
+                            backgroundVolume = backgroundVolume,
+                            onChangedBackgroundVolume = onChangedBackgroundVolume,
+                            onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+                            effectVolume = effectVolume,
+                            onChangedEffectVolume = onChangedEffectVolume,
+                            onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
                             onCheckChangeVibration = onCheckChangeVibration,
                             modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                         )
@@ -109,8 +118,12 @@ fun DialogTitle(
 
 @Composable
 fun SoundControlPanel(
-    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
-    onValueChangeEffectSoundSlider: (Float) -> Unit,
+    backgroundVolume: Float,
+    onChangedBackgroundVolume: (Float) -> Unit,
+    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    effectVolume: Float,
+    onChangedEffectVolume: (Float) -> Unit,
+    onChangeFinishedEffectVolume: (Float) -> Unit,
     onCheckChangeVibration: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -130,16 +143,18 @@ fun SoundControlPanel(
                 .background(color = colorResource(id = R.color.color_bbd0ff))
         )
         Spacer(modifier = Modifier.height(height = 13.5.dp))
-        SliderUnit(
+        BackgroundVolumeSliderUnit(
             text = stringResource(id = R.string.home_setting_sound_background),
-            isBackgroundSlider = true,
-            onValueChangeFinished = onValueChangeBackgroundSoundSlider
+            value = backgroundVolume,
+            onValueChanged = onChangedBackgroundVolume,
+            onValueChangeFinished = onChangeFinishedBackgroundVolume
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
-        SliderUnit(
+        EffectVolumeSliderUnit(
             text = stringResource(id = R.string.home_setting_sound_effect),
-            isBackgroundSlider = false,
-            onValueChangeFinished = onValueChangeEffectSoundSlider
+            value = effectVolume,
+            onValueChanged = onChangedEffectVolume,
+            onValueChangeFinished = onChangeFinishedEffectVolume
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SwitchUnit(
@@ -151,22 +166,13 @@ fun SoundControlPanel(
 }
 
 @Composable
-fun SliderUnit(
+fun BackgroundVolumeSliderUnit(
     text: String,
-    isBackgroundSlider: Boolean,
+    value: Float,
+    onValueChanged: (Float) -> Unit,
     onValueChangeFinished: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var sliderPosition by remember {
-        mutableStateOf(
-            if (isBackgroundSlider) {
-                PrefsManager.backgroundVolume
-            } else {
-                PrefsManager.effectVolume
-            }
-        )
-    }
-
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
     ) {
@@ -181,10 +187,48 @@ fun SliderUnit(
                 modifier = Modifier.weight(weight = 4f)
             )
             Slider(
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+                value = value,
+                onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
                 valueRange = 0.0f..1.0f,
-                onValueChangeFinished = { onValueChangeFinished.invoke(sliderPosition) },
+                onValueChangeFinished = { onValueChangeFinished.invoke(value) },
+                colors = SliderDefaults.colors(
+                    thumbColor = colorResource(id = R.color.color_bbd0ff),
+                    activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
+                ),
+                modifier = Modifier
+                    .weight(weight = 6f)
+                    .height(height = 40.dp),
+            )
+        }
+    }
+}
+
+@Composable
+fun EffectVolumeSliderUnit(
+    text: String,
+    value: Float,
+    onValueChanged: (Float) -> Unit,
+    onValueChangeFinished: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    CompositionLocalProvider(
+        LocalRippleTheme provides BlueRippleTheme,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                fontSize = 14.textDp,
+                color = colorResource(id = R.color.color_b8c0ff),
+                modifier = Modifier.weight(weight = 4f)
+            )
+            Slider(
+                value = value,
+                onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
+                valueRange = 0.0f..1.0f,
+                onValueChangeFinished = { onValueChangeFinished.invoke(value) },
                 colors = SliderDefaults.colors(
                     thumbColor = colorResource(id = R.color.color_bbd0ff),
                     activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
@@ -201,7 +245,7 @@ fun SliderUnit(
 fun SwitchUnit(
     text: String,
     isVibrationSwitch: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     var isSwitchChecked by remember {
         mutableStateOf(

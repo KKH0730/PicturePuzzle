@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seno.game.R
 import com.seno.game.di.DiffOpenCv
-import com.seno.game.domain.DiffPictureUseCase
+import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getDrawable
 import com.seno.game.ui.game.diff_picture.model.Answer
 import com.seno.game.ui.game.diff_picture.model.DiffGameInfo

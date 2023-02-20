@@ -93,7 +93,6 @@ class KakaoAccountManager(private val context: Context) {
                 if (kakaoAccount == null) {
                     Single.just(null)
                 } else {
-                    Timber.e("kkh user : $user")
                     val email = kakaoAccount.email
                     val nickname = user.kakaoAccount?.profile?.nickname
                     val kakaoUid = user.id

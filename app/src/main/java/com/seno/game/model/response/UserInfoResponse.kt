@@ -10,5 +10,4 @@ data class UserInfoResponse(
     val isVibrationOn: Boolean,
     val isPushOn: Boolean,
     val isShowAD: Boolean,
-    val diffPictureGameInfoResponse: DiffPictureInfoResponse
 )

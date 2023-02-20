@@ -4,16 +4,14 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pixplicity.easyprefs.library.Prefs
 import com.seno.game.R
 import com.seno.game.di.DiffOpenCv
-import com.seno.game.domain.DiffPictureUseCase
+import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getDrawableResourceId
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.game.diff_picture.list.TOTAL_STAGE
-import com.seno.game.ui.game.diff_picture.model.Answer
 import com.seno.game.ui.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.game.diff_picture.model.Point
 import com.seno.game.ui.game.diff_picture.multi.ANSWER_CORRECTION
@@ -25,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt

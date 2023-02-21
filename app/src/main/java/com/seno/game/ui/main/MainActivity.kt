@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             if (savedGameInfo != null) {
                                 // 저장된 게임 데이터 Load
-                                savedGameInfoToLocalDB(savedGameInfo = savedGameInfo)
+                                savedGameInfo.savedGameInfoToLocalDB()
 
                                 // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
                                 HomeLoadingScreen()
@@ -89,7 +89,6 @@ class MainActivity : AppCompatActivity() {
                             } else {
                                 HomeLoadingScreen()
                             }
-
                         }
                     }
                 }
@@ -127,22 +126,6 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { mainViewModel.savedGameInfoToLocalDB.collect(onCallbackSavedGameInfo::invoke)}
                 launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
-            }
-        }
-    }
-
-    private fun savedGameInfoToLocalDB(savedGameInfo: SavedGameInfo?) {
-        savedGameInfo?.let {
-            PrefsManager.apply {
-                nickname = it.nickname
-                profileUri = it.profileUri
-                backgroundVolume = it.backgroundVolume
-                effectVolume = it.effectVolume
-                isVibrationOn = it.isVibrationOn
-                isPushOn = it.isPushOn
-                isShowAD = it.isShowAD
-                diffPictureStage = it.diffPictureGameCurrentStage
-                diffPictureCompleteGameRound = it.completeGameRound
             }
         }
     }
@@ -189,6 +172,22 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+fun SavedGameInfo?.savedGameInfoToLocalDB() {
+    this?.let {
+        PrefsManager.apply {
+            nickname = it.nickname
+            profileUri = it.profileUri
+            backgroundVolume = it.backgroundVolume
+            effectVolume = it.effectVolume
+            isVibrationOn = it.isVibrationOn
+            isPushOn = it.isPushOn
+            isShowAD = it.isShowAD
+            diffPictureStage = it.diffPictureGameCurrentStage
+            diffPictureCompleteGameRound = it.completeGameRound
+        }
+    }
+}
+
 @Composable
 fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
     val eventHandler by rememberUpdatedState(newValue = event)
@@ -204,4 +203,8 @@ fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
             lifecycle.removeObserver(observer)
         }
     }
+}
+
+fun String.println() {
+    Timber.e("kkhdev : $this")
 }

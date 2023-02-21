@@ -1,10 +1,10 @@
 package com.seno.game.ui.main.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +19,7 @@ import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
+import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
@@ -28,14 +29,13 @@ import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.util.MusicPlayUtil
-import timber.log.Timber
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen() {
     val homeViewModel = hiltViewModel<HomeViewModel>()
     HomeUI(
-        backgroundVolume = homeViewModel.backgroundVolume.collectAsStateWithLifecycle().value,
+        savedGameInfo = homeViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value,
         onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
         onChangeFinishedBackgroundVolume = {
             homeViewModel.reqUpdateBackgroundVolume(
@@ -43,7 +43,6 @@ fun HomeScreen() {
                 volume = it.toString()
             )
         },
-        effectVolume = homeViewModel.effectVolume.collectAsStateWithLifecycle().value,
         onChangedEffectVolume = homeViewModel::updateEffectVolume,
         onChangeFinishedEffectVolume = {
             homeViewModel.reqUpdateEffectVolume(
@@ -56,10 +55,9 @@ fun HomeScreen() {
 
 @Composable
 fun HomeUI(
-    backgroundVolume: Float,
+    savedGameInfo: SavedGameInfo,
     onChangedBackgroundVolume: (Float) -> Unit,
     onChangeFinishedBackgroundVolume: (Float) -> Unit,
-    effectVolume: Float,
     onChangedEffectVolume: (Float) -> Unit,
     onChangeFinishedEffectVolume: (Float) -> Unit,
 ) {
@@ -75,8 +73,6 @@ fun HomeUI(
     var isLoading by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
-
-
 
     (context as MainActivity).LifecycleEventListener {
         when (it) {
@@ -140,10 +136,10 @@ fun HomeUI(
     if (isShowSettingDialog) {
         SettingDialog(
             onClickClose = { isShowSettingDialog = false },
-            backgroundVolume = backgroundVolume,
+            backgroundVolume = savedGameInfo.backgroundVolume,
             onChangedBackgroundVolume = onChangedBackgroundVolume,
             onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
-            effectVolume = effectVolume,
+            effectVolume = savedGameInfo.effectVolume,
             onChangedEffectVolume = onChangedEffectVolume,
             onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
             onCheckChangeVibration = { PrefsManager.isVibrationOn = it },

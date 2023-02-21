@@ -27,7 +27,7 @@ class GameViewModel @Inject constructor(
 
     fun searchWord(input: String) {
         viewModelScope.launch {
-            val result = searchWordUseCase(input)
+            val result = searchWordUseCase.reqSearchWord(word = input)
 
             withContext(Dispatchers.Main) {
                 if (result is Result.Success) {

@@ -12,11 +12,9 @@ import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
@@ -96,6 +94,35 @@ object AccountManager {
             return FirebaseAuth.getInstance().currentUser?.photoUrl
         }
 
+    @JvmStatic
+    fun addAuthStateListener(onSignedIn: () -> Unit, onSignedOut: () -> Unit) {
+        val authStateListener = FirebaseAuth.AuthStateListener {
+            getFirebaseUserIdToken(
+                onSuccess = { onSignedIn.invoke() },
+                onFailure = {
+                    onSignedOut.invoke()
+                    Timber.e(it)
+                }
+            )
+        }
+        firebaseRequest.firebaseAuth.addAuthStateListener(authStateListener)
+    }
+
+    private fun getFirebaseUserIdToken(
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        currentUser?.let { firebaseUser ->
+            firebaseUser.getIdToken(true).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    task.result?.let { onSuccess.invoke() }
+                } else {
+                    task.exception?.let { onFailure.invoke(it) }
+                        ?: onFailure.invoke(Exception("Unknown FirebaseUser Id Token Error"))
+                }
+            }
+        } ?: onFailure(Exception("FirebaseUser is null"))
+    }
 
     fun signInWithCredential(
         credential: AuthCredential,
@@ -262,7 +289,7 @@ object AccountManager {
 
                     platform.let { PrefsManager.platform = it.name }
                     nickname?.let { PrefsManager.nickname = it }
-                    profileUri?.let { PrefsManager.profileUri = it}
+                    profileUri?.let { PrefsManager.profileUri = it }
 
                     val savedGameInfoMap = mutableMapOf<String, Any>(
                         "diffPictureGameCurrentStage" to 0,
@@ -307,7 +334,6 @@ object AccountManager {
                         this.isShowAD = documentSnapshot.getBoolean("isShowAD") ?: isShowAD
                         this.profileUri.saveDiskCacheData(size = null)
                     }
-
 
                     val savedGameInfoMap = mutableMapOf<String, Any>(
                         "diffPictureGameCurrentStage" to 0,
@@ -383,7 +409,7 @@ object AccountManager {
 
     fun signInAnonymous(
         onSuccess: () -> Unit,
-        onFail: () -> Unit
+        onFail: () -> Unit,
     ) {
         firebaseRequest.signInAnonymous()
             .addOnFailureListener { onFail.invoke() }

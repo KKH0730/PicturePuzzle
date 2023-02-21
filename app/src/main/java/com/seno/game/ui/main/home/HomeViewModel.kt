@@ -3,23 +3,28 @@ package com.seno.game.ui.main.home
 import androidx.lifecycle.*
 import com.seno.game.R
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
-import com.seno.game.domain.usecase.user.UserInfoUseCase
+import com.seno.game.domain.usecase.user.GameConfigUseCase
 import com.seno.game.extensions.getString
+import com.seno.game.manager.AccountManager
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Result
+import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val diffPictureUseCase: DiffPictureUseCase,
-    private val userInfoUseCase: UserInfoUseCase
+    private val configUseCase: GameConfigUseCase,
 ) : BaseViewModel() {
+
+    private var isFirstLogin = true
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
@@ -39,11 +44,40 @@ class HomeViewModel @Inject constructor(
     private val _gameReadySharedFlow = MutableSharedFlow<Unit>()
     val gameReadySharedFlow = _gameReadySharedFlow.asSharedFlow()
 
+    private val _savedGameInfoToLocalDB = MutableStateFlow(SavedGameInfo())
+    val savedGameInfoToLocalDB: StateFlow<SavedGameInfo> get() = _savedGameInfoToLocalDB.asStateFlow()
+
     private val _backgroundVolume = MutableStateFlow(PrefsManager.backgroundVolume)
     val backgroundVolume: StateFlow<Float> get() = _backgroundVolume.asStateFlow()
 
     private val _effectVolume = MutableStateFlow(PrefsManager.effectVolume)
     val effectVolume: StateFlow<Float> get() = _effectVolume.asStateFlow()
+
+    private val _vibrationSwitchOnOff = MutableStateFlow(PrefsManager.isVibrationOn)
+    val vibrationSwitchOnOff: StateFlow<Boolean> get() = _vibrationSwitchOnOff.asStateFlow()
+
+    private val _pushSwitchOnOff = MutableStateFlow(PrefsManager.isVibrationOn)
+    val pushSwitchOnOff: StateFlow<Boolean> get() = _pushSwitchOnOff.asStateFlow()
+
+    init {
+        AccountManager.addAuthStateListener(
+            onSignedIn = {
+                if (isFirstLogin) {
+                    isFirstLogin = false
+                    return@addAuthStateListener
+                }
+
+                if (AccountManager.isAnonymous) {
+
+                } else {
+                    AccountManager.firebaseUid?.let { reqGetSavedGameInfo(uid = it) }
+                }
+            },
+            onSignedOut = {
+                // 로그 아웃 후 익명으로 강제 로그인 시키기 때문에 onSignedOut { } 블럭은 사용 하지 않음
+            }
+        )
+    }
 
     fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
         viewModelScope.launch {
@@ -116,27 +150,55 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun reqGetSavedGameInfo(uid: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
+                savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
+                    when (result) {
+                        is Result.Success -> {
+                            Timber.e("kkhdev Home reqGetSavedGameInfo() Success")
+                            _savedGameInfoToLocalDB.emit(result.data)
+                        }
+                        is Result.Error -> {
+                            _message.emit(getString(R.string.network_request_error))
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
     fun updateBackgroundVolume(volume: Float) {
         PrefsManager.backgroundVolume = volume
         MusicPlayUtil.setVol(leftVol = volume, rightVol = volume, isBackgroundSound = true)
 
-        _backgroundVolume.value = volume
+        _savedGameInfoToLocalDB.value = _savedGameInfoToLocalDB.value.copy().apply {
+            backgroundVolume = volume
+        }
     }
 
     fun updateEffectVolume(volume: Float) {
         PrefsManager.effectVolume = volume
         MusicPlayUtil.setVol(leftVol = volume, rightVol = volume, isBackgroundSound = false)
 
-        _effectVolume.value = volume
+        _savedGameInfoToLocalDB.value = _savedGameInfoToLocalDB.value.copy().apply {
+            effectVolume = volume
+        }
     }
 
     fun reqUpdateBackgroundVolume(uid: String?, volume: String) {
         viewModelScope.launch {
             uid?.let {
-                userInfoUseCase.updateBackgroundVolume(uid = uid, volume = volume).collect { result ->
+                configUseCase.reqUpdateBackgroundVolume(uid = uid, volume = volume).collect { result ->
                     when (result) {
-                        is Result.Success -> { _backgroundVolume.emit(result.data) }
-                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
+                        is Result.Success -> {
+                            _backgroundVolume.emit(result.data)
+                        }
+                        is Result.Error -> {
+                            _message.emit(getString(R.string.network_request_error))
+                        }
                         else -> {}
                     }
                 }
@@ -147,10 +209,14 @@ class HomeViewModel @Inject constructor(
     fun reqUpdateEffectVolume(uid: String?, volume: String) {
         viewModelScope.launch {
             uid?.let {
-                userInfoUseCase.updateEffectVolume(uid = uid, volume = volume).collect { result ->
+                configUseCase.reqUpdateEffectVolume(uid = uid, volume = volume).collect { result ->
                     when (result) {
-                        is Result.Success -> { _effectVolume.emit(result.data) }
-                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
+                        is Result.Success -> {
+                            _effectVolume.emit(result.data)
+                        }
+                        is Result.Error -> {
+                            _message.emit(getString(R.string.network_request_error))
+                        }
                         else -> {}
                     }
                 }

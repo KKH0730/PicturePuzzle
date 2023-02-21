@@ -1,5 +1,7 @@
 package com.seno.game.di
 
+import com.seno.game.data.config.ConfigImpl
+import com.seno.game.data.config.ConfigRepository
 import com.seno.game.data.diff_picture.DiffPictureImpl
 import com.seno.game.data.diff_picture.DiffPictureRepository
 import com.seno.game.data.hunminjeongeum.HunMinJeongEumImpl
@@ -23,4 +25,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindUserInfoRepository(userInfoImpl: UserInfoImpl): UserInfoRepository
+
+    @Binds
+    abstract fun bindConfigRepository(configImpl: ConfigImpl): ConfigRepository
 }

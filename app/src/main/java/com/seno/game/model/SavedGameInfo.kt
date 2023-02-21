@@ -10,7 +10,7 @@ data class SavedGameInfo(
     var backgroundVolume: Float = PrefsManager.backgroundVolume,
     var effectVolume: Float = PrefsManager.effectVolume,
     var isVibrationOn: Boolean = PrefsManager.isVibrationOn,
-    val isPushOn: Boolean = PrefsManager.isPushOn,
+    var isPushOn: Boolean = PrefsManager.isPushOn,
     val isShowAD: Boolean = PrefsManager.isShowAD,
     val diffPictureGameCurrentStage: Int = 0,
     val completeGameRound: String = ""

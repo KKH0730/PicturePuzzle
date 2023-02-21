@@ -29,12 +29,12 @@ fun SettingDialog(
     onClickClose: () -> Unit,
     backgroundVolume: Float,
     onChangedBackgroundVolume: (Float) -> Unit,
-    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    onChangedFinishedBackgroundVolume: (Float) -> Unit,
     effectVolume: Float,
     onChangedEffectVolume: (Float) -> Unit,
-    onChangeFinishedEffectVolume: (Float) -> Unit,
-    onCheckChangeVibration: (Boolean) -> Unit,
-    onCheckChangePush: (Boolean) -> Unit,
+    onChangedFinishedEffectVolume: (Float) -> Unit,
+    onChangedVibration: (Boolean) -> Unit,
+    onChangedPush: (Boolean) -> Unit,
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
@@ -59,16 +59,16 @@ fun SettingDialog(
                         SoundControlPanel(
                             backgroundVolume = backgroundVolume,
                             onChangedBackgroundVolume = onChangedBackgroundVolume,
-                            onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+                            onChangedFinishedBackgroundVolume = onChangedFinishedBackgroundVolume,
                             effectVolume = effectVolume,
                             onChangedEffectVolume = onChangedEffectVolume,
-                            onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
-                            onCheckChangeVibration = onCheckChangeVibration,
+                            onChangedFinishedEffectVolume = onChangedFinishedEffectVolume,
+                            onChangedVibration = onChangedVibration,
                             modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                         )
                         Spacer(modifier = Modifier.height(height = 15.dp))
                         NotificationPanel(
-                            onCheckChangePush = onCheckChangePush,
+                            onChangedPush = onChangedPush,
                             modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
                         )
                         Spacer(modifier = Modifier.height(height = 20.dp))
@@ -120,11 +120,11 @@ fun DialogTitle(
 fun SoundControlPanel(
     backgroundVolume: Float,
     onChangedBackgroundVolume: (Float) -> Unit,
-    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    onChangedFinishedBackgroundVolume: (Float) -> Unit,
     effectVolume: Float,
     onChangedEffectVolume: (Float) -> Unit,
-    onChangeFinishedEffectVolume: (Float) -> Unit,
-    onCheckChangeVibration: (Boolean) -> Unit,
+    onChangedFinishedEffectVolume: (Float) -> Unit,
+    onChangedVibration: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -147,20 +147,20 @@ fun SoundControlPanel(
             text = stringResource(id = R.string.home_setting_sound_background),
             value = backgroundVolume,
             onValueChanged = onChangedBackgroundVolume,
-            onValueChangeFinished = onChangeFinishedBackgroundVolume
+            onValueChangeFinished = onChangedFinishedBackgroundVolume
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         EffectVolumeSliderUnit(
             text = stringResource(id = R.string.home_setting_sound_effect),
             value = effectVolume,
             onValueChanged = onChangedEffectVolume,
-            onValueChangeFinished = onChangeFinishedEffectVolume
+            onValueChangeFinished = onChangedFinishedEffectVolume
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SwitchUnit(
             text = stringResource(id = R.string.home_setting_sound_vibration),
             isVibrationSwitch = true,
-            onCheckedChange = onCheckChangeVibration
+            onCheckedChange = onChangedVibration
         )
     }
 }
@@ -287,7 +287,7 @@ fun SwitchUnit(
 
 @Composable
 fun NotificationPanel(
-    onCheckChangePush: (Boolean) -> Unit,
+    onChangedPush: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CompositionLocalProvider(
@@ -312,7 +312,7 @@ fun NotificationPanel(
             SwitchUnit(
                 text = stringResource(id = R.string.home_setting_notification_push),
                 isVibrationSwitch = false,
-                onCheckedChange = onCheckChangePush
+                onCheckedChange = onChangedPush
             )
         }
     }

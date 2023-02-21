@@ -47,12 +47,6 @@ class HomeViewModel @Inject constructor(
     private val _savedGameInfoToLocalDB = MutableStateFlow(SavedGameInfo())
     val savedGameInfoToLocalDB: StateFlow<SavedGameInfo> get() = _savedGameInfoToLocalDB.asStateFlow()
 
-    private val _backgroundVolume = MutableStateFlow(PrefsManager.backgroundVolume)
-    val backgroundVolume: StateFlow<Float> get() = _backgroundVolume.asStateFlow()
-
-    private val _effectVolume = MutableStateFlow(PrefsManager.effectVolume)
-    val effectVolume: StateFlow<Float> get() = _effectVolume.asStateFlow()
-
     private val _vibrationSwitchOnOff = MutableStateFlow(PrefsManager.isVibrationOn)
     val vibrationSwitchOnOff: StateFlow<Boolean> get() = _vibrationSwitchOnOff.asStateFlow()
 
@@ -156,10 +150,7 @@ class HomeViewModel @Inject constructor(
                 val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
                 savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
                     when (result) {
-                        is Result.Success -> {
-                            Timber.e("kkhdev Home reqGetSavedGameInfo() Success")
-                            _savedGameInfoToLocalDB.emit(result.data)
-                        }
+                        is Result.Success -> { _savedGameInfoToLocalDB.emit(result.data) }
                         is Result.Error -> {
                             _message.emit(getString(R.string.network_request_error))
                         }
@@ -191,17 +182,7 @@ class HomeViewModel @Inject constructor(
     fun reqUpdateBackgroundVolume(uid: String?, volume: String) {
         viewModelScope.launch {
             uid?.let {
-                configUseCase.reqUpdateBackgroundVolume(uid = uid, volume = volume).collect { result ->
-                    when (result) {
-                        is Result.Success -> {
-                            _backgroundVolume.emit(result.data)
-                        }
-                        is Result.Error -> {
-                            _message.emit(getString(R.string.network_request_error))
-                        }
-                        else -> {}
-                    }
-                }
+                configUseCase.reqUpdateBackgroundVolume(uid = uid, volume = volume).collect()
             }
         }
     }
@@ -209,14 +190,48 @@ class HomeViewModel @Inject constructor(
     fun reqUpdateEffectVolume(uid: String?, volume: String) {
         viewModelScope.launch {
             uid?.let {
-                configUseCase.reqUpdateEffectVolume(uid = uid, volume = volume).collect { result ->
+                configUseCase.reqUpdateEffectVolume(uid = uid, volume = volume).collect()
+            }
+        }
+    }
+
+    fun reqUpdateVibrationOnOff(uid: String?, isVibrationOn: Boolean) {
+        uid?.let {
+            viewModelScope.launch {
+                configUseCase.reqUpdateVibrationOnOff(
+                    uid = uid,
+                    isVibrationOn = isVibrationOn
+                ).collect { result ->
                     when (result) {
                         is Result.Success -> {
-                            _effectVolume.emit(result.data)
+                            PrefsManager.isVibrationOn = result.data
+                            _savedGameInfoToLocalDB.value = _savedGameInfoToLocalDB.value.copy().apply {
+                                this.isVibrationOn = result.data
+                            }
                         }
-                        is Result.Error -> {
-                            _message.emit(getString(R.string.network_request_error))
+                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    fun reqUpdatePushOnOff(uid: String?, isPushOn: Boolean) {
+        uid?.let {
+            viewModelScope.launch {
+                configUseCase.reqUpdatePushOnOff(
+                    uid = uid,
+                    isPushOn = isPushOn
+                ).collect { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            PrefsManager.isPushOn = result.data
+                            _savedGameInfoToLocalDB.value = _savedGameInfoToLocalDB.value.copy().apply {
+                                this.isPushOn = result.data
+                            }
                         }
+                        is Result.Error -> { _message.emit(getString(R.string.network_request_error)) }
                         else -> {}
                     }
                 }

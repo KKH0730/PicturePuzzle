@@ -49,7 +49,9 @@ fun HomeScreen() {
                 uid = AccountManager.firebaseUid,
                 volume = it.toString()
             )
-        }
+        },
+        onChangedVibration = { homeViewModel.reqUpdateVibrationOnOff(AccountManager.firebaseUid, isVibrationOn = it) },
+        onChangedPush = { homeViewModel.reqUpdatePushOnOff(AccountManager.firebaseUid, isPushOn = it) }
     )
 }
 
@@ -60,6 +62,8 @@ fun HomeUI(
     onChangeFinishedBackgroundVolume: (Float) -> Unit,
     onChangedEffectVolume: (Float) -> Unit,
     onChangeFinishedEffectVolume: (Float) -> Unit,
+    onChangedVibration: (Boolean) -> Unit,
+    onChangedPush: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
@@ -138,12 +142,12 @@ fun HomeUI(
             onClickClose = { isShowSettingDialog = false },
             backgroundVolume = savedGameInfo.backgroundVolume,
             onChangedBackgroundVolume = onChangedBackgroundVolume,
-            onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+            onChangedFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
             effectVolume = savedGameInfo.effectVolume,
             onChangedEffectVolume = onChangedEffectVolume,
-            onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
-            onCheckChangeVibration = { PrefsManager.isVibrationOn = it },
-            onCheckChangePush = { PrefsManager.isPushOn = it },
+            onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
+            onChangedVibration = onChangedVibration,
+            onChangedPush = onChangedPush,
             onClickLogin = { context.startActivity(SignGateActivity::class.java) },
             onClickLogout = {
                 isShowSettingDialog = false

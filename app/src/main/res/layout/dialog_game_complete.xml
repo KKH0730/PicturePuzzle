@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="dialog"
+            type="com.seno.game.ui.game.diff_picture.view.GameCompleteDialog" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_804D4C4C">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:cardCornerRadius="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="40dp"
+                        android:gravity="center"
+                        android:text="@string/diff_next_round_dialog_title"
+                        android:textColor="@color/color_b8c0ff"
+                        android:textSize="20dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtNoButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="28dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/bg_dialog_button_n"
+                        android:gravity="center"
+                        android:text="@string/diff_finish"
+                        android:textColor="@color/color_bbd0ff"
+                        android:textSize="16dp"
+                        android:onClick="@{() -> dialog.clickNegativeButton()}"
+                        app:layout_constraintEnd_toStartOf="@+id/txtYesButton"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/txtMessage" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtYesButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="28dp"
+                        android:background="@drawable/bg_dialog_button_y"
+                        android:gravity="center"
+                        android:text="@string/diff_next"
+                        android:textColor="@color/white"
+                        android:textSize="16dp"
+                        android:onClick="@{() -> dialog.clickPositiveButton()}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/txtNoButton"
+                        app:layout_constraintTop_toBottomOf="@+id/txtMessage" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/txtClose"
+                        android:layout_width="150dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="28dp"
+                        android:background="@drawable/bg_22dp_rounding_2dp_border_color_b8c0ff"
+                        android:gravity="center"
+                        android:text="@string/diff_complete"
+                        android:textColor="@color/color_b8c0ff"
+                        android:textSize="16dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="10dp"
+                        android:onClick="@{() -> dialog.clickNegativeButton()}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:contentDescription="@string/game_prepare"
+                        app:layout_constraintTop_toBottomOf="@+id/txtMessage"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivCharacter"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:elevation="3dp"
+                android:src="@drawable/ic_dialog_cat_wow"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@+id/clDialog"
+            app:layout_constraintBottom_toBottomOf="@+id/clDialog"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:lottie_rawRes="@raw/congratulation"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

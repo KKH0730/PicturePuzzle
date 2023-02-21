@@ -1,7 +1,6 @@
 package com.seno.game.ui.main
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -10,19 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.google.firebase.auth.FirebaseAuth
 import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
@@ -30,6 +22,7 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.ui.main.home.HomeDummyScreen
 import com.seno.game.ui.splash.SplashActivity
 import com.seno.game.util.MusicPlayUtil
@@ -46,66 +39,58 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         printHashKey()
 
-        Timber.e("kkh displayName : ${AccountManager.currentUser?.displayName}")
-
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
-            SplashActivity.start(context = this@MainActivity)
-            finish()
+//            SplashActivity.start(context = this@MainActivity)
+//            finish()
+            DPSinglePlayListActivity.start(context = this)
         } else {
             setContent {
                 AppTheme {
                     Surface(Modifier.fillMaxSize()) {
-                        HomeDummyScreen()
-                        if (checkNetworkConnectivityForComposable()) {
-                            MusicPlayUtil.startBackgroundBGM(context = this@MainActivity)
-                            MainScreen()
+                        if (AccountManager.isUser) {
+                            MainUI(isAuthentication = true)
                         } else {
-                            RestartDialog(
-                                title = getString(R.string.network_error_title),
-                                content = getString(R.string.network_error),
-                                confirmText = getString(R.string.alert_dialog_restart),
-                                onClickConfirm = { this@MainActivity.restartApp() }
-                            )
+                            var isAuthentication by remember { mutableStateOf(false) }
+                            reqAuthentication { isAuthentication = it }
+                            MainUI(isAuthentication = isAuthentication)
                         }
                     }
                 }
             }
         }
-//        setAuthentication {
-//            if (it) {
-//                setContent {
-//                    AppTheme {
-//                        Surface(Modifier.fillMaxSize()) {
-//                            if (checkNetworkConnectivityForComposable()) {
-//                                MainScreen()
-//                            } else {
-//                                RestartDialog(
-//                                    title = getString(R.string.network_error_title),
-//                                    content = getString(R.string.network_error),
-//                                    confirmText = getString(R.string.alert_dialog_restart),
-//                                    onClickConfirm = { this@MainActivity.restartApp() }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
+    }
+
+    @Composable
+    private fun MainUI(isAuthentication: Boolean) {
+        HomeDummyScreen()
+        if (isAuthentication) {
+            if (checkNetworkConnectivityForComposable()) {
+                MusicPlayUtil.startBackgroundSound(context = this@MainActivity)
+                MainScreen()
+            } else {
+                RestartDialog(
+                    title = getString(R.string.network_error_title),
+                    content = getString(R.string.network_error),
+                    confirmText = getString(R.string.alert_dialog_restart),
+                    onClickConfirm = { this@MainActivity.restartApp() }
+                )
+            }
+        }
     }
 
     override fun onDestroy() {
-        MusicPlayUtil.release()
+        MusicPlayUtil.release(isBackgroundSound = true)
         super.onDestroy()
     }
 
-    private fun setAuthentication(callback: (Boolean) -> Unit) {
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser != null) {
+    private fun reqAuthentication(callback: (Boolean) -> Unit) {
+        if (AccountManager.isUser) {
             callback(true)
         } else {
-            auth.signInAnonymously()
-                .addOnSuccessListener { callback(true) }
-                .addOnFailureListener { callback(false) }
+            AccountManager.signInAnonymous(
+                onSuccess = { callback(true) },
+                onFail = { callback(false) }
+            )
         }
     }
 
@@ -129,7 +114,6 @@ class MainActivity : AppCompatActivity() {
         fun start(context: Context) {
             context.startActivity(MainActivity::class.java) {
                 putExtra("isSplashFinish", true)
-                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             }
         }
     }

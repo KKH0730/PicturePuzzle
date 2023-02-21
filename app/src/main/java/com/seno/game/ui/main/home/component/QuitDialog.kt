@@ -49,8 +49,8 @@ fun QuitDialog(
                 Spacer(modifier = Modifier.height(height = 28.dp))
                 Row() {
                     Spacer(modifier = Modifier.width(width = 10.dp))
-                    QuitDialogYesButton(onClick = onClickYes)
                     QuitDialogNoButton(onClick = onClickNo)
+                    QuitDialogYesButton(onClick = onClickYes)
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
                 Spacer(modifier = Modifier.height(height = 25.dp))

@@ -1,17 +1,37 @@
 <resources>
     <string name="app_name">game</string>
 
+    <!-- AD -->
+    <string name="admob_app_id">ca-app-pub-5813878503406225~5288452366</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5813878503406225/1232877035</string>
+    <string name="reward_ad_unit_id">ca-app-pub-5813878503406225/4218913276</string>
+
+    <string name="banner_ad_unit_id_for_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="reward_ad_unit_id_for_test">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="native_ad_unit_id_for_test">ca-app-pub-3940256099942544/2247696110</string>
+
     <!-- 공통 -->
-    <string name="game_start">시작</string>
+    <string name="game_start">시작!</string>
     <string name="game_prepare">준비</string>
     <string name="game_prepare_complete">준비 완료</string>
+    <string name="guest">GUEST</string>
+    <string name="guest2">(GUEST)</string>
+    <string name="facebook">페이스북</string>
+    <string name="kakao">카카오</string>
+    <string name="google">구글</string>
+    <string name="naver">네이버</string>
+
+    <!-- MyProfile -->
+    <string name="account_facebook_login">Facebook 아이디로 로그인</string>
+    <string name="account_google_login">Google 아이디로 로그인</string>
+    <string name="my_profile_guide">로그인을 하면 닉네임과 아바타 변경이 가능해져요!</string>
+    <string name="my_profile_login">로그인</string>
+    <string name="my_profile_create_account">계정생성</string>
+    <string name="my_profile_close">닫기</string>
 
     <!-- SignGate -->
-    <string name="account_facebook_login">Facebook 아이디로 로그인</string>
-    <string name="account_google_login">Google 아성디로 로그인</string>
-    <string name="sign_gate_guide">로그인을 하면 닉네임과 아바타 변경이 가능해져요!</string>
-    <string name="sign_gate_login">로그인</string>
-    <string name="sign_gate_create_account">계정생성</string>
+    <string name="sign_gate_title">3초 간편로그인!</string>
+    <string name="sign_gate_guide">원하시는 소셜 계정으로 로그인할 수 있어요!\n로그인 후에는 기기를 변경해도 데이터가 보존돼요.\n또한 내 프로필을 조금 더 멋지게 꾸밀 수 있죠.</string>
     <string name="sign_gate_close">닫기</string>
 
     <string name="blank"></string>
@@ -34,7 +54,7 @@
     <string name="home_setting_sound">SOUND</string>
     <string name="home_setting_sound_background">배경음악</string>
     <string name="home_setting_sound_effect">효과음</string>
-    <string name="home_setting_sound_vibration">진동</string>
+    <string name="home_setting_sound_vibration">터치 시 진동</string>
     <string name="home_setting_notification">NOTIFICATION</string>
     <string name="home_setting_notification_push">Push 알림</string>
     <string name="home_setting_account">ACCOUNT</string>
@@ -46,8 +66,7 @@
     <string name="home_setting_account_profile">프로필 관리</string>
 
 
-    <string name="game_prepare_ready">준비</string>
-    <string name="game_prepare_start">시작!</string>
+    <string name="game_prepare_start">START!</string>
 
     <string name="hummin_correct">정답!</string>
     <string name="hummin_incorrect">일치하는 단어가 없어요…</string>
@@ -55,6 +74,24 @@
     <string name="hummin_submit">제출</string>
     <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
 
+    <!-- single gmale -->
     <string name="diff_title">틀린그림을 찾아보세요</string>
     <string name="diff_total_answer_count">점수 : %s</string>
+
+    <string name="diff_next_round_dialog_title">모든 정답을 맞추셨습니다!</string>
+    <string name="diff_finish">나가기</string>
+    <string name="diff_next">다음</string>
+    <string name="diff_complete">확인</string>
+
+    <string name="diff_fail_dialog_content">앗! 제한시간이 끝났어요</string>
+    <string name="diff_fail_dialog_sub_content">광고를 보면 이어서 할 수 있어요</string>
+    <string name="diff_fail_dialog_give_up">포기할래</string>
+    <string name="diff_fail_dialog_show_ad">이어서 할래</string>
+
+    <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
+
+    <string name="diff_level_low">쉬움</string>
+    <string name="diff_level_middle">보통</string>
+    <string name="diff_level_high">어려움</string>
+    <string name="diff_level_hell">지옥</string>
 </resources>

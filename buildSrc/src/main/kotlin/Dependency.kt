@@ -1,4 +1,3 @@
-
 object Version {
     const val COMPOSE = "1.2.0"
 }
@@ -20,14 +19,19 @@ object Dependency {
         const val RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.2.1"
     }
 
+    object JETBRAINS {
+        const val COROUTINE_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+        const val COROUTINE_PLAY_SERVICE = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1"
+    }
+
     object KTX {
         const val CORE = "androidx.core:core-ktx:1.7.0"
+        const val ACTIVITY_KTX = "androidx.activity:activity-ktx:1.4.0"
     }
 
     object Compose {
         private const val VERSION = "1.2.0"
         const val ACTIVITY_COMPOSE = "androidx.activity:activity-compose:1.5.0"
-        const val ACTIVITY_KTX = "androidx.activity:activity-ktx:1.4.0"
 
         const val COMPOSE_MATERIAL = "androidx.compose.material:material:$VERSION"
         const val PREVIEW = "androidx.compose.ui:ui-tooling-preview:$VERSION"
@@ -49,8 +53,13 @@ object Dependency {
     }
 
     object Lifecycle {
+        const val lifecycle = "2.4.1"
         const val VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
         const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha01"
+        const val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
+        const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+        const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+        const val process = "androidx.lifecycle:lifecycle-process:$lifecycle"
     }
 
     object Paging {
@@ -59,17 +68,29 @@ object Dependency {
     }
 
     object Facebook {
-        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:14.1.1"
-        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:14.1.1"
+        private const val VERSION = "14.1.1"
+        const val FACEBOOK_LOGIN = "com.facebook.android:facebook-login:$VERSION"
+        const val FACEBOOK_APP_LINK = "com.facebook.android:facebook-applinks:$VERSION"
+    }
+
+    object Naver {
+        const val NAVER_JDK8 = "com.navercorp.nid:oauth-jdk8:5.2.0"
+    }
+
+    object Kakao {
+        const val KAKAO_SDK_ALL = "com.kakao.sdk:v2-all:2.11.2"
+        const val KAKAO_SDK_ALL_RX = "com.kakao.sdk:v2-all-rx:2.11.2"
     }
 
     object Google {
         const val PLAY_SERVICE_AUTH = "com.google.android.gms:play-services-auth:18.0.0"
+        const val PLAY_SERVICE_ADS = "com.google.android.gms:play-services-ads:21.3.0"
     }
 
     object Accompanist {
-        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:0.25.1"
-        const val PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
+        private const val VERSION = "0.25.1"
+        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:$VERSION"
+        const val PAGER = "com.google.accompanist:accompanist-pager:$VERSION"
     }
 
     object Hilt {
@@ -91,8 +112,31 @@ object Dependency {
         const val GSON_CONVERTER = "com.squareup.retrofit2:converter-gson:$VERSION"
     }
 
+    object Rx {
+        const val RXJAVA = "io.reactivex.rxjava2:rxjava:2.2.21"
+        const val RXANDROID = "io.reactivex.rxjava2:rxandroid:2.1.1"
+        const val RXKOTLIN = "io.reactivex.rxjava2:rxkotlin:2.4.0"
+    }
+
     object Timber {
         const val TIMBER = "com.jakewharton.timber:timber:5.0.1"
+    }
+
+    object Glide {
+        private const val VERSION = "4.12.0"
+        const val GLIDE = "com.github.bumptech.glide:glide:$VERSION"
+        const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:$VERSION"
+
+        private const val VERSION_COMPOSE = "1.4.7"
+        const val GLIDE_COMPOSE = "com.github.skydoves:landscapist-glide:$VERSION_COMPOSE"
+    }
+
+    object Etc {
+        const val EASY_PREFS = "com.pixplicity.easyprefs:EasyPrefs:1.10.0"
+        const val QR = "com.journeyapps:zxing-android-embedded:3.6.0"
+        const val LOTTIE = "com.airbnb.android:lottie:5.2.0"
+        const val COMPOSE_LOTTIE = "com.airbnb.android:lottie-compose:5.2.0"
+        const val RECYCLERVIEW_DIVIDER = "com.github.fondesa:recycler-view-divider:3.0.0"
     }
 
     object Test {

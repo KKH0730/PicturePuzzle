@@ -8,10 +8,10 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.seno.game.R
-import timber.log.Timber
 
-class FacebookAccountManager(val activity: Activity) {
+const val LOGIN_FACEBOOK_REQUEST_CODE = 64206
 
+class FacebookAccountManager(private val activity: Activity) {
 
     private var loginManager: LoginManager = LoginManager.getInstance()
     private var callbackManager: CallbackManager = CallbackManager.Factory.create()
@@ -39,13 +39,6 @@ class FacebookAccountManager(val activity: Activity) {
     }
 
     fun logout() {
-//        val accessToken = AccessToken.getCurrentAccessToken()
-//        val isLoggedIn = accessToken != null && !accessToken.isExpired
-//
-//        if (!isLoggedIn) {
-//            return
-//        }
-
         loginManager.run {
             unregisterCallback(callbackManager)
             this.logOut()
@@ -58,9 +51,5 @@ class FacebookAccountManager(val activity: Activity) {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
-    }
-
-    companion object {
-        const val LOGIN_FACEBOOK_REQUEST_CODE = 64206
     }
 }

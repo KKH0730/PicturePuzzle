@@ -11,7 +11,6 @@ buildscript {
         classpath(Plugins.KOTLIN_GRADLE)
         classpath(Plugins.GOOGLE_SERVICE)
         classpath(Plugins.CRASHLYTICS)
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
     }
 }
 

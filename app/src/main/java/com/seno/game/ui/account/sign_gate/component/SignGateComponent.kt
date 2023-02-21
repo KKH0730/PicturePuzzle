@@ -1,128 +1,233 @@
 package com.seno.game.ui.account.sign_gate.component
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FacebookAuthProvider
+import com.navercorp.nid.NaverIdLoginSDK
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
-import com.seno.game.extensions.textDp
-
+import com.seno.game.extensions.toast
+import com.seno.game.manager.*
+import timber.log.Timber
 
 @Composable
-fun SignGateHeader(
-    onClickClose: () -> Unit
+fun SocialLoginContainer(
+    googleAccountManager: GoogleAccountManager,
+    facebookAccountManager: FacebookAccountManager,
+    naverAccountManager: NaverAccountManager,
+    kakaoAccountManager: KakaoAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height = 102.dp)
-            .background(color = colorResource(id = R.color.color_e7c6ff))
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(space = 22.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .noRippleClickable { onClickClose.invoke() }
+        GoogleLoginButton(
+            googleAccountManager = googleAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+        KakaoLoginButton(
+            kakaoAccountManager = kakaoAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+
+        NaverLoginButton(
+            naverAccountManager = naverAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+        FaceBookLoginButton(
+            facebookAccountManager = facebookAccountManager,
+            onClickSocialLogin = onClickSocialLogin,
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
+    }
+}
+
+@Composable
+fun GoogleLoginButton(
+    googleAccountManager: GoogleAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit,
+) {
+    val context = LocalContext.current
+    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
         ) {
-            Text(
-                text = stringResource(id = R.string.sign_gate_close),
-                color = Color.White,
-                fontSize = 14.textDp,
-                modifier = Modifier.padding(start = 16.dp, top = 24.dp)
-            )
+            if (it.resultCode == Activity.RESULT_OK) {
+                googleAccountManager.onActivityResult(
+                    data = it.data,
+                    onSocialSignInCallbackListener = object : OnSocialSignInCallbackListener {
+                        override fun signInWithCredential(idToken: String?) {
+                            try {
+                                idToken?.let { token ->
+                                    val authCredential = googleAccountManager.getAuthCredential(token)
+                                    AccountManager.signInWithCredential(
+                                        credential = authCredential,
+                                        platform = PlatForm.GOOGLE,
+                                        onSignInSucceed = onSignInSucceed,
+                                        onSignInFailed = onSignInFailed
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Timber.e(e)
+                            }
+                        }
+
+                        override fun onError(e: Exception?) {
+                            Timber.e(e)
+                        }
+                    }
+                )
+            }
         }
+
+    SnsLoginButton(snsImage = painterResource(id = R.drawable.ic_sns_google)) {
+        onClickSocialLogin.invoke()
+        googleAccountManager.login(launcher = launcher)
     }
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .clip(shape = CircleShape)
-            .size(size = 72.dp)
-            .background(color = colorResource(id = R.color.color_b8c0ff))
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_user_profile),
-            contentDescription = null,
-            modifier = Modifier
-                .size(size = 64.dp)
-                .align(alignment = Alignment.Center)
-        )
-    }
-}
-
-@Composable
-fun NicknameContainer(
-    nickName: String,
-    modifier: Modifier = Modifier
+fun KakaoLoginButton(
+    kakaoAccountManager: KakaoAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height = 88.dp)
-            .background(color = colorResource(id = R.color.color_b8c0ff))
+    val context = LocalContext.current
+
+    SnsLoginButton(
+        snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
-        Text(
-            text = nickName,
-            fontSize = 20.textDp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.offset(x = 16.dp, y = 44.dp)
+        onClickSocialLogin.invoke()
+        kakaoAccountManager.login(
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
         )
     }
 }
 
 @Composable
-fun LoginButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .width(width = 130.dp)
-            .noRippleClickable { onClick.invoke() }
+fun NaverLoginButton(
+    naverAccountManager: NaverAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
+) {
+    val context = LocalContext.current
+    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            when (it.resultCode) {
+                Activity.RESULT_OK -> {
+                    naverAccountManager.onActivityResult(
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                }
+                Activity.RESULT_CANCELED -> {
+                    // 실패 or 에러
+                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                    val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                }
+            }
+        }
+
+
+    SnsLoginButton(
+        snsImage = painterResource(id = R.drawable.ic_sns_naver)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.bg_dialog_button_y),
-            contentDescription = null,
-            modifier = Modifier.align(alignment = Alignment.Center)
-        )
-        Text(
-            text = stringResource(id = R.string.sign_gate_login),
-            color = Color.White,
-            fontSize = 16.textDp,
-            modifier = Modifier.align(alignment = Alignment.Center)
+        onClickSocialLogin.invoke()
+        naverAccountManager.login(
+            context = context,
+            launcher = launcher,
+            onSignInSucceed = {
+                context.toast("로그인 성공")
+            },
+            onSigInFailed = {
+                context.toast("로그인 실패")
+            },
         )
     }
 }
 
 @Composable
-fun CreateAccountButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .width(width = 130.dp)
-            .noRippleClickable { onClick.invoke() }
+fun FaceBookLoginButton(
+    facebookAccountManager: FacebookAccountManager,
+    onClickSocialLogin: () -> Unit,
+    onSignInSucceed: () -> Unit,
+    onSignInFailed: () -> Unit
+) {
+    val context = LocalContext.current
+
+    SnsLoginButton(
+        snsImage = painterResource(id = R.drawable.ic_sns_facebook)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.bg_dialog_button_n),
-            contentDescription = null,
-            modifier = Modifier.align(alignment = Alignment.Center)
-        )
-        Text(
-            text = stringResource(id = R.string.sign_gate_create_account),
-            color = colorResource(id = R.color.color_bbd0ff),
-            fontSize = 16.textDp,
-            modifier = Modifier.align(alignment = Alignment.Center)
+        onClickSocialLogin.invoke()
+        facebookAccountManager.login(
+            onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
+                override fun signInWithCredential(idToken: String?) {
+                    try {
+                        idToken?.let { token ->
+                            val credential = FacebookAuthProvider.getCredential(token)
+                            AccountManager.signInWithCredential(
+                                credential = credential,
+                                platform = PlatForm.FACEBOOK,
+                                onSignInSucceed = onSignInSucceed,
+                                onSignInFailed = onSignInFailed
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                    }
+                }
+
+                override fun onError(e: Exception?) {
+                    Timber.e(e)
+                }
+            }
         )
     }
 }
+
+@Composable
+fun SnsLoginButton(
+    snsImage: Painter,
+    onClick: () -> Unit,
+) {
+    Image(
+        painter = snsImage,
+        contentDescription = null,
+        modifier = Modifier
+            .size(size = 40.dp)
+            .noRippleClickable { onClick.invoke() }
+    )
+}
+

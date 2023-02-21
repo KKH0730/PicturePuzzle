@@ -28,7 +28,7 @@ fun HomeDummyScreen() {
         )
         Spacer(modifier = Modifier.weight(weight = 1f))
         Image(
-            painter = painterResource(id = R.drawable.ic_splash),
+            painter = painterResource(id = R.drawable.ic_studio_seno_logo),
             contentDescription = null,
         )
         Spacer(modifier = Modifier.height(height = 36.dp))

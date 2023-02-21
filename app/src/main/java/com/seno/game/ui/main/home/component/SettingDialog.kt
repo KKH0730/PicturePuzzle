@@ -1,7 +1,6 @@
 package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -20,14 +19,21 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.BlueRippleTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingDialog(
     onClickClose: () -> Unit,
-    onValueChangeBackgroundSlider: (Float) -> Unit,
-    onDismissed: () -> Unit
+    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
+    onValueChangeEffectSoundSlider: (Float) -> Unit,
+    onCheckChangeVibration: (Boolean) -> Unit,
+    onCheckChangePush: (Boolean) -> Unit,
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit,
+    onDismissed: () -> Unit,
 ) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         Dialog(onDismissRequest = onDismissed) {
@@ -38,23 +44,33 @@ fun SettingDialog(
                     .width(width = 281.dp)
                     .height(height = 430.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     DialogTitle(onClickClose = onClickClose)
-                    SoundControlPanel(
-                        onValueChangeBackgroundSlider = onValueChangeBackgroundSlider,
-                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(height = 15.dp))
-                    NotificationPanel(
-                        onCheckedChange = {},
-                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(height = 20.dp))
-                    AccountPanel(modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        SoundControlPanel(
+                            onValueChangeBackgroundSoundSlider = onValueChangeBackgroundSoundSlider,
+                            onValueChangeEffectSoundSlider = onValueChangeEffectSoundSlider,
+                            onCheckChangeVibration = onCheckChangeVibration,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 15.dp))
+                        NotificationPanel(
+                            onCheckChangePush = onCheckChangePush,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 20.dp))
+                        AccountPanel(
+                            onClickLogin = onClickLogin,
+                            onClickLogout = onClickLogout,
+                            onClickManageProfile = onClickManageProfile,
+                            modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                        )
+                        Spacer(modifier = Modifier.height(height = 25.dp))
+                    }
                 }
             }
         }
@@ -63,7 +79,7 @@ fun SettingDialog(
 
 @Composable
 fun DialogTitle(
-    onClickClose: () -> Unit
+    onClickClose: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -93,8 +109,10 @@ fun DialogTitle(
 
 @Composable
 fun SoundControlPanel(
-    onValueChangeBackgroundSlider: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    onValueChangeBackgroundSoundSlider: (Float) -> Unit,
+    onValueChangeEffectSoundSlider: (Float) -> Unit,
+    onCheckChangeVibration: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(0.83f)
@@ -114,21 +132,20 @@ fun SoundControlPanel(
         Spacer(modifier = Modifier.height(height = 13.5.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_background),
-            onValueChangeFinished = onValueChangeBackgroundSlider
+            isBackgroundSlider = true,
+            onValueChangeFinished = onValueChangeBackgroundSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
         SliderUnit(
             text = stringResource(id = R.string.home_setting_sound_effect),
-            onValueChangeFinished = {
-
-            }
+            isBackgroundSlider = false,
+            onValueChangeFinished = onValueChangeEffectSoundSlider
         )
         Spacer(modifier = Modifier.height(height = 6.dp))
-        SliderUnit(
+        SwitchUnit(
             text = stringResource(id = R.string.home_setting_sound_vibration),
-            onValueChangeFinished = {
-
-            }
+            isVibrationSwitch = true,
+            onCheckedChange = onCheckChangeVibration
         )
     }
 }
@@ -136,10 +153,19 @@ fun SoundControlPanel(
 @Composable
 fun SliderUnit(
     text: String,
+    isBackgroundSlider: Boolean,
     onValueChangeFinished: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    var sliderPosition by remember { mutableStateOf(0.5f) }
+    var sliderPosition by remember {
+        mutableStateOf(
+            if (isBackgroundSlider) {
+                PrefsManager.backgroundVolume
+            } else {
+                PrefsManager.effectVolume
+            }
+        )
+    }
 
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
@@ -172,12 +198,54 @@ fun SliderUnit(
 }
 
 @Composable
-fun NotificationPanel(
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+fun SwitchUnit(
+    text: String,
+    isVibrationSwitch: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var isSwitchChecked by remember { mutableStateOf(false) }
+    var isSwitchChecked by remember {
+        mutableStateOf(
+            if (isVibrationSwitch) {
+                PrefsManager.isVibrationOn
+            } else {
+                PrefsManager.isPushOn
+            }
+        )
+    }
 
+    CompositionLocalProvider(
+        LocalRippleTheme provides BlueRippleTheme,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = text,
+                fontSize = 14.textDp,
+                color = colorResource(id = R.color.color_b8c0ff),
+                modifier = Modifier.align(alignment = Alignment.CenterStart)
+            )
+            Switch(
+                checked = isSwitchChecked,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                    checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
+                    uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                    uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
+                ),
+                onCheckedChange = {
+                    isSwitchChecked = it
+                    onCheckedChange.invoke(it)
+                },
+                modifier = Modifier.align(alignment = Alignment.CenterEnd)
+            )
+        }
+    }
+}
+
+@Composable
+fun NotificationPanel(
+    onCheckChangePush: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     CompositionLocalProvider(
         LocalRippleTheme provides BlueRippleTheme,
     ) {
@@ -197,34 +265,22 @@ fun NotificationPanel(
                     .background(color = colorResource(id = R.color.color_bbd0ff))
             )
             Spacer(modifier = Modifier.height(height = 13.5.dp))
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(id = R.string.home_setting_notification_push),
-                    fontSize = 14.textDp,
-                    color = colorResource(id = R.color.color_b8c0ff),
-                    modifier = Modifier.align(alignment = Alignment.CenterStart)
-                )
-                Switch(
-                    checked = isSwitchChecked,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                        checkedTrackColor = colorResource(id = R.color.color_80bbd0ff),
-//                        uncheckedThumbColor = Color.Blue,
-//                        uncheckedTrackColor = Color.Red,
-                    ),
-                    onCheckedChange = {
-                        isSwitchChecked = it
-                        onCheckedChange.invoke(it)
-                    },
-                    modifier = Modifier.align(alignment = Alignment.CenterEnd)
-                )
-            }
+            SwitchUnit(
+                text = stringResource(id = R.string.home_setting_notification_push),
+                isVibrationSwitch = false,
+                onCheckedChange = onCheckChangePush
+            )
         }
     }
 }
 
 @Composable
-fun AccountPanel(modifier: Modifier = Modifier) {
+fun AccountPanel(
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -243,13 +299,14 @@ fun AccountPanel(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(height = 18.dp))
             Text(
-                text = if (AccountManager.isSignedIn) {
+                text = if (AccountManager.isAnonymous) {
+                    stringResource(id = R.string.home_setting_account_no_member)
+                } else {
                     String.format(
                         format = stringResource(id = R.string.home_setting_account_member),
-                        "김경호", "카카오"
+                        PrefsManager.nickname,
+                        AccountManager.authProviderName
                     )
-                } else {
-                    stringResource(id = R.string.home_setting_account_no_member)
                 },
                 textAlign = TextAlign.Center,
                 fontSize = 14.textDp,
@@ -257,62 +314,77 @@ fun AccountPanel(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Spacer(modifier = Modifier.height(height = 15.dp))
+        Spacer(modifier = Modifier.height(height = 11.dp))
         AccountButtonContainer(
-            onClickLeftButton = {},
-            onClickRightButton = {},
+            onClickLogin = onClickLogin,
+            onClickLogout = onClickLogout,
+            onClickManageProfile = onClickManageProfile
         )
-        Spacer(modifier = Modifier.height(height = 15.dp))
     }
 }
 
 @Composable
 fun AccountButtonContainer(
-    onClickLeftButton: () -> Unit,
-    onClickRightButton: () -> Unit
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickManageProfile: () -> Unit,
 ) {
-    Row() {
-        Box(
-            modifier = Modifier
-                .weight(weight = 1f)
-                .noRippleClickable { onClickLeftButton.invoke() }
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_dialog_button_y),
-                contentDescription = null,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
-            Text(
-                text = if (AccountManager.isSignedIn) {
-                    stringResource(id = R.string.home_setting_account_logout)
-                } else {
-                    stringResource(id = R.string.home_setting_account_login)
-                },
-                color = Color.White,
-                fontSize = 16.textDp,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
+    if (AccountManager.isAnonymous) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .noRippleClickable { onClickLogin.invoke() }
+                    .align(alignment = Alignment.Center)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_login),
+                    color = Color.White,
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
         }
-        Box(
-            modifier = Modifier
-                .weight(weight = 1f)
-                .noRippleClickable { onClickRightButton.invoke() }
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_dialog_button_n),
-                contentDescription = null,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
-            Text(
-                text = if (AccountManager.isSignedIn) {
-                    stringResource(id = R.string.home_setting_account_profile)
-                } else {
-                    stringResource(id = R.string.home_setting_account_create_account)
-                },
-                color = colorResource(id = R.color.color_bbd0ff),
-                fontSize = 16.textDp,
-                modifier = Modifier.align(alignment = Alignment.Center)
-            )
+    } else {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .noRippleClickable { onClickLogout.invoke() }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_logout),
+                    color = Color.White,
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .noRippleClickable { onClickManageProfile.invoke() }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bg_dialog_button_n),
+                    contentDescription = null,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+                Text(
+                    text = stringResource(id = R.string.home_setting_account_profile),
+                    color = colorResource(id = R.color.color_bbd0ff),
+                    fontSize = 16.textDp,
+                    modifier = Modifier.align(alignment = Alignment.Center)
+                )
+            }
         }
     }
 }

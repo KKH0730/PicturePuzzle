@@ -1,12 +1,12 @@
 package com.seno.game.util
 
 import android.graphics.Bitmap
-import com.seno.game.ui.game.diffgame.model.Answer
+import com.seno.game.ui.game.diff_picture.model.Answer
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
-import timber.log.Timber
-const val RADIUS_CORRECTION = 20
+
+const val RADIUS_CORRECTION = 50
 
 class DiffPictureOpencvUtil {
 
@@ -64,7 +64,7 @@ class DiffPictureOpencvUtil {
         return diffMat
     }
 
-    fun drawCircle(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
+    fun getDiffAnswer(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
 
         if (srcBitmap == null || copyBitmap == null) {
             return null
@@ -85,7 +85,7 @@ class DiffPictureOpencvUtil {
             Imgproc.cvtColor(diffMat, bin, Imgproc.COLOR_BGR2GRAY)
             Imgproc.threshold(bin, bin, 0.0, 255.0, Imgproc.THRESH_OTSU)
 
-            val pointList = ArrayList<com.seno.game.ui.game.diffgame.model.Point>()
+            val pointList = ArrayList<com.seno.game.ui.game.diff_picture.model.Point>()
             val contours = ArrayList<MatOfPoint>()
             val hierarchy = Mat()
 
@@ -119,20 +119,33 @@ class DiffPictureOpencvUtil {
                 val centerX = (rect.x + (rect.width / 2)).toDouble()
                 val centerY = (rect.y + (rect.height / 2)).toDouble()
 
-                pointList.add(com.seno.game.ui.game.diffgame.model.Point(
+                pointList.add(com.seno.game.ui.game.diff_picture.model.Point(
+                    rectX = rect.x.toFloat(),
+                    rectY = rect.y.toFloat(),
+                    rectWidth = rect.width.toFloat(),
+                    rectHeight = rect.height.toFloat(),
                     srcWidth = src.width().toFloat(),
                     srcHeight = src.height().toFloat(),
                     centerX = centerX.toFloat(),
                     centerY = centerY.toFloat(),
-                    answerRadius = (rect.height.coerceAtLeast(rect.width) + RADIUS_CORRECTION).toFloat()
+                    answerRadius = (rect.width.coerceAtLeast(rect.height) / 2).toFloat()
                 ))
 
                 Imgproc.circle(
                     src,
                     Point(centerX, centerY),
-                    rect.height.coerceAtLeast(rect.width) + RADIUS_CORRECTION,
+                    (rect.width.coerceAtLeast(rect.height) / 2) + RADIUS_CORRECTION,
                     RED,
                     10
+                )
+
+                Imgproc.rectangle(
+                    src,
+                    Point(rect.x.toDouble(), rect.y.toDouble()),
+                    Point((rect.x + rect.width).toDouble(), (rect.y + rect.height).toDouble()),
+                    RED,
+                    10,
+                    1
                 )
             }
             Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2BGR)

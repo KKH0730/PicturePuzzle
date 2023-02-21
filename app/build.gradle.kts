@@ -1,12 +1,20 @@
+import java.io.FileInputStream
+import java.util.*
+
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("dagger.hilt.android.plugin")
 }
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreFileInputStream = FileInputStream(keystorePropertiesFile)
+val keystoreProperties = Properties()
+keystoreProperties.load(keystoreFileInputStream)
 
 android {
     compileSdk = 32
@@ -19,6 +27,16 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+
+    signingConfigs {
+        create("release") {
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"] as String?
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+        }
     }
 
     buildTypes {
@@ -40,6 +58,8 @@ android {
         }
 
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -68,14 +88,15 @@ android {
 dependencies {
     implementation(project(":opencv"))
 
-    //AndroidX
+    // AndroidX
     implementation(Dependency.AndroidX.APP_COMPAT)
     implementation(Dependency.AndroidX.MATERIAL)
     implementation(Dependency.AndroidX.CONSTRAINT_LAYOUT)
     implementation(Dependency.AndroidX.RECYCLERVIEW)
 
-    //KTX
+    // KTX
     implementation(Dependency.KTX.CORE)
+    implementation(Dependency.KTX.ACTIVITY_KTX)
 
     // Compose
     implementation(Dependency.Compose.ACTIVITY_COMPOSE)
@@ -89,9 +110,6 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     debugImplementation(Dependency.Compose.UI_TOOLING)
 
     // Firebase
@@ -102,7 +120,10 @@ dependencies {
     implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
     implementation(Dependency.Firebase.FIREBASE_MESSAGING)
     implementation(Dependency.Firebase.FIREBASE_STORAGE)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.3")
+
+    // Jetbrains
+    implementation(Dependency.JETBRAINS.COROUTINE_ANDROID)
+    implementation(Dependency.JETBRAINS.COROUTINE_PLAY_SERVICE)
 
     // Accompanist
     implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
@@ -112,16 +133,40 @@ dependencies {
     implementation(Dependency.Facebook.FACEBOOK_LOGIN)
     implementation(Dependency.Facebook.FACEBOOK_APP_LINK)
 
+    // Naver
+    implementation(Dependency.Naver.NAVER_JDK8)
+
+    // Kakao
+    implementation(Dependency.Kakao.KAKAO_SDK_ALL_RX)
+
     // Google
     implementation(Dependency.Google.PLAY_SERVICE_AUTH)
+    implementation(Dependency.Google.PLAY_SERVICE_ADS)
 
     // Retrofit
     implementation(Dependency.Retrofit.RETROFIT)
     implementation(Dependency.Retrofit.GSON_CONVERTER)
     implementation(Dependency.OkHttp.LOGGING_INTERCEPTOR)
 
+    // RX
+    implementation(Dependency.Rx.RXJAVA)
+    implementation(Dependency.Rx.RXANDROID)
+    implementation(Dependency.Rx.RXKOTLIN)
+
     // Timber
     implementation(Dependency.Timber.TIMBER)
+
+    // Glide
+    implementation(Dependency.Glide.GLIDE)
+    implementation(Dependency.Glide.GLIDE_COMPILER)
+    implementation(Dependency.Glide.GLIDE_COMPOSE)
+
+    // Etc
+    implementation(Dependency.Etc.EASY_PREFS)
+    implementation(Dependency.Etc.QR)
+    implementation(Dependency.Etc.LOTTIE)
+    implementation(Dependency.Etc.COMPOSE_LOTTIE)
+    implementation(Dependency.Etc.RECYCLERVIEW_DIVIDER)
 
     // TEST
     testImplementation(Dependency.Test.JUNIT)
@@ -132,9 +177,4 @@ dependencies {
     implementation(Dependency.Hilt.ANDROID)
     kapt(Dependency.Hilt.COMPILER)
     testImplementation(Dependency.Hilt.TESTING)
-
-    implementation("com.journeyapps:zxing-android-embedded:3.6.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1")
 }

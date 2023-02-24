@@ -1,6 +1,5 @@
 package com.seno.game.ui.main.home
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -24,10 +23,10 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.component.LoadingView
-import com.seno.game.ui.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
+import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.util.MusicPlayUtil
 
 @OptIn(ExperimentalLifecycleComposeApi::class)

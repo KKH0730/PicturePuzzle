@@ -26,12 +26,11 @@
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android?:allowBackup">
-
         <activity
-            android:name=".ui.game.diff_picture.list.DPSinglePlayListActivity"
+            android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.game.diff_picture.single.DPSinglePlayActivity"
+            android:name=".ui.main.home.game.diff_picture.single.DPSinglePlayActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -58,6 +57,9 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
+
+        <service android:name=".service.TerminationDetectService"
+            android:stopWithTask="false"/>
 
         <activity
             android:name=".ui.account.sign_gate.SignGateActivity"

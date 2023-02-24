@@ -18,8 +18,8 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.Player
-import com.seno.game.ui.game.diff_picture.multi.DiffPictureGameActivity
 import com.seno.game.ui.main.home.HomeViewModel
+import com.seno.game.ui.main.home.game.diff_picture.multi.DiffPictureGameActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber

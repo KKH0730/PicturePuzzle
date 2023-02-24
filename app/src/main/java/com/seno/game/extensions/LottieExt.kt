@@ -40,19 +40,19 @@ fun Context.drawLottieAnswerCircle(
         this.scaleType = ImageView.ScaleType.FIT_XY
         this.layoutParams = LinearLayout.LayoutParams(radius, radius)
         this.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationCancel(animator: Animator?) {
+            override fun onAnimationCancel(animator: Animator) {
                 onAnimationCancel.invoke(animator)
             }
 
-            override fun onAnimationRepeat(animator: Animator?) {
+            override fun onAnimationRepeat(animator: Animator) {
                 onAnimationRepeat.invoke(animator)
             }
 
-            override fun onAnimationStart(animator: Animator?) {
+            override fun onAnimationStart(animator: Animator) {
                 onAnimationStart.invoke(animator)
             }
 
-            override fun onAnimationEnd(animator: Animator?) {
+            override fun onAnimationEnd(animator: Animator) {
                 onAnimationEnd.invoke(animator)
             }
         })

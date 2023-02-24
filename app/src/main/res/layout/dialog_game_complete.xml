@@ -6,7 +6,7 @@
     <data>
         <variable
             name="dialog"
-            type="com.seno.game.ui.game.diff_picture.view.GameCompleteDialog" />
+            type="com.seno.game.ui.main.home.game.diff_picture.view.GameCompleteDialog" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

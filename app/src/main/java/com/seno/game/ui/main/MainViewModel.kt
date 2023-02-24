@@ -33,7 +33,6 @@ class MainViewModel @Inject constructor(
                 savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
                     when (result) {
                         is Result.Success -> {
-                            Timber.e("kkhdev Main getSavedGameInfo() Success")
                             _savedGameInfoToLocalDB.emit(result.data)
                         }
                         is Result.Error -> { _showNetworkErrorEvent.value = true }

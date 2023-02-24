@@ -5,7 +5,7 @@
         <import type="android.view.View"/>
         <variable
             name="activity"
-            type="com.seno.game.ui.game.diff_picture.multi.DiffPictureGameActivity" />
+            type="com.seno.game.ui.main.home.game.diff_picture.multi.DiffPictureGameActivity" />
 
         <variable
             name="isShowAd"

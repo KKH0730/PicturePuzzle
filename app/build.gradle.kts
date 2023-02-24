@@ -17,12 +17,12 @@ val keystoreProperties = Properties()
 keystoreProperties.load(keystoreFileInputStream)
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.seno.game"
         minSdk = 23
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0.0"
 
@@ -110,6 +110,7 @@ dependencies {
     implementation(Dependency.Paging.COMPOSE)
     implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
     implementation(Dependency.Compose.NAVIGATION)
+    implementation("com.google.ar:core:1.30.0")
     debugImplementation(Dependency.Compose.UI_TOOLING)
 
     // Firebase

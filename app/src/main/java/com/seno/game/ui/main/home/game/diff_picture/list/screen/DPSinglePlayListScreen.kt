@@ -2,7 +2,9 @@ package com.seno.game.ui.main.home.game.diff_picture.list.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -24,7 +26,6 @@ fun DPSinglePlayListScreen(
     onClickGameItem: (DPSingleGame) -> Unit,
     onClickPlayButton: () -> Unit
 ) {
-
     val pagerPage by rememberUpdatedState(newValue = stage)
     Box(modifier = Modifier.fillMaxSize()) {
         Image(

@@ -207,7 +207,3 @@ fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
         }
     }
 }
-
-fun String.println() {
-    Timber.e("kkhdev : $this")
-}

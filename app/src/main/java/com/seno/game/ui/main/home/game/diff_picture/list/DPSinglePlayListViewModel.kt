@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 const val TOTAL_STAGE = 5
@@ -76,6 +77,8 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
         if (selectedGame?.id == selectedItem.id) {
             return
         }
+        Timber.e("kkhdev selectedGame : $selectedGame")
+        Timber.e("kkhdev selectedItem : $selectedItem")
         val duplicatedGameList = _gameList.value[_currentStage.value].toMutableList()
         duplicatedGameList.indexOf(selectedItem)
             .takeIf { it != -1 }
@@ -139,16 +142,18 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
                     id += 1
                 }
             }
-            kotlin.runCatching {
-                gameList.first { !it.isComplete }
-                    .apply { this.isSelect = true }
-                    .also { selectedGame = it }
-            }.onFailure {
-                selectedGame = null
-                it.printStackTrace()
-            }
             gameList
         }
+
+        kotlin.runCatching {
+            stageInfos[_currentStage.value].first { !it.isComplete }
+        }.onSuccess {
+            it.isSelect = true
+            selectedGame = it
+        }.onFailure {
+            it.printStackTrace()
+        }
+
         _gameList.value = stageInfos
     }
 

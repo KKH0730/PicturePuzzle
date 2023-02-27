@@ -185,3 +185,20 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,android,androidstudio
+/app/src/main/res/mipmap-hdpi/ic_launcher.png
+/app/src/main/res/mipmap-mdpi/ic_launcher.png
+/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+/app/src/main/ic_launcher-playstore.png
+/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png
+/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+/app/src/main/res/drawable/ic_launcher_foreground.xml
+/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png

@@ -32,10 +32,8 @@ import com.seno.game.extensions.textDp
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.list.rememberGameListState
-import com.seno.game.ui.main.println
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val SECOND = 1000
 const val MINUTE_1 = 6000L
@@ -47,37 +45,41 @@ const val TEMP_TOTAL_HEART_COUNT = 6
 fun GameListHeader(
     onClickBack: () -> Unit,
 ) {
+
+    // 기준시간
+    // 하트 사용 후
+    // 하트 충전 후
+
+
     val currentTime = System.currentTimeMillis()
-    val passedTime = ((currentTime - PrefsManager.diffPictureHearChargedTime) / MINUTE_3)
-    val remainTime = if (PrefsManager.diffPictureHearChargedTime == 0L) {
+    val chargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
+    val remainTime = if (PrefsManager.diffPictureHeartChangedTime == 0L) {
         MINUTE_3
     } else {
-        ((currentTime - PrefsManager.diffPictureHearChargedTime) % MINUTE_3)
+        ((currentTime - PrefsManager.diffPictureHeartChangedTime) % MINUTE_3)
     }
 
     var heartCount by remember {
         mutableStateOf(
-            if (passedTime > TOTAL_HEART_COUNT) {
+            if (chargeHeartCount + PrefsManager.diffPictureHeartCount > TOTAL_HEART_COUNT) {
                 TOTAL_HEART_COUNT
             } else {
-                passedTime.toInt()
+                chargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
             }.also { PrefsManager.diffPictureHeartCount = it }
         )
     }
     var heartTime by remember { mutableStateOf(remainTime) }
     if (heartCount < TEMP_TOTAL_HEART_COUNT) {
         LaunchedEffect(key1 = heartTime) {
+            delay(1000)
+
             if (heartCount == TEMP_TOTAL_HEART_COUNT) {
                 return@LaunchedEffect
             }
 
-            delay(1000)
-            heartTime -= SECOND
-
             if (heartTime == 0L) {
-                PrefsManager.diffPictureHearChargedTime = System.currentTimeMillis()
+                PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
 
-                delay(1000)
                 heartTime = MINUTE_3
 
                 if (heartCount < TEMP_TOTAL_HEART_COUNT) {
@@ -87,6 +89,8 @@ fun GameListHeader(
                     heartCount -= 1
                     PrefsManager.diffPictureHeartCount -= 1
                 }
+            } else {
+                heartTime -= SECOND
             }
         }
     }

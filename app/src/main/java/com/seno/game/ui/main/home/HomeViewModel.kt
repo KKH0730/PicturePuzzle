@@ -11,6 +11,7 @@ import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseViewModel
+import com.seno.game.ui.main.savedGameInfoToLocalDB
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -148,7 +149,10 @@ class HomeViewModel @Inject constructor(
                 val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
                 savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
                     when (result) {
-                        is Result.Success -> { _savedGameInfoToLocalDB.emit(result.data) }
+                        is Result.Success -> {
+                            result.data.savedGameInfoToLocalDB()
+                            _savedGameInfoToLocalDB.emit(result.data)
+                        }
                         is Result.Error -> {
                             _message.emit(getString(R.string.network_request_error))
                         }

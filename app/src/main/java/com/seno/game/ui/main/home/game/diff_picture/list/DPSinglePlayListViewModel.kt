@@ -157,15 +157,22 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     fun startNextGame(currentRoundPosition: Int, finalRoundPosition: Int) {
         viewModelScope.launch {
-            if (currentRoundPosition <= finalRoundPosition - 1) {
-                _currentGameRound.emit(
-                    StartGameModel(
-                        currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
-                        currentStagePosition = _currentStage.value,
-                        currentRoundPosition = currentRoundPosition + 1,
-                        finalRoundPosition = finalRoundPosition
+            if (PrefsManager.diffPictureHeartCount > 0) {
+                PrefsManager.diffPictureHeartCount -= 1
+                reqUpdateSavedGameInfo()
+
+                if (currentRoundPosition <= finalRoundPosition - 1) {
+                    _currentGameRound.emit(
+                        StartGameModel(
+                            currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
+                            currentStagePosition = _currentStage.value,
+                            currentRoundPosition = currentRoundPosition + 1,
+                            finalRoundPosition = finalRoundPosition
+                        )
                     )
-                )
+                }
+            } else {
+                _message.emit(getString(R.string.diff_game_no_heart))
             }
         }
     }

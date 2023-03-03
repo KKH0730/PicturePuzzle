@@ -2,8 +2,8 @@ package com.seno.game.data.config
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.data.network.ApiConstants
-import com.seno.game.data.user.SavedGameInfoMapper
-import com.seno.game.data.user.UserInfoMapper
+import com.seno.game.data.mapper.ConfigMapper
+import com.seno.game.data.mapper.DiffPictureSavedGameInfoMapper
 import com.seno.game.extensions.onResponseWithDefaultValue
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
@@ -12,8 +12,8 @@ import javax.inject.Inject
 
 class ConfigImpl @Inject constructor(
     private val db: FirebaseFirestore,
-    private val userInfoMapper: UserInfoMapper,
-    private val savedGameInfoMapper: SavedGameInfoMapper,
+    private val configMapper: ConfigMapper,
+    private val diffPictureSavedGameInfoMapper: DiffPictureSavedGameInfoMapper,
 ): ConfigRepository {
     override suspend fun getSavedGameInfo(uid: String): SavedGameInfo {
         return kotlin.runCatching {
@@ -23,7 +23,7 @@ class ConfigImpl @Inject constructor(
                 .await()
 
             val userInfoResponse = if (userInfoDocRef.exists()) {
-                userInfoMapper.fromRemote(model = userInfoDocRef)
+                configMapper.fromRemote(model = userInfoDocRef)
             } else {
                 null
             }
@@ -38,7 +38,7 @@ class ConfigImpl @Inject constructor(
                     .await()
 
                 if (savedGameInfDocRef.exists()) {
-                    savedGameInfo = savedGameInfoMapper.fromRemote(
+                    savedGameInfo = diffPictureSavedGameInfoMapper.fromRemote(
                         param1 = savedGameInfDocRef,
                         param2 = userInfoResponse
                     )

@@ -187,6 +187,8 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             isShowAD = it.isShowAD
             diffPictureStage = it.diffPictureGameCurrentStage
             diffPictureCompleteGameRound = it.completeGameRound
+            diffPictureHeartCount = it.diffPictureHeartCount
+            diffPictureHeartChangedTime = it.diffPictureHeartChangedTime
         }
     }
 }

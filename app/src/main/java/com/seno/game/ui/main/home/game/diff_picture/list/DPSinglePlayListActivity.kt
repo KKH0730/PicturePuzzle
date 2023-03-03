@@ -15,20 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
 import com.seno.game.extensions.*
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class DPSinglePlayListActivity : AppCompatActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 result.data?.let { intent ->
+                    viewModel.reqUpdateSavedGameInfo()
+
                     val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
                     val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
                     val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
@@ -60,10 +63,12 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                     DPSinglePlayListScreen(
                         stageInfos = viewModel.gameList.collectAsState().value,
                         stage = viewModel.currentStage.collectAsState().value,
+                        enablePlayButton = viewModel.enablePlayButton.collectAsState().value,
                         onChangedStage = viewModel::onChangedPage,
                         onClickBack = { finish() },
                         onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
                         onClickPlayButton = { viewModel.startGame() },
+                        onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
                     )
                 }
             }
@@ -82,10 +87,13 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                         launcher = launcher
                     )
                     overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
+
+                    viewModel.updateEnableUpdateButton(enable = true)
                 }
             }
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.message.collect {
+                    viewModel.updateEnableUpdateButton(enable = true)
                     Toast.makeText(this@DPSinglePlayListActivity, it, Toast.LENGTH_SHORT).show()
                 }
             }

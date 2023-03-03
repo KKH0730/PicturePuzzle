@@ -25,3 +25,16 @@ fun <T> kotlin.Result<T>.onResponseWithDefaultValue(
             Timber.e(it)
             onFailure?.invoke(it)
         }.getOrDefault(defaultValue)
+
+fun <T> kotlin.Result<T>.onResponseWithNull(
+    onSuccess: (() -> Unit)? = null,
+    onFailure: ((Throwable) -> Unit)? = null,
+): T? =
+    (this@onResponseWithNull)
+        .onSuccess { onSuccess?.invoke() }
+        .onFailure {
+            it.printStackTrace()
+            Timber.e(it)
+            onFailure?.invoke(it)
+        }.getOrNull()
+

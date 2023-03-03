@@ -45,6 +45,7 @@ const val TOTAL_HEART_COUNT = 5
 @Composable
 fun GameListHeader(
     onClickBack: () -> Unit,
+    onChangedHeartTime: (Long) -> Unit
 ) {
     var heartCount by remember { mutableStateOf(PrefsManager.diffPictureHeartCount) }
     var heartTime by remember { mutableStateOf(MINUTE_3) }
@@ -69,6 +70,7 @@ fun GameListHeader(
                 PrefsManager.diffPictureHeartCount = it
                 if (prevHeartCount != it) {
                     PrefsManager.diffPictureHeartChangedTime = currentTime
+                    onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChangedTime)
                 }
             }
 
@@ -103,6 +105,7 @@ fun GameListHeader(
 
             if (heartTime <= 0L) {
                 PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
+                onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChangedTime)
 
                 heartTime = MINUTE_3
 
@@ -364,6 +367,7 @@ fun NavigateGameStageArrow(
 
 @Composable
 fun PlayButton(
+    enablePlayButton: Boolean,
     onClick: () -> Unit,
 ) {
     Box(
@@ -375,7 +379,9 @@ fun PlayButton(
                 ),
                 shape = RoundedCornerShape(size = 22.dp)
             )
-            .noRippleClickable { onClick.invoke() }
+            .noRippleClickable {
+                onClick.takeIf { enablePlayButton }?.invoke()
+            }
     ) {
         Text(
             text = "PLAY",

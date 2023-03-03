@@ -84,10 +84,4 @@ object PrefsManager {
         set(value) {
             Prefs.putLong("diffPictureHeartChangedTime", value)
         }
-
-    // 하트 개수
-    // 하트가 충전된 시간
-
-    // case1 : 하트 갯수가 < 5일때
-    // (현재 시간 - 하트가 충전된 시간)이 3분 < 6분 이면 하트 + 1, 6분 < 9분 이면 하트 + 1 이런 식으로 최대 5개까지 충전 시켜줌
 }

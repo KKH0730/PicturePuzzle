@@ -15,7 +15,6 @@ import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,7 +71,6 @@ class HomeViewModel @Inject constructor(
             }
         )
     }
-
     fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
         viewModelScope.launch {
             _loadingFlow.value = true

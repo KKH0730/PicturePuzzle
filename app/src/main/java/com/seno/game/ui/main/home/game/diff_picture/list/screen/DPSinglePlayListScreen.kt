@@ -21,10 +21,12 @@ import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 fun DPSinglePlayListScreen(
     stageInfos: List<List<DPSingleGame>>,
     stage: Int,
+    enablePlayButton: Boolean,
     onChangedStage: (Int) -> Unit,
     onClickBack: () -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
-    onClickPlayButton: () -> Unit
+    onClickPlayButton: () -> Unit,
+    onChangedHeartTime: (Long) -> Unit
 ) {
     val pagerPage by rememberUpdatedState(newValue = stage)
     Box(modifier = Modifier.fillMaxSize()) {
@@ -39,7 +41,7 @@ fun DPSinglePlayListScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(height = 30.dp))
-            GameListHeader(onClickBack = onClickBack)
+            GameListHeader(onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
             Spacer(modifier = Modifier.height(height = 53.dp))
             LifePointGuideTerm()
             Spacer(modifier = Modifier.height(height = 33.dp))
@@ -51,7 +53,7 @@ fun DPSinglePlayListScreen(
                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(height = 40.dp))
-            PlayButton(onClick = onClickPlayButton)
+            PlayButton(enablePlayButton = enablePlayButton, onClick = onClickPlayButton)
         }
     }
 }

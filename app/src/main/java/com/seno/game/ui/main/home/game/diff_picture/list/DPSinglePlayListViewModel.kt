@@ -3,25 +3,27 @@ package com.seno.game.ui.main.home.game.diff_picture.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seno.game.R
+import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawableResourceId
 import com.seno.game.extensions.getString
+import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 const val TOTAL_STAGE = 5
 
 @HiltViewModel
-class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
+class DiffPictureSingleGameViewModel @Inject constructor(
+    private val diffPictureUseCase: DiffPictureUseCase
+) : ViewModel() {
     private val _message = MutableSharedFlow<String>()
     val message get() = _message.asSharedFlow()
 
@@ -33,6 +35,9 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
 
     private val _currentGameRound = MutableSharedFlow<StartGameModel>()
     val currentGameRound get() = _currentGameRound.asSharedFlow()
+
+    private val _enablePlayButton = MutableStateFlow(true)
+    val enablePlayButton get() = _enablePlayButton.asStateFlow()
 
     private val stageInfos: List<List<Pair<Int, Int>>>
         get() {
@@ -77,12 +82,14 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
 
     private var selectedGame: DPSingleGame? = null
 
+    fun updateEnableUpdateButton(enable: Boolean) {
+        _enablePlayButton.value = enable
+    }
+
     fun syncGameItem(selectedItem: DPSingleGame) {
         if (selectedGame?.id == selectedItem.id) {
             return
         }
-        Timber.e("kkhdev selectedGame : $selectedGame")
-        Timber.e("kkhdev selectedItem : $selectedItem")
         val duplicatedGameList = _gameList.value[_currentStage.value].toMutableList()
         duplicatedGameList.indexOf(selectedItem)
             .takeIf { it != -1 }
@@ -102,15 +109,33 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
         _gameList.value = newGameList
     }
 
+    fun reqUpdateSavedGameInfo(heartCount: Int = PrefsManager.diffPictureHeartCount) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                AccountManager.firebaseUid?.let { uid ->
+                    diffPictureUseCase.reqUpdateSavedGameInfo(
+                        uid = uid,
+                        stage = PrefsManager.diffPictureStage,
+                        completeGameRound = PrefsManager.diffPictureCompleteGameRound,
+                        heartCount = heartCount,
+                        heartChangedTime = PrefsManager.diffPictureHeartChangedTime
+                    )
+                }
+            }
+        }
+    }
+
     fun startGame() {
         viewModelScope.launch {
-            val heartCount = PrefsManager.diffPictureHeartCount
-            if (heartCount == 5) {
-                PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
-            }
+            if (PrefsManager.diffPictureHeartCount > 0) {
+                updateEnableUpdateButton(enable = false)
 
-            if (heartCount > 0) {
-                PrefsManager.diffPictureHeartCount = heartCount - 1
+                PrefsManager.diffPictureHeartCount -= 1
+
+                if (PrefsManager.diffPictureHeartCount + 1 == 5) {
+                    PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
+                    reqUpdateSavedGameInfo()
+                }
 
                 val gameList = _gameList.value[_currentStage.value]
                 val selectedGameIndex = gameList.indexOf(selectedGame)
@@ -177,7 +202,7 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
         finalRoundPosition: Int,
     ) {
         if (currentRoundPosition == finalRoundPosition
-            && _currentStage.value < TOTAL_STAGE - 1) {
+            && _currentStage.value < stageInfos.size - 1) {
             _currentStage.value += 1
         }
     }

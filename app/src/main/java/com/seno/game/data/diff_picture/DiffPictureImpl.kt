@@ -1,16 +1,21 @@
 package com.seno.game.data.diff_picture
 
 import android.net.Uri
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Transaction
 import com.google.firebase.storage.StorageReference
+import com.seno.game.data.network.ApiConstants
 import com.seno.game.di.coroutine.IoDispatcher
 import com.seno.game.di.network.DiffDocRef
+import com.seno.game.extensions.onResponseWithDefaultValue
+import com.seno.game.extensions.onResponseWithNull
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Player
 import com.seno.game.model.Result
+import com.seno.game.model.SavedGameInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -25,6 +30,35 @@ class DiffPictureImpl @Inject constructor(
     @DiffDocRef
     @Inject
     lateinit var diffGameDocRef: DocumentReference
+    override suspend fun updateSavedGameInfo(
+        uid: String,
+        stage: Int,
+        completeGameRound: String,
+        heartCount: Int,
+        heartChangedTime: Long
+    ) {
+        Timber.e("updateSavedGameInfo uid : $uid")
+        val map = mutableMapOf<String, Any>(
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
+            ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to heartChangedTime
+        )
+        kotlin.runCatching {
+            db.collection(ApiConstants.Collection.PROFILE)
+                .document(uid)
+                .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+                .document(ApiConstants.Document.DIFF_PICTURE)
+                .set(map)
+                .addOnSuccessListener {
+                    Timber.e("updateSavedGameInfo addOnSuccessListener")
+                }
+                .addOnFailureListener {
+                    Timber.e("updateSavedGameInfo addOnFailureListener : ${it.message}")
+                }
+
+        }
+    }
 
     override suspend fun getDiffPictures(): Result<List<Pair<Uri, Uri>>> {
         return withContext(Dispatchers.IO) {

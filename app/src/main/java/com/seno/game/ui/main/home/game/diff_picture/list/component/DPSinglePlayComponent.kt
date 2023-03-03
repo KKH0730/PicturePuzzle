@@ -1,22 +1,21 @@
 package com.seno.game.ui.main.home.game.diff_picture.list.component
 
 import android.annotation.SuppressLint
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -53,35 +52,37 @@ fun GameListHeader(
     val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                val currentTime = System.currentTimeMillis()
-                val prevHeartCount = PrefsManager.diffPictureHeartCount
-                val prevChargeHeartTime = PrefsManager.diffPictureHeartChangedTime
+            if (event != Lifecycle.Event.ON_RESUME) {
+                return@LifecycleEventObserver
+            }
 
-                val onResumeChargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
-                heartCount = if (onResumeChargeHeartCount + PrefsManager.diffPictureHeartCount >= TOTAL_HEART_COUNT) {
-                    TOTAL_HEART_COUNT
-                } else {
-                    onResumeChargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
-                }.also {
-                    PrefsManager.diffPictureHeartCount = it
-                    if (prevHeartCount != it) {
-                        PrefsManager.diffPictureHeartChangedTime = currentTime
-                    }
-                }
+            val currentTime = System.currentTimeMillis()
+            val prevHeartCount = PrefsManager.diffPictureHeartCount
+            val prevChargeHeartTime = PrefsManager.diffPictureHeartChangedTime
 
-                val onResumeTimeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
-                heartTime = if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
-                    MINUTE_3
-                } else if(onResumeTimeGab <= 0) {
-                    if (heartCount == TOTAL_HEART_COUNT) {
-                        0
-                    } else {
-                        MINUTE_3 + onResumeTimeGab
-                    }
-                } else {
-                    onResumeTimeGab
+            val onResumeChargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
+            heartCount = if (onResumeChargeHeartCount + PrefsManager.diffPictureHeartCount >= TOTAL_HEART_COUNT) {
+                TOTAL_HEART_COUNT
+            } else {
+                onResumeChargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
+            }.also {
+                PrefsManager.diffPictureHeartCount = it
+                if (prevHeartCount != it) {
+                    PrefsManager.diffPictureHeartChangedTime = currentTime
                 }
+            }
+
+            val onResumeTimeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
+            heartTime = if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
+                MINUTE_3
+            } else if (onResumeTimeGab <= 0) {
+                if (heartCount == TOTAL_HEART_COUNT) {
+                    0
+                } else {
+                    MINUTE_3 + onResumeTimeGab
+                }
+            } else {
+                onResumeTimeGab
             }
         }
         lifeCycleOwner.addObserver(observer)
@@ -254,15 +255,13 @@ fun SingleGameGridList(
                 .offset(y = 15.dp)
                 .align(alignment = Alignment.TopCenter)
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_left_white),
-                contentDescription = "left_arrow",
-                modifier = Modifier.noRippleClickable {
-                    if (gameListState.pagerState.currentPage > 0) {
-                        gameListState.coroutineScope.launch {
-                            gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage - 1)
-                        }
+            NavigateGameStageArrow(
+                imgResource = R.drawable.ic_arrow_left_white,
+                contentDescription = "right_arrow",
+                isVisible = pagerPage > 0,
+                onClick = {
+                    gameListState.coroutineScope.launch {
+                        gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage - 1)
                     }
                 }
             )
@@ -306,14 +305,13 @@ fun SingleGameGridList(
                     }
                 }
             }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right_white),
+            NavigateGameStageArrow(
+                imgResource = R.drawable.ic_arrow_right_white,
                 contentDescription = "right_arrow",
-                modifier = Modifier.noRippleClickable {
-                    if (gameListState.pagerState.currentPage < stageInfos.size - 1) {
-                        gameListState.coroutineScope.launch {
-                            gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage + 1)
-                        }
+                isVisible = pagerPage < stageInfos.size - 1,
+                onClick = {
+                    gameListState.coroutineScope.launch {
+                        gameListState.pagerState.animateScrollToPage(gameListState.pagerState.currentPage + 1)
                     }
                 }
             )
@@ -345,88 +343,23 @@ fun SingleGameGridList(
 }
 
 @Composable
-fun GameItem(
-    index: Int,
-    dpSingleGame: DPSingleGame,
-    isComplete: Boolean,
-    isFistIsNotCompleteIndex: Int?,
-    isSelected: Boolean,
-    onClickGameItem: (DPSingleGame) -> Unit,
+fun NavigateGameStageArrow(
+    @DrawableRes imgResource: Int,
+    contentDescription: String,
+    isVisible: Boolean,
+    onClick: () -> Unit
 ) {
-    StageCircle(
-        index = index,
-        isComplete = isComplete,
-        isSelected = isSelected,
-        isFistIsNotCompleteIndex = isFistIsNotCompleteIndex,
-        dpSingleGame = dpSingleGame,
-        onClickGameItem = onClickGameItem
-    )
-}
-
-@Composable
-fun StageCircle(
-    index: Int,
-    isComplete: Boolean,
-    isSelected: Boolean,
-    isFistIsNotCompleteIndex: Int?,
-    dpSingleGame: DPSingleGame,
-    onClickGameItem: (DPSingleGame) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = Modifier.size(size = 36.dp)) {
-        if (isSelected) {
-            Image(
-                painter = painterResource(id = R.drawable.img_stage_selection_ring),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(size = 36.dp)
-                    .align(alignment = Alignment.Center)
-            )
-        }
-
-        if (isComplete) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_stage_done),
-                contentDescription = "state_done",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(color = colorResource(id = R.color.color_B5EAEAE8))
-                    .align(alignment = Alignment.Center)
-                    .noRippleClickable {
-                        onClickGameItem
-                            .takeIf { isComplete }
-                            ?.invoke(dpSingleGame)
-                    }
-            )
-        } else {
-            Box(
-                modifier = modifier
-                    .clip(shape = CircleShape)
-                    .size(30.dp)
-                    .background(color = colorResource(id = R.color.color_B5EAEAE8))
-                    .align(alignment = Alignment.Center)
-                    .noRippleClickable {
-                        onClickGameItem
-                            .takeIf {
-                                isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex
-                            }
-                            ?.invoke(dpSingleGame)
-                    }
-            ) {
-                Text(
-                    text = "${index + 1}",
-                    color = colorResource(id = R.color.color_b8c0ff),
-                    fontSize = 14.textDp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .clip(shape = CircleShape)
-                        .align(alignment = Alignment.Center)
-                )
+    Image(
+        painter = painterResource(id = imgResource),
+        contentDescription = contentDescription,
+        modifier = Modifier
+            .alpha(alpha = if (isVisible) 1f else 0f)
+            .noRippleClickable {
+                if (isVisible){
+                    onClick.invoke()
+                }
             }
-        }
-    }
+    )
 }
 
 @Composable

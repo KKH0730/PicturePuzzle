@@ -17,12 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -36,53 +39,73 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 const val SECOND = 1000
-const val MINUTE_1 = 6000L
-const val MINUTE_3 = MINUTE_1 * 1
+const val MINUTE_1 = 60000L
+const val MINUTE_3 = MINUTE_1 * 3
 const val TOTAL_HEART_COUNT = 5
-const val TEMP_TOTAL_HEART_COUNT = 6
 
 @Composable
 fun GameListHeader(
     onClickBack: () -> Unit,
 ) {
+    var heartCount by remember { mutableStateOf(PrefsManager.diffPictureHeartCount) }
+    var heartTime by remember { mutableStateOf(MINUTE_3) }
 
-    // 기준시간
-    // 하트 사용 후
-    // 하트 충전 후
+    val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(key1 = lifeCycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val currentTime = System.currentTimeMillis()
+                val prevHeartCount = PrefsManager.diffPictureHeartCount
+                val prevChargeHeartTime = PrefsManager.diffPictureHeartChangedTime
 
+                val onResumeChargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
+                heartCount = if (onResumeChargeHeartCount + PrefsManager.diffPictureHeartCount >= TOTAL_HEART_COUNT) {
+                    TOTAL_HEART_COUNT
+                } else {
+                    onResumeChargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
+                }.also {
+                    PrefsManager.diffPictureHeartCount = it
+                    if (prevHeartCount != it) {
+                        PrefsManager.diffPictureHeartChangedTime = currentTime
+                    }
+                }
 
-    val currentTime = System.currentTimeMillis()
-    val chargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
-    val remainTime = if (PrefsManager.diffPictureHeartChangedTime == 0L) {
-        MINUTE_3
-    } else {
-        ((currentTime - PrefsManager.diffPictureHeartChangedTime) % MINUTE_3)
+                val onResumeTimeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
+                heartTime = if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
+                    MINUTE_3
+                } else if(onResumeTimeGab <= 0) {
+                    if (heartCount == TOTAL_HEART_COUNT) {
+                        0
+                    } else {
+                        MINUTE_3 + onResumeTimeGab
+                    }
+                } else {
+                    onResumeTimeGab
+                }
+            }
+        }
+        lifeCycleOwner.addObserver(observer)
+        onDispose {
+            lifeCycleOwner.removeObserver(observer)
+        }
     }
 
-    var heartCount by remember {
-        mutableStateOf(
-            if (chargeHeartCount + PrefsManager.diffPictureHeartCount > TOTAL_HEART_COUNT) {
-                TOTAL_HEART_COUNT
-            } else {
-                chargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
-            }.also { PrefsManager.diffPictureHeartCount = it }
-        )
-    }
-    var heartTime by remember { mutableStateOf(remainTime) }
-    if (heartCount < TEMP_TOTAL_HEART_COUNT) {
+    if (heartCount < TOTAL_HEART_COUNT) {
         LaunchedEffect(key1 = heartTime) {
-            delay(1000)
+            if (heartTime > 0L) {
+                delay(1000)
+            }
 
-            if (heartCount == TEMP_TOTAL_HEART_COUNT) {
+            if (heartCount == TOTAL_HEART_COUNT) {
                 return@LaunchedEffect
             }
 
-            if (heartTime == 0L) {
+            if (heartTime <= 0L) {
                 PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
 
                 heartTime = MINUTE_3
 
-                if (heartCount < TEMP_TOTAL_HEART_COUNT) {
+                if (heartCount < TOTAL_HEART_COUNT) {
                     heartCount += 1
                     PrefsManager.diffPictureHeartCount += 1
                 } else {
@@ -94,7 +117,6 @@ fun GameListHeader(
             }
         }
     }
-
 
     Box(modifier = Modifier.fillMaxWidth()) {
         GamePlayHeartPoint(heartCount = heartCount, modifier = Modifier.align(alignment = Alignment.Center))

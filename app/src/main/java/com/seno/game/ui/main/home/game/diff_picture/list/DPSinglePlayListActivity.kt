@@ -3,6 +3,7 @@ package com.seno.game.ui.main.home.game.diff_picture.list
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -11,7 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
 import com.seno.game.extensions.*
 import com.seno.game.theme.AppTheme
@@ -68,7 +72,7 @@ class DPSinglePlayListActivity : AppCompatActivity() {
 
     private fun startObserve() {
         lifecycleScope.launch {
-            launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.currentGameRound.collect {
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,
@@ -78,6 +82,11 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                         launcher = launcher
                     )
                     overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
+                }
+            }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.message.collect {
+                    Toast.makeText(this@DPSinglePlayListActivity, it, Toast.LENGTH_SHORT).show()
                 }
             }
         }

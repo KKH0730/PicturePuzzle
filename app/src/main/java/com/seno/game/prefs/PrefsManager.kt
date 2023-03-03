@@ -74,15 +74,15 @@ object PrefsManager {
         }
 
     var diffPictureHeartCount: Int
-        get() = Prefs.getInt("diffPictureHeartCount")
+        get() = Prefs.getInt("diffPictureHeartCount", 5)
         set(value) {
-            Prefs.putInt("diffPictureHeartCount", 5)
+            Prefs.putInt("diffPictureHeartCount", value)
         }
 
     var diffPictureHeartChangedTime: Long
-        get() = Prefs.getLong("diffPictureHeartChangedTime")
+        get() = Prefs.getLong("diffPictureHeartChangedTime", 0L)
         set(value) {
-            Prefs.putLong("diffPictureHeartChangedTime", 0L)
+            Prefs.putLong("diffPictureHeartChangedTime", value)
         }
 
     // 하트 개수

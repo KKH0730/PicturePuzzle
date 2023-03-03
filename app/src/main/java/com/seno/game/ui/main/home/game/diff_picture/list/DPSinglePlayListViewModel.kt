@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.seno.game.R
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.extensions.getString
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
@@ -21,14 +22,17 @@ const val TOTAL_STAGE = 5
 
 @HiltViewModel
 class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
+    private val _message = MutableSharedFlow<String>()
+    val message get() = _message.asSharedFlow()
+
     private val _currentStage = MutableStateFlow(PrefsManager.diffPictureStage)
-    val currentStage = _currentStage.asStateFlow()
+    val currentStage get() = _currentStage.asStateFlow()
 
     private val _gameList = MutableStateFlow(singleGameList)
-    val gameList = _gameList.asStateFlow()
+    val gameList get() = _gameList.asStateFlow()
 
     private val _currentGameRound = MutableSharedFlow<StartGameModel>()
-    val currentGameRound = _currentGameRound.asSharedFlow()
+    val currentGameRound get() = _currentGameRound.asSharedFlow()
 
     private val stageInfos: List<List<Pair<Int, Int>>>
         get() {
@@ -100,17 +104,28 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
 
     fun startGame() {
         viewModelScope.launch {
-            val gameList = _gameList.value[_currentStage.value]
-            val selectedGameIndex = gameList.indexOf(selectedGame)
-            if (selectedGameIndex != -1) {
-                _currentGameRound.emit(
-                    StartGameModel(
-                        currentGameModel = gameList[selectedGameIndex],
-                        currentStagePosition = _currentStage.value,
-                        currentRoundPosition = selectedGameIndex,
-                        finalRoundPosition = _gameList.value[_currentStage.value].size - 1
+            val heartCount = PrefsManager.diffPictureHeartCount
+            if (heartCount == 5) {
+                PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
+            }
+
+            if (heartCount > 0) {
+                PrefsManager.diffPictureHeartCount = heartCount - 1
+
+                val gameList = _gameList.value[_currentStage.value]
+                val selectedGameIndex = gameList.indexOf(selectedGame)
+                if (selectedGameIndex != -1) {
+                    _currentGameRound.emit(
+                        StartGameModel(
+                            currentGameModel = gameList[selectedGameIndex],
+                            currentStagePosition = _currentStage.value,
+                            currentRoundPosition = selectedGameIndex,
+                            finalRoundPosition = _gameList.value[_currentStage.value].size - 1
+                        )
                     )
-                )
+                }
+            } else {
+                _message.emit(getString(R.string.diff_game_no_heart))
             }
         }
     }

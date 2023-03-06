@@ -230,7 +230,7 @@ object AccountManager {
         nickname: String?,
     ) = suspendCoroutine { continuation ->
         val userNickname = nickname ?: PrefsManager.nickname
-        val userProfileUri = profileUri ?: PrefsManager.nickname
+        val userProfileUri = profileUri ?: PrefsManager.profileUri
         val map = mutableMapOf(
             ApiConstants.UserInfo.UID to uid,
             ApiConstants.UserInfo.NICKNAME to userNickname,

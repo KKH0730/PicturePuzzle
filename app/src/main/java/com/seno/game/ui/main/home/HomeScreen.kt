@@ -115,7 +115,6 @@ fun HomeUI(
             onClickYes = {
                 isLoading = true
                 AccountManager.startLogout(
-                    context = context,
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,

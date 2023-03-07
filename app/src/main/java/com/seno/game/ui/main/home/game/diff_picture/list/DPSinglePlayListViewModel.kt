@@ -126,10 +126,10 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     }
 
     fun startGame() {
+        updateEnableUpdateButton(enable = false)
+
         viewModelScope.launch {
             if (PrefsManager.diffPictureHeartCount > 0) {
-                updateEnableUpdateButton(enable = false)
-
                 PrefsManager.diffPictureHeartCount -= 1
 
                 if (PrefsManager.diffPictureHeartCount + 1 == 5) {
@@ -156,6 +156,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     }
 
     fun startNextGame(currentRoundPosition: Int, finalRoundPosition: Int) {
+        updateEnableUpdateButton(enable = false)
+
         viewModelScope.launch {
             if (PrefsManager.diffPictureHeartCount > 0) {
                 PrefsManager.diffPictureHeartCount -= 1
@@ -172,6 +174,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                     )
                 }
             } else {
+                updateEnableUpdateButton(enable = true)
                 _message.emit(getString(R.string.diff_game_no_heart))
             }
         }

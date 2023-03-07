@@ -3,7 +3,6 @@ package com.seno.game.ui.main.home.game.diff_picture.list
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -12,11 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
 import com.seno.game.extensions.*
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
@@ -41,10 +39,14 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                             viewModel.setNextStage()
                         }
                         if (isStartNextGame) {
-                            viewModel.startNextGame(
-                                currentRoundPosition = currentRoundPosition,
-                                finalRoundPosition = finalRoundPosition
-                            )
+                            if (PrefsManager.diffPictureHeartCount == 0) {
+                                window.decorView.rootView.showSnackBar(message = getString(R.string.diff_game_no_heart))
+                            } else {
+                                viewModel.startNextGame(
+                                    currentRoundPosition = currentRoundPosition,
+                                    finalRoundPosition = finalRoundPosition
+                                )
+                            }
                         }
                         viewModel.refreshGameList()
                     }
@@ -76,10 +78,11 @@ class DPSinglePlayListActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("ShowToast")
     private fun startObserve() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentGameRound.collect {
+            launch {
+            viewModel.currentGameRound.collect {
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,
                         stagePosition = it.currentStagePosition,
@@ -92,10 +95,10 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                     viewModel.updateEnableUpdateButton(enable = true)
                 }
             }
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch {
                 viewModel.message.collect {
                     viewModel.updateEnableUpdateButton(enable = true)
-                    Toast.makeText(this@DPSinglePlayListActivity, it, Toast.LENGTH_SHORT).show()
+                    window.decorView.rootView.showSnackBar(message = it)
                 }
             }
         }

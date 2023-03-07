@@ -13,8 +13,7 @@
         android:id="@+id/clRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_804D4C4C"
-        android:onClick="@{() -> dialog.clickBackground()}">
+        android:background="@color/color_804D4C4C">
 
         <androidx.cardview.widget.CardView
             android:layout_width="300dp"

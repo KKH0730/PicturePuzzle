@@ -34,11 +34,6 @@ class GameFailDialog @JvmOverloads constructor(
         setBackgroundColor(context.getColor(R.color.color_804D4C4C))
         visibility = View.GONE
     }
-
-    fun clickBackground() {
-        visibility = View.GONE
-    }
-
     fun clickGiveUpButton() {
         onClickGiveUp?.invoke()
     }

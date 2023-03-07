@@ -1,13 +1,10 @@
 package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -23,7 +20,6 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
-import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.MusicPlayUtil
 import com.skydoves.landscapist.glide.GlideImage
 

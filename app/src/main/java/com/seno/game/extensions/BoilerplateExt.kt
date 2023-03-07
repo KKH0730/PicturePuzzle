@@ -12,16 +12,3 @@ fun <T> Flow<Result<T>>.catchError(dispatcher: CoroutineDispatcher): Flow<Result
         Timber.e(it)
         emit(Result.Error(Exception(it)))
     }.flowOn(dispatcher)
-
-fun <T> kotlin.Result<T>.onResponseWithDefaultValue(
-    onSuccess: (() -> Unit)? = null,
-    onFailure: ((Throwable) -> Unit)? = null,
-    defaultValue: T,
-): T =
-    (this@onResponseWithDefaultValue)
-        .onSuccess { onSuccess?.invoke() }
-        .onFailure {
-            it.printStackTrace()
-            Timber.e(it)
-            onFailure?.invoke(it)
-        }.getOrDefault(defaultValue)

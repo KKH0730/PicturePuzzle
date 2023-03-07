@@ -11,11 +11,11 @@ import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseViewModel
+import com.seno.game.ui.main.savedGameInfoToLocalDB
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,25 +54,24 @@ class HomeViewModel @Inject constructor(
     val pushSwitchOnOff: StateFlow<Boolean> get() = _pushSwitchOnOff.asStateFlow()
 
     init {
-        AccountManager.addAuthStateListener(
-            onSignedIn = {
-                if (isFirstLogin) {
-                    isFirstLogin = false
-                    return@addAuthStateListener
-                }
+//        AccountManager.addAuthStateListener(
+//            onSignedIn = {
+//                if (isFirstLogin) {
+//                    isFirstLogin = false
+//                    return@addAuthStateListener
+//                }
+//
+//                if (AccountManager.isAnonymous) {
+//
+//                } else {
 
-                if (AccountManager.isAnonymous) {
-
-                } else {
-                    AccountManager.firebaseUid?.let { reqGetSavedGameInfo(uid = it) }
-                }
-            },
-            onSignedOut = {
-                // 로그 아웃 후 익명으로 강제 로그인 시키기 때문에 onSignedOut { } 블럭은 사용 하지 않음
-            }
-        )
+//                }
+//            },
+//            onSignedOut = {
+//                // 로그 아웃 후 익명으로 강제 로그인 시키기 때문에 onSignedOut { } 블럭은 사용 하지 않음
+//            }
+//        )
     }
-
     fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
         viewModelScope.launch {
             _loadingFlow.value = true
@@ -140,23 +139,6 @@ class HomeViewModel @Inject constructor(
             } else {
                 _gameReadySharedFlow.emit(Unit)
                 _message.emit(getString(R.string.network_request_error))
-            }
-        }
-    }
-
-    private fun reqGetSavedGameInfo(uid: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
-                savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
-                    when (result) {
-                        is Result.Success -> { _savedGameInfoToLocalDB.emit(result.data) }
-                        is Result.Error -> {
-                            _message.emit(getString(R.string.network_request_error))
-                        }
-                        else -> {}
-                    }
-                }
             }
         }
     }

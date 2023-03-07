@@ -10,6 +10,7 @@ import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.model.DiffGameInfo

@@ -2,7 +2,6 @@ package com.seno.game.ui.main
 
 import androidx.lifecycle.viewModelScope
 import com.seno.game.domain.usecase.user.GameConfigUseCase
-import com.seno.game.domain.usecase.user.UserInfoUseCase
 import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.ui.base.BaseViewModel
@@ -11,12 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userInfoUseCase: UserInfoUseCase,
     private val configUseCase: GameConfigUseCase
 ): BaseViewModel() {
 
@@ -29,7 +26,7 @@ class MainViewModel @Inject constructor(
     fun getSavedGameInfo(uid: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val savedUserInfoResponse =  configUseCase.reqGetSavedGameInfo(params = uid)
+                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
                 savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
                     when (result) {
                         is Result.Success -> {

@@ -2,14 +2,34 @@ package com.seno.game.domain.usecase.diff_game
 
 import android.net.Uri
 import com.seno.game.data.diff_picture.DiffPictureRepository
+import com.seno.game.di.coroutine.IoDispatcher
+import com.seno.game.extensions.catchError
 import com.seno.game.model.DiffPictureGame
-import com.seno.game.model.Player
 import com.seno.game.model.Result
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class DiffPictureUseCase @Inject constructor(
-    private val diffPictureRepository: DiffPictureRepository
+    private val diffPictureRepository: DiffPictureRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
+
+    suspend fun reqUpdateSavedGameInfo(
+        uid: String,
+        stage: Int,
+        completeGameRound: String,
+        heartCount: Int,
+        heartChangedTime: Long
+    ): Flow<Result<Unit>> =
+        diffPictureRepository.updateSavedGameInfo(
+            uid = uid,
+            stage = stage,
+            completeGameRound = completeGameRound,
+            heartCount = heartCount,
+            heartChangedTime = heartChangedTime
+        ).catchError(dispatcher = ioDispatcher)
+
 
     suspend fun reqDiffPictures(): Result<List<Pair<Uri, Uri>>>  {
         return diffPictureRepository.getDiffPictures()

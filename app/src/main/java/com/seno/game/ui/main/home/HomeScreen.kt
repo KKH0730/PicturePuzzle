@@ -33,6 +33,7 @@ import com.seno.game.util.MusicPlayUtil
 @Composable
 fun HomeScreen() {
     val homeViewModel = hiltViewModel<HomeViewModel>()
+
     HomeUI(
         savedGameInfo = homeViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value,
         onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
@@ -50,7 +51,7 @@ fun HomeScreen() {
             )
         },
         onChangedVibration = { homeViewModel.reqUpdateVibrationOnOff(AccountManager.firebaseUid, isVibrationOn = it) },
-        onChangedPush = { homeViewModel.reqUpdatePushOnOff(AccountManager.firebaseUid, isPushOn = it) }
+        onChangedPush = { homeViewModel.reqUpdatePushOnOff(AccountManager.firebaseUid, isPushOn = it) },
     )
 }
 
@@ -66,7 +67,7 @@ fun HomeUI(
 ) {
     val context = LocalContext.current
     val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
-    val googleAccountManager = GoogleAccountManager(activity = context as MainActivity)
+    val googleAccountManager = GoogleAccountManager(activity = context)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
@@ -77,11 +78,14 @@ fun HomeUI(
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
 
-    (context as MainActivity).LifecycleEventListener {
+    var isEnableSoloPlay by remember { mutableStateOf(true) }
+
+    context.LifecycleEventListener {
         when (it) {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
+                isEnableSoloPlay = true
                 nickname = PrefsManager.nickname
                 profile = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
@@ -111,7 +115,6 @@ fun HomeUI(
             onClickYes = {
                 isLoading = true
                 AccountManager.startLogout(
-                    context = context,
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,
@@ -199,8 +202,10 @@ fun HomeUI(
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = {
+                    isEnableSoloPlay = false
+
                     DPSinglePlayListActivity.start(context = context)
-                    (context as MainActivity).overridePendingTransition(
+                    context.overridePendingTransition(
                         R.anim.slide_right_enter,
                         R.anim.slide_right_exit
                     )

@@ -2,19 +2,21 @@ package com.seno.game.manager
 
 import android.content.Context
 import android.net.Uri
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.*
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.R
+import com.seno.game.data.network.ApiConstants
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
-import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
@@ -110,7 +112,7 @@ object AccountManager {
 
     private fun getFirebaseUserIdToken(
         onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
+        onFailure: (Exception) -> Unit,
     ) {
         currentUser?.let { firebaseUser ->
             firebaseUser.getIdToken(true).addOnCompleteListener { task ->
@@ -130,50 +132,29 @@ object AccountManager {
         onSignInSucceed: () -> Unit,
         onSignInFailed: () -> Unit,
     ) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val uid = withContext(Dispatchers.IO) {
-                var userUid: String? = null
-
-                firebaseRequest.signInWithCredential(credential = credential)
-                    .addOnFailureListener { onSignInFailed.invoke() }
-                    .addOnCompleteListener {
-                        if (!it.isSuccessful) {
-                            onSignInFailed.invoke()
-                            return@addOnCompleteListener
-                        }
-
-                        userUid = it.result.user?.uid
-                    }.await()
-                userUid
+        CoroutineScope(Dispatchers.IO).launch {
+            val signInTask = firebaseRequest.signInWithCredential(credential = credential)
+            if (!signInTask.isSuccessful) {
+                onSignInFailed.invoke()
+                return@launch
             }
 
-            val isProfileDocExist = withContext(Dispatchers.IO) {
-                var isDocumentExist = false
-                if (uid == null) {
-                    onSignInFailed.invoke()
-                } else {
-                    profileColRef.document(uid).get()
-                        .addOnFailureListener { onSignInFailed.invoke() }
-                        .addOnCompleteListener {
-                            if (!it.isSuccessful) {
-                                onSignInFailed.invoke()
-                                return@addOnCompleteListener
-                            }
-                            isDocumentExist = it.result.exists()
-                        }.await()
-                }
-                isDocumentExist
-            }
-
-            withContext(Dispatchers.IO) {
+            val uid = signInTask.result.user?.uid
+            if (uid == null) {
+                onSignInFailed.invoke()
+                return@launch
+            } else {
+                val isProfileDocExist = isExistProfileDocument(uid = uid)
                 if (isProfileDocExist) {
+                    // SNS 로그인
                     getProfileInfo(
                         uid = uid,
                         onSignInSucceed = onSignInSucceed,
                         onSignInFailed = onSignInFailed
                     )
                 } else {
-                    saveProfileInfo(
+                    // SNS 회원가입
+                    setProfileInfo(
                         uid = uid,
                         platform = platform,
                         nickname = displayName,
@@ -186,6 +167,17 @@ object AccountManager {
         }
     }
 
+    private suspend fun isExistProfileDocument(uid: String) = suspendCoroutine { continuation ->
+        profileColRef.document(uid).get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    continuation.resume(task.result.exists())
+                } else {
+                    continuation.resume(false)
+                }
+            }
+    }
+
     fun createUserWithEmailAndPassword(
         email: String,
         password: String,
@@ -195,64 +187,84 @@ object AccountManager {
         onSignInSucceed: () -> Unit,
         onSignInFailed: () -> Unit,
     ) {
-        firebaseRequest.createUserWithEmailAndPassword(email, password)
-            .addOnFailureListener { e ->
-                if (e is FirebaseAuthUserCollisionException) {
-                    // 로그인이니까 프로필 가져오기
-                    signInUserWithEmailAndPassword(
+        CoroutineScope(Dispatchers.IO).launch {
+            when (val createUserWithEmailAndPasswordResult = firebaseRequest.createUserWithEmailAndPassword(email, password)) {
+                null -> {
+                    onSignInFailed.invoke()
+                }
+                is FirebaseAuthUserCollisionException -> {
+                    val signInUserWithEmailAndPasswordResult = firebaseRequest.signInWithEmailAndPassword(
                         email = email,
                         password = password,
+                    )
+
+                    if (signInUserWithEmailAndPasswordResult == null || signInUserWithEmailAndPasswordResult is Exception) {
+                        onSignInFailed.invoke()
+                    } else {
+                        val user = (signInUserWithEmailAndPasswordResult as AuthResult).user
+                        getProfileInfo(
+                            uid = user?.uid,
+                            onSignInSucceed = onSignInSucceed,
+                            onSignInFailed = onSignInFailed
+                        )
+                    }
+                }
+                else -> {
+                    val user = (createUserWithEmailAndPasswordResult as AuthResult).user
+                    setProfileInfo(
+                        uid = user?.uid,
+                        platform = platform,
+                        nickname = nickname,
+                        profileUri = profileUri,
                         onSignInSucceed = onSignInSucceed,
                         onSignInFailed = onSignInFailed
                     )
-                } else {
-                    onSignInFailed.invoke()
                 }
             }
-
-            .addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    if (it.exception !is FirebaseAuthUserCollisionException) {
-                        onSignInFailed.invoke()
-                    }
-                    return@addOnCompleteListener
-                }
-
-                saveProfileInfo(
-                    uid = it.result.user?.uid,
-                    platform = platform,
-                    nickname = nickname,
-                    profileUri = profileUri,
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
-            }
+        }
     }
 
-    private fun signInUserWithEmailAndPassword(
-        email: String,
-        password: String,
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit,
-    ) {
-        firebaseRequest.signInWithEmailAndPassword(email, password)
-            .addOnFailureListener { onSignInFailed.invoke() }
-            .addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    onSignInFailed.invoke()
-                    return@addOnCompleteListener
-                }
+    private suspend fun setUserInfo(
+        uid: String,
+        platform: PlatForm,
+        nickname: String?,
+    ) = suspendCoroutine { continuation ->
+        val userNickname = nickname ?: PrefsManager.nickname
+        val userProfileUri = profileUri ?: PrefsManager.profileUri
+        val map = mutableMapOf(
+            ApiConstants.UserInfo.UID to uid,
+            ApiConstants.UserInfo.NICKNAME to userNickname,
+            ApiConstants.UserInfo.PLATFORM to platform.name,
+            ApiConstants.UserInfo.PROFILE_URI to userProfileUri,
+            ApiConstants.UserInfo.BACKGROUND_VOLUME to PrefsManager.backgroundVolume.toString(),
+            ApiConstants.UserInfo.EFFECT_VOLUME to PrefsManager.effectVolume.toString(),
+            ApiConstants.UserInfo.IS_VIBRATION_ON to PrefsManager.isVibrationOn,
+            ApiConstants.UserInfo.IS_PUSH_ON to PrefsManager.isPushOn,
+            ApiConstants.UserInfo.IS_SHOW_AD to PrefsManager.isShowAD
+        )
 
-
-                getProfileInfo(
-                    uid = it.result.user?.uid,
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
-            }
+        profileColRef.document(uid)
+            .set(map)
+            .addOnCompleteListener { task -> continuation.resume(task) }
     }
 
-    private fun saveProfileInfo(
+    private suspend fun setDiffPictureGameInfo(uid: String) = suspendCoroutine { continuation ->
+        val savedGameInfoMap = mutableMapOf<String, Any>(
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to PrefsManager.diffPictureStage,
+            ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to PrefsManager.diffPictureCompleteGameRound,
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to PrefsManager.diffPictureHeartCount,
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to PrefsManager.diffPictureHeartChangedTime
+        )
+
+        profileColRef
+            .document(uid)
+            .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+            .document(ApiConstants.Document.DIFF_PICTURE)
+            .set(savedGameInfoMap)
+            .addOnCompleteListener { task -> continuation.resume(task) }
+    }
+
+    private suspend fun setProfileInfo(
         uid: String?,
         platform: PlatForm,
         nickname: String?,
@@ -260,99 +272,101 @@ object AccountManager {
         onSignInSucceed: () -> Unit,
         onSignInFailed: () -> Unit,
     ) {
-
         uid?.let {
             profileUri?.saveDiskCacheData(size = null)
 
-            val userNickname = nickname ?: PrefsManager.nickname
-            val userProfileUri = profileUri ?: PrefsManager.nickname
-            val map = mutableMapOf(
-                "uid" to uid,
-                "nickname" to userNickname,
-                "platform" to platform.name,
-                "profileUri" to userProfileUri,
-                "backgroundVolume" to PrefsManager.backgroundVolume.toString(),
-                "effectVolume" to PrefsManager.effectVolume.toString(),
-                "isVibrationOn" to PrefsManager.isVibrationOn,
-                "isPushOn" to PrefsManager.isPushOn,
-                "isShowAD" to PrefsManager.isShowAD
-            )
+            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname)
+            if (!userInfoTask.isSuccessful) {
+                onSignInFailed.invoke()
+                return
+            }
 
-            profileColRef.document(uid)
-                .set(map)
-                .addOnFailureListener { onSignInFailed.invoke() }
-                .addOnCompleteListener {
-                    if (!it.isSuccessful) {
-                        onSignInFailed.invoke()
-                        return@addOnCompleteListener
-                    }
+            val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
+            if (!savedGameInfoTask.isSuccessful) {
+                onSignInFailed.invoke()
+                return
+            }
 
-                    platform.let { PrefsManager.platform = it.name }
-                    nickname?.let { PrefsManager.nickname = it }
-                    profileUri?.let { PrefsManager.profileUri = it }
+            PrefsManager.apply {
+                nickname?.let { this.nickname = it }
+                this.platform = platform.name
+                profileUri?.let { this.profileUri = it }
+            }
 
-                    val savedGameInfoMap = mutableMapOf<String, Any>(
-                        "diffPictureGameCurrentStage" to 0,
-                        "completeGameRound" to ""
-                    )
-
-                    profileColRef
-                        .document(uid)
-                        .collection("save_game_info")
-                        .document("diff_picture")
-                        .set(savedGameInfoMap)
-                        .addOnSuccessListener { onSignInSucceed.invoke() }
-                        .addOnFailureListener { onSignInFailed.invoke() }
-                }
+            onSignInSucceed.invoke()
         } ?: onSignInFailed.invoke()
     }
 
-    private fun getProfileInfo(
+    private suspend fun getUserInfo(
+        uid: String,
+    ) = suspendCoroutine { continuation ->
+        profileColRef.document(uid)
+            .get()
+            .addOnCompleteListener { task -> continuation.resume(task) }
+    }
+
+    private suspend fun getDiffPictureGameInfo(uid: String) = suspendCoroutine { continuation ->
+        profileColRef
+            .document(uid)
+            .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+            .document(ApiConstants.Document.DIFF_PICTURE)
+            .get()
+            .addOnCompleteListener { task -> continuation.resume(task) }
+    }
+
+    private suspend fun getProfileInfo(
         uid: String?,
         onSignInSucceed: () -> Unit,
         onSignInFailed: () -> Unit,
     ) {
         uid?.let {
-            profileColRef.document(uid)
-                .get()
-                .addOnFailureListener { onSignInFailed.invoke() }
-                .addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        onSignInFailed.invoke()
-                        return@addOnCompleteListener
-                    }
+            val userInfoTask = getUserInfo(uid = uid)
+            if (!userInfoTask.isSuccessful) {
+                onSignInFailed.invoke()
+                return
+            }
 
-                    val documentSnapshot = task.result
-                    PrefsManager.apply {
-                        this.nickname = documentSnapshot.getString("nickname") ?: ""
-                        this.platform = documentSnapshot.getString("platform") ?: ""
-                        this.profileUri = documentSnapshot.getString("profileUri") ?: ""
-                        this.backgroundVolume = documentSnapshot.getString("backgroundVolume")?.toFloat() ?: backgroundVolume
-                        this.effectVolume = documentSnapshot.getString("effectVolume")?.toFloat() ?: effectVolume
-                        this.isVibrationOn = documentSnapshot.getBoolean("isVibrationOn") ?: isVibrationOn
-                        this.isPushOn = documentSnapshot.getBoolean("isPushOn") ?: isPushOn
-                        this.isShowAD = documentSnapshot.getBoolean("isShowAD") ?: isShowAD
-                        this.profileUri.saveDiskCacheData(size = null)
-                    }
-
-                    val savedGameInfoMap = mutableMapOf<String, Any>(
-                        "diffPictureGameCurrentStage" to 0,
-                        "completeGameRound" to ""
-                    )
-
-                    profileColRef
-                        .document(uid)
-                        .collection("save_game_info")
-                        .document("diff_picture")
-                        .set(savedGameInfoMap)
-                        .addOnSuccessListener { onSignInSucceed.invoke() }
-                        .addOnFailureListener { onSignInFailed.invoke() }
+            val userDoc = userInfoTask.result as DocumentSnapshot
+            if (userDoc.exists()) {
+                PrefsManager.apply {
+                    this.nickname = userDoc.getString(ApiConstants.UserInfo.NICKNAME) ?: nickname
+                    this.platform = userDoc.getString(ApiConstants.UserInfo.PLATFORM) ?: platform
+                    this.profileUri = userDoc.getString(ApiConstants.UserInfo.PROFILE_URI) ?: profileUri
+                    this.backgroundVolume = userDoc.getString(ApiConstants.UserInfo.BACKGROUND_VOLUME)?.toFloat() ?: backgroundVolume
+                    this.effectVolume = userDoc.getString(ApiConstants.UserInfo.EFFECT_VOLUME)?.toFloat() ?: effectVolume
+                    this.isVibrationOn = userDoc.getBoolean(ApiConstants.UserInfo.IS_VIBRATION_ON) ?: isVibrationOn
+                    this.isPushOn = userDoc.getBoolean(ApiConstants.UserInfo.IS_PUSH_ON) ?: isPushOn
+                    this.isShowAD = userDoc.getBoolean(ApiConstants.UserInfo.IS_SHOW_AD) ?: isShowAD
+                    this.profileUri.saveDiskCacheData(size = null)
                 }
+            }
+            val savedGameInfoTask = getDiffPictureGameInfo(uid = uid)
+            if (!savedGameInfoTask.isSuccessful) {
+                onSignInFailed.invoke()
+                return
+            }
+
+            val savedGameInfoDoc = savedGameInfoTask.result as DocumentSnapshot
+            if (savedGameInfoDoc.exists()) {
+                PrefsManager.apply {
+                    (savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: diffPictureCompleteGameRound)
+                        .split(",")
+                        .forEach { round ->
+                            this.diffPictureCompleteGameRound = round
+                        }
+                    this.diffPictureStage =
+                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: diffPictureStage
+                    this.diffPictureHeartCount =
+                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: diffPictureHeartCount
+                    this.diffPictureHeartChangedTime =
+                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME) ?: diffPictureHeartChangedTime
+                }
+            }
+            onSignInSucceed.invoke()
         } ?: onSignInFailed.invoke()
     }
 
     fun startLogout(
-        context: Context,
         facebookAccountManager: FacebookAccountManager?,
         googleAccountManager: GoogleAccountManager?,
         naverAccountManager: NaverAccountManager?,
@@ -362,26 +376,26 @@ object AccountManager {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
                 facebookAccountManager?.logout()
-                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
                     logoutListener = object : GoogleAccountManager.LogoutListener {
                         override fun onSuccessLogout() {
-                            signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
+                            signOutFirebase(isCompleteLogout = isCompleteLogout)
                         }
                     })
             }
 
             override fun onSignOutNaver() {
                 naverAccountManager?.logout()
-                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutKakao() {
                 kakaoAccountManager?.logout()
-                signOutFirebase(context = context, isCompleteLogout = isCompleteLogout)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
         })
     }
@@ -399,7 +413,7 @@ object AccountManager {
         }
     }
 
-    fun signOutFirebase(context: Context, isCompleteLogout: () -> Unit) {
+    fun signOutFirebase(isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
         signInAnonymous(
             onSuccess = isCompleteLogout,

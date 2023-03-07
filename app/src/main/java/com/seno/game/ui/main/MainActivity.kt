@@ -186,7 +186,11 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             isPushOn = it.isPushOn
             isShowAD = it.isShowAD
             diffPictureStage = it.diffPictureGameCurrentStage
-            diffPictureCompleteGameRound = it.completeGameRound
+            it.completeGameRound.split(",").forEach { round ->
+                diffPictureCompleteGameRound = round
+            }
+            diffPictureHeartCount = it.diffPictureHeartCount
+            diffPictureHeartChangedTime = it.diffPictureHeartChangedTime
         }
     }
 }
@@ -206,8 +210,4 @@ fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
             lifecycle.removeObserver(observer)
         }
     }
-}
-
-fun String.println() {
-    Timber.e("kkhdev : $this")
 }

@@ -12,6 +12,8 @@ data class SavedGameInfo(
     var isVibrationOn: Boolean = PrefsManager.isVibrationOn,
     var isPushOn: Boolean = PrefsManager.isPushOn,
     val isShowAD: Boolean = PrefsManager.isShowAD,
-    val diffPictureGameCurrentStage: Int = 0,
-    val completeGameRound: String = ""
+    val diffPictureGameCurrentStage: Int = PrefsManager.diffPictureStage,
+    val completeGameRound: String = PrefsManager.diffPictureCompleteGameRound,
+    val diffPictureHeartCount: Int = PrefsManager.diffPictureHeartCount,
+    val diffPictureHeartChangedTime: Long = PrefsManager.diffPictureHeartChangedTime
 )

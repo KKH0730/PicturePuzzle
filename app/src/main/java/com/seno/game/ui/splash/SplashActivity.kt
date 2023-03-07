@@ -25,13 +25,10 @@ import hideNavigationBar
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        window.hideNavigationBar()
         createRandomNickname()
 
         setContent {
-            val systemUiController = rememberSystemUiController()
-            systemUiController.isNavigationBarVisible = false
-
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     Box(

@@ -27,7 +27,7 @@ class ConfigImpl @Inject constructor(
             }
 
             if (!userInfoTask.isSuccessful || !userInfoTask.result.exists()) {
-                emit(Result.Error(userInfoTask.exception?.cause))
+                emit(Result.Success(SavedGameInfo()))
                 return@flow
             }
 
@@ -41,7 +41,7 @@ class ConfigImpl @Inject constructor(
             }
 
             if (!diffPictureGameInfoTask.isSuccessful || !diffPictureGameInfoTask.result.exists()) {
-                emit(Result.Error(userInfoTask.exception?.cause))
+                emit(Result.Success(SavedGameInfo()))
                 return@flow
             }
 

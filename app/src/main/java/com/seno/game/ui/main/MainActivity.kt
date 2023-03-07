@@ -186,7 +186,9 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             isPushOn = it.isPushOn
             isShowAD = it.isShowAD
             diffPictureStage = it.diffPictureGameCurrentStage
-            diffPictureCompleteGameRound = it.completeGameRound
+            it.completeGameRound.split(",").forEach { round ->
+                diffPictureCompleteGameRound = round
+            }
             diffPictureHeartCount = it.diffPictureHeartCount
             diffPictureHeartChangedTime = it.diffPictureHeartChangedTime
         }

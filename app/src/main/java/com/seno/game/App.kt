@@ -2,6 +2,7 @@ package com.seno.game
 
 import android.app.Application
 import android.content.ContextWrapper
+import androidx.appcompat.app.AppCompatDelegate
 import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.ads.MobileAds
 import com.kakao.sdk.common.KakaoSdk
@@ -23,6 +24,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         Timber.plant(Timber.DebugTree())
 

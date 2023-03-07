@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
@@ -25,10 +26,12 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.hideNavigationBar()
         createRandomNickname()
 
         setContent {
+            val systemUiController = rememberSystemUiController()
+            systemUiController.isNavigationBarVisible = false
+
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     Box(

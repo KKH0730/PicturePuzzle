@@ -33,6 +33,7 @@ import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
 import com.seno.game.util.AnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
+import hideNavigationBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -80,7 +81,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        window.hideNavigationBar()
         initSetting()
 
         setPrepareView()

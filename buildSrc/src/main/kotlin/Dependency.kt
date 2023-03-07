@@ -88,9 +88,8 @@ object Dependency {
     }
 
     object Accompanist {
-        private const val VERSION = "0.25.1"
-        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:$VERSION"
-        const val PAGER = "com.google.accompanist:accompanist-pager:$VERSION"
+        const val SYSTEM_UI_CONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:0.29.1-alpha"
+        const val PAGER = "com.google.accompanist:accompanist-pager:0.25.1"
     }
 
     object Hilt {

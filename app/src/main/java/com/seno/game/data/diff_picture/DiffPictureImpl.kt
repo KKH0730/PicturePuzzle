@@ -1,21 +1,15 @@
 package com.seno.game.data.diff_picture
 
 import android.net.Uri
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Transaction
 import com.google.firebase.storage.StorageReference
 import com.seno.game.data.network.ApiConstants
-import com.seno.game.di.coroutine.IoDispatcher
 import com.seno.game.di.network.DiffDocRef
-import com.seno.game.extensions.onResponseWithDefaultValue
-import com.seno.game.extensions.onResponseWithNull
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Player
 import com.seno.game.model.Result
-import com.seno.game.model.SavedGameInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -49,7 +43,7 @@ class DiffPictureImpl @Inject constructor(
                 .document(uid)
                 .collection(ApiConstants.Collection.SAVE_GAME_INFO)
                 .document(ApiConstants.Document.DIFF_PICTURE)
-                .set(map)
+                .update(map)
                 .addOnSuccessListener {
                     Timber.e("updateSavedGameInfo addOnSuccessListener")
                 }

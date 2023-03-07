@@ -349,8 +349,11 @@ object AccountManager {
             val savedGameInfoDoc = savedGameInfoTask.result as DocumentSnapshot
             if (savedGameInfoDoc.exists()) {
                 PrefsManager.apply {
-                    this.diffPictureCompleteGameRound =
-                        savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: diffPictureCompleteGameRound
+                    (savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: diffPictureCompleteGameRound)
+                        .split(",")
+                        .forEach { round ->
+                            this.diffPictureCompleteGameRound = round
+                        }
                     this.diffPictureStage =
                         savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: diffPictureStage
                     this.diffPictureHeartCount =

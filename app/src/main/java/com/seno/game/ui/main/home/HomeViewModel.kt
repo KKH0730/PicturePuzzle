@@ -143,26 +143,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun reqGetSavedGameInfo(uid: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
-                savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
-                    when (result) {
-                        is Result.Success -> {
-                            result.data.savedGameInfoToLocalDB()
-                            _savedGameInfoToLocalDB.emit(result.data)
-                        }
-                        is Result.Error -> {
-                            _message.emit(getString(R.string.network_request_error))
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
     fun updateBackgroundVolume(volume: Float) {
         PrefsManager.backgroundVolume = volume
         MusicPlayUtil.setVol(leftVol = volume, rightVol = volume, isBackgroundSound = true)

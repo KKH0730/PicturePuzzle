@@ -26,7 +26,7 @@ class MainViewModel @Inject constructor(
     fun getSavedGameInfo(uid: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val savedUserInfoResponse =  configUseCase.reqGetSavedGameInfo(params = uid)
+                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
                 savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
                     when (result) {
                         is Result.Success -> {

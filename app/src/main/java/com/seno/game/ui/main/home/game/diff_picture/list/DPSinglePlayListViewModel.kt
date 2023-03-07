@@ -119,7 +119,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                         completeGameRound = PrefsManager.diffPictureCompleteGameRound,
                         heartCount = heartCount,
                         heartChangedTime = PrefsManager.diffPictureHeartChangedTime
-                    )
+                    ).collect()
                 }
             }
         }
@@ -204,12 +204,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         _gameList.value = stageInfos
     }
 
-    fun setNextStage(
-        currentRoundPosition: Int,
-        finalRoundPosition: Int,
-    ) {
-        if (currentRoundPosition == finalRoundPosition
-            && _currentStage.value < stageInfos.size - 1) {
+    fun setNextStage() {
+        if (_currentStage.value < stageInfos.size - 1) {
             _currentStage.value += 1
         }
     }

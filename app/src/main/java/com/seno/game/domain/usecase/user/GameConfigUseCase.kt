@@ -14,26 +14,26 @@ class GameConfigUseCase @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     suspend fun reqGetSavedGameInfo(params: String): Flow<Result<SavedGameInfo>> {
-        return configRepository.getSavedGameInfo(uid = params).catchError(ioDispatcher)
+        return configRepository.getSavedGameInfo(uid = params).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdateBackgroundVolume(uid: String, volume: String): Flow<Result<Float>> {
-        return configRepository.updateBackgroundVolume(uid = uid, volume = volume).catchError(ioDispatcher)
+        return configRepository.updateBackgroundVolume(uid = uid, volume = volume).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdateEffectVolume(uid: String, volume: String): Flow<Result<Float>> {
-        return configRepository.updateEffectVolume(uid = uid, volume = volume).catchError(ioDispatcher)
+        return configRepository.updateEffectVolume(uid = uid, volume = volume).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdateVibrationOnOff(uid: String, isVibrationOn: Boolean): Flow<Result<Boolean>> {
-        return configRepository.updateVibrationOnOff(uid = uid, isVibrationOn = isVibrationOn).catchError(ioDispatcher)
+        return configRepository.updateVibrationOnOff(uid = uid, isVibrationOn = isVibrationOn).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdatePushOnOff(uid: String, isPushOn: Boolean): Flow<Result<Boolean>> {
-        return configRepository.updatePushOnOff(uid = uid, isPushOn = isPushOn).catchError(ioDispatcher)
+        return configRepository.updatePushOnOff(uid = uid, isPushOn = isPushOn).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdateADOnOff(uid: String, isShowAD: Boolean): Flow<Result<Boolean>> {
-        return configRepository.updateADOnOff(uid = uid, isShowAD = isShowAD).catchError(ioDispatcher)
+        return configRepository.updateADOnOff(uid = uid, isShowAD = isShowAD).catchError(dispatcher = ioDispatcher)
     }
 }

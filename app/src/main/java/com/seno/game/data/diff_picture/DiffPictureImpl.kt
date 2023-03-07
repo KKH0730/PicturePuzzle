@@ -11,10 +11,14 @@ import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Player
 import com.seno.game.model.Result
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class DiffPictureImpl @Inject constructor(
     private val db: FirebaseFirestore,
@@ -29,28 +33,34 @@ class DiffPictureImpl @Inject constructor(
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChangedTime: Long
-    ) {
-        Timber.e("updateSavedGameInfo uid : $uid")
-        val map = mutableMapOf<String, Any>(
-            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
-            ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
-            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
-            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to heartChangedTime
-        )
-        kotlin.runCatching {
-            db.collection(ApiConstants.Collection.PROFILE)
-                .document(uid)
-                .collection(ApiConstants.Collection.SAVE_GAME_INFO)
-                .document(ApiConstants.Document.DIFF_PICTURE)
-                .update(map)
-                .addOnSuccessListener {
-                    Timber.e("updateSavedGameInfo addOnSuccessListener")
-                }
-                .addOnFailureListener {
-                    Timber.e("updateSavedGameInfo addOnFailureListener : ${it.message}")
-                }
-
+        heartChangedTime: Long,
+    ): Flow<Result<Unit>> = flow {
+        val updateSavedGameInfoTask = suspendCoroutine { continuation ->
+            val map = mutableMapOf<String, Any>(
+                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
+                ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
+                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
+                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to heartChangedTime
+            )
+            kotlin.runCatching {
+                db.collection(ApiConstants.Collection.PROFILE)
+                    .document(uid)
+                    .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+                    .document(ApiConstants.Document.DIFF_PICTURE)
+                    .update(map)
+                    .addOnCompleteListener { task -> continuation.resume(task) }
+                    .addOnSuccessListener {
+                        Timber.e("updateSavedGameInfo addOnSuccessListener")
+                    }
+                    .addOnFailureListener {
+                        Timber.e("updateSavedGameInfo addOnFailureListener : ${it.message}")
+                    }
+            }
+        }
+        if (updateSavedGameInfoTask.isSuccessful) {
+            emit(Result.Success(Unit))
+        } else {
+            emit(Result.Error(updateSavedGameInfoTask.exception))
         }
     }
 
@@ -109,11 +119,13 @@ class DiffPictureImpl @Inject constructor(
             db.runBatch { batch ->
                 batch.set(roomDocRef, map)
             }.addOnSuccessListener {
-                result = Result.Success(DiffPictureGame(
-                    date = date,
-                    roomUid = roomUid,
-                    playerList = arrayListOf(Player(uid = uid, nickName = nickName, isReady = true))
-                ))
+                result = Result.Success(
+                    DiffPictureGame(
+                        date = date,
+                        roomUid = roomUid,
+                        playerList = arrayListOf(Player(uid = uid, nickName = nickName, isReady = true))
+                    )
+                )
             }.addOnFailureListener {
                 result = Result.Error(exception = it)
             }.await()
@@ -126,16 +138,18 @@ class DiffPictureImpl @Inject constructor(
     override suspend fun enterRoom(date: String, uid: String, roomUid: String, nickName: String): Result<DiffPictureGame>? {
         return try {
             var result: Result<DiffPictureGame>? = null
-            var tempDiffPictureGame: DiffPictureGame ? = null
+            var tempDiffPictureGame: DiffPictureGame? = null
             val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
             db.runTransaction { transaction ->
                 val snapshot = transaction.get(roomDocRef)
                 val playerList = playerListMapper(playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>)).toMutableList()
-                playerList.add(Player(
-                    uid = uid,
-                    nickName = nickName,
-                    isReady = false
-                ))
+                playerList.add(
+                    Player(
+                        uid = uid,
+                        nickName = nickName,
+                        isReady = false
+                    )
+                )
 
                 val diffPictureGame = diffPictureGameMapper(documentSnapshot = snapshot).apply {
                     this.playerList = playerList as ArrayList<Player>
@@ -197,12 +211,13 @@ class DiffPictureImpl @Inject constructor(
     ): Result<DiffPictureGame>? {
         return try {
             var result: Result<DiffPictureGame>? = null
-            var tempDiffPictureGame: DiffPictureGame ? = null
+            var tempDiffPictureGame: DiffPictureGame? = null
             val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
             db.runTransaction { transaction ->
                 val snapshot = transaction.get(roomDocRef)
 
-                val playerList = playerListMapper(uid = uid, playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>)).toMutableList()
+                val playerList =
+                    playerListMapper(uid = uid, playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>)).toMutableList()
                 val diffPictureGame = diffPictureGameMapper(documentSnapshot = snapshot).apply {
                     this.playerList = playerList as ArrayList<Player>
                 }
@@ -226,7 +241,6 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 }
-
 
 private fun diffPictureGameMapper(documentSnapshot: DocumentSnapshot): DiffPictureGame {
     return DiffPictureGame(

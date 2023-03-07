@@ -35,16 +35,17 @@ class DPSinglePlayListActivity : AppCompatActivity() {
                     val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
                     val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
                     val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
-                    viewModel.setNextStage(currentRoundPosition = currentRoundPosition, finalRoundPosition = finalRoundPosition)
 
-                    if (isStartNextGame) {
-                        if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                    if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                        if (currentRoundPosition == finalRoundPosition) {
+                            viewModel.setNextStage()
+                        }
+                        if (isStartNextGame) {
                             viewModel.startNextGame(
                                 currentRoundPosition = currentRoundPosition,
                                 finalRoundPosition = finalRoundPosition
                             )
                         }
-                    } else {
                         viewModel.refreshGameList()
                     }
                 }

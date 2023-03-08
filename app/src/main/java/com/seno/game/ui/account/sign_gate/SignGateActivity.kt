@@ -24,8 +24,7 @@ class SignGateActivity : AppCompatActivity() {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     googleAccountManager = GoogleAccountManager(activity = this@SignGateActivity)
-                    facebookAccountManager =
-                        FacebookAccountManager(activity = this@SignGateActivity)
+                    facebookAccountManager = FacebookAccountManager(activity = this@SignGateActivity)
                     naverAccountManager = NaverAccountManager()
                     kakaoAccountManager = KakaoAccountManager(context = this@SignGateActivity)
 
@@ -37,14 +36,12 @@ class SignGateActivity : AppCompatActivity() {
                         onSignInSucceed = {
                             runOnUiThread {
                                 toast("로그인 성공")
-                                finish()
                             }
 
                         },
                         onSignInFailed = {
                             runOnUiThread {
                                 toast("로그인 실패")
-                                finish()
                             }
                         },
                         onClickClose = { finish() }

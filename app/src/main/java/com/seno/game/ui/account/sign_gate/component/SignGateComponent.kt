@@ -73,7 +73,6 @@ fun GoogleLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit,
 ) {
-    val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -96,14 +95,18 @@ fun GoogleLoginButton(
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Timber.e(e)
+                                onSignInFailed.invoke()
                             }
                         }
 
                         override fun onError(e: Exception?) {
                             Timber.e(e)
+                            onSignInFailed.invoke()
                         }
                     }
                 )
+            } else {
+                onSignInFailed.invoke()
             }
         }
 

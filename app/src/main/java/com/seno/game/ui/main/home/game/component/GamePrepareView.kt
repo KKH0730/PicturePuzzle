@@ -55,8 +55,3 @@ fun GamePrepareView(onFinishPrepare: () -> Unit) {
         )
     }
 }
-
-@Composable
-fun GameEndView(onGameFinished: () -> Unit) {
-
-}

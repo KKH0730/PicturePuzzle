@@ -112,6 +112,8 @@ fun HomeUI(
         LogoutDialog(
             onClickYes = {
                 isLoading = true
+                isShowLogoutDialog = false
+
                 AccountManager.startLogout(
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,

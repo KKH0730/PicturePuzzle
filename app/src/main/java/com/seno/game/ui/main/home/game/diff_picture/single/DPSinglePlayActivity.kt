@@ -254,6 +254,9 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             AnimationUtils.stopAnimation(animatorSet)
             animatorSet = null
         }
+        if (binding.lavLoadingView.isAnimating) {
+            binding.lavLoadingView.cancelAnimation()
+        }
         rewardedAd?.fullScreenContentCallback = null
         binding.cvTimerView.release()
         super.onDestroy()
@@ -327,7 +330,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                     override fun onAdFailedToLoad(p0: LoadAdError) {
                         super.onAdFailedToLoad(p0)
                         this@DPSinglePlayActivity.rewardedAd = null
-                        binding.clLoadingView.visibility = View.GONE
+                        showLoadingView(isShow = false)
                         isContinueFailGame = false
                     }
 
@@ -341,7 +344,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                                     dismiss()
                                     binding.ivTimer.setImageResource(R.drawable.ic_timer_normal)
                                     binding.tvRemainingTime.setTextColor(getColor(R.color.white))
-                                    binding.clLoadingView.visibility = View.GONE
+                                    showLoadingView(isShow = false)
                                     binding.cvTimerView.run {
                                         resetTimer()
                                         timerRestart()
@@ -356,7 +359,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                                 super.onAdFailedToShowFullScreenContent(p0)
                                 this@DPSinglePlayActivity.rewardedAd = null
                                 dismiss()
-                                binding.clLoadingView.visibility = View.GONE
+                                showLoadingView(isShow = false)
                                 isContinueFailGame = false
                             }
                         }
@@ -495,11 +498,12 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
     }
 
+    @SuppressLint("VisibleForTests")
     private fun showRewardedAD(rewardedAdLoadCallback :RewardedAdLoadCallback) {
         if (binding.clLoadingView.visibility == View.VISIBLE) {
             return
         }
-        binding.clLoadingView.visibility = View.VISIBLE
+        showLoadingView(isShow = true)
         binding.cvTimerView.stopTimer()
 
         val adRequest = AdRequest.Builder().build()
@@ -517,7 +521,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
                 this@DPSinglePlayActivity.rewardedAd = null
-                binding.clLoadingView.visibility = View.GONE
+                showLoadingView(isShow = false)
                 binding.cvTimerView.timerRestart()
                 isShowHint = false
             }
@@ -535,7 +539,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                                 diff = diff
                             )
                         }
-                        binding.clLoadingView.visibility = View.GONE
+                        showLoadingView(isShow = false)
                         binding.cvTimerView.timerRestart()
 
                         isShowHint = false
@@ -556,6 +560,16 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
 
         showRewardedAD(rewardedAdLoadCallback)
+    }
+
+    private fun showLoadingView(isShow: Boolean) {
+        if (isShow) {
+            binding.clLoadingView.visibility = View.VISIBLE
+            binding.lavLoadingView.playAnimation()
+        } else {
+            binding.clLoadingView.visibility = View.GONE
+            binding.lavLoadingView.pauseAnimation()
+        }
     }
 
 //    fun onClickResult() {

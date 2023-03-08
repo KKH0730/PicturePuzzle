@@ -206,13 +206,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lavLoadingView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24dp"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:text="로딩중..."
+                android:scaleType="fitXY"
+                app:lottie_rawRes="@raw/cat_loading"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_speed="2"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

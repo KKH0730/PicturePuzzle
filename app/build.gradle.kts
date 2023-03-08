@@ -17,16 +17,16 @@ val keystoreProperties = Properties()
 keystoreProperties.load(keystoreFileInputStream)
 
 android {
-    compileSdk = 33
+    compileSdk = Version.COMPLIE_SDK
 
     defaultConfig {
-        applicationId = "com.seno.game"
-        minSdk = 23
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0.0"
+        applicationId = Version.APPLICATION_ID
+        minSdk = Version.MIN_SDK
+        targetSdk = Version.TARGET_SDK
+        versionCode = Version.VERSION_CODE
+        versionName = Version.VERSION_NAME
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = Version.ANDROID_UNIT_RUNNER
     }
 
 
@@ -40,31 +40,32 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-
-            manifestPlaceholders["enableCrashReporting"] = false
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                // If you don't need crash reporting for your debug build,
-                // you can speed up your build by disabling mapping file uploading.
-                mappingFileUploadEnabled = false
-            }
-            // crashlytics 플러그인을 사용하지 않음
-            extra.set("enableCrashlytics", false)
-            // crashlytics 빌드 ID 업데이트 막기
-            extra.set("alwaysUpdateBuildId", false)
-        }
-
-        getByName("release") {
+        release {
             signingConfig = signingConfigs.getByName("release")
 
+            // proguard settings
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = true
+        }
+        debug {
+            // proguard settings
+            isMinifyEnabled = false
+            isShrinkResources = false
+            manifestPlaceholders["enableCrashReporting"] = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                // If you don't need crash reporting for your debug build,
+                // you can speed up your build by disabling mapping file uploading.
+                mappingFileUploadEnabled = false
+            }
+
+            // crashlytics 플러그인을 사용하지 않음
+            extra.set("enableCrashlytics", false)
+            // crashlytics 빌드 ID 업데이트 막기
+            extra.set("alwaysUpdateBuildId", false)
         }
     }
     compileOptions {

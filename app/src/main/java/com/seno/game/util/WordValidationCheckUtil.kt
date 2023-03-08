@@ -69,7 +69,7 @@ object WordValidationCheckUtil {
             return false
         }
 
-        var t = 0
+        var t: Int
         val seof = input.length - consonant.length
         val slen = consonant.length
 

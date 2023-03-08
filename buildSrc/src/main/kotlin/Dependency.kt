@@ -1,14 +1,28 @@
 object Version {
     const val COMPOSE = "1.2.0"
+
+    // Build Configuration
+    const val COMPLIE_SDK = 33
+    const val MIN_SDK = 26
+    const val TARGET_SDK = 33
+    const val APPLICATION_ID = "com.seno.game"
+    const val ANDROID_UNIT_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
+
+    // Versioning
+    private const val versionMajor = 1
+    private const val versionMinor = 0
+    private const val versionPatch = 0
+    const val VERSION_CODE = versionMajor * 10000 + versionMinor * 100 + versionPatch
+    const val VERSION_NAME = "${versionMajor}.${versionMinor}.${versionPatch}"
 }
 
 object Plugins {
-    const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.2"
-    const val HILT_AGP = "com.google.dagger:hilt-android-gradle-plugin:2.42"
-    const val KOTLIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
-    const val KOTLIN_GRADLE = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
-    const val GOOGLE_SERVICE = "com.google.gms:google-services:4.3.13"
-    const val CRASHLYTICS = "com.google.firebase:firebase-crashlytics-gradle:2.9.2"
+    const val ANDROID_GRADLE_PLUGIN = "com.android.application"
+    const val LIBRARY = "com.android.library"
+    const val HILT_AGP = "com.google.dagger.hilt.android"
+    const val KOTLIN = "org.jetbrains.kotlin.android"
+    const val GOOGLE_SERVICE = "com.google.gms.google-services"
+    const val CRASHLYTICS = "com.google.firebase.crashlytics"
 }
 
 object Dependency {
@@ -53,9 +67,9 @@ object Dependency {
     }
 
     object Lifecycle {
-        const val lifecycle = "2.4.1"
-        const val VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
-        const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha01"
+        const val lifecycle = "2.5.1"
+        const val VIEWMODEL_COMPOSE = "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle"
+        const val RUNTIME_COMPOSE = "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle"
         const val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
         const val liveDataKtx = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
         const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
@@ -93,7 +107,7 @@ object Dependency {
     }
 
     object Hilt {
-        private const val VERSION = "2.42"
+        private const val VERSION = "2.44.2"
         const val ANDROID = "com.google.dagger:hilt-android:$VERSION"
         const val COMPILER = "com.google.dagger:hilt-android-compiler:$VERSION"
         const val TESTING = "com.google.dagger:hilt-android-testing:$VERSION"

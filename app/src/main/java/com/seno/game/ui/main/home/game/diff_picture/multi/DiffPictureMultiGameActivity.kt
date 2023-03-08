@@ -368,7 +368,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding
                     super.onAdLoaded(rewardedAd)
                     this@DiffPictureGameActivity.rewardedAd = rewardedAd
                     this@DiffPictureGameActivity.rewardedAd?.fullScreenContentCallback = fullScreenContentCallback
-                    this@DiffPictureGameActivity.rewardedAd?.show(this@DiffPictureGameActivity) { rewardItem ->
+                    this@DiffPictureGameActivity.rewardedAd?.show(this@DiffPictureGameActivity) {
                         isShowHint = true
                         isLoadingVideoAD = false
                     }

@@ -44,7 +44,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
             val diffImages = getArrays(R.array.diff_picture_stage1)
             val diffCopyImages = getArrays(R.array.diff_picture_copy_stage1)
             return (1..TOTAL_STAGE).map {
-                diffImages.mapIndexed { index, s ->
+                diffImages.mapIndexed { index, _ ->
                     diffImages[index].getDrawableResourceId() to diffCopyImages[index].getDrawableResourceId()
                 }
             }
@@ -184,7 +184,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
         var id = 0
         val stageInfos = stageInfos.mapIndexed { stage, list ->
-            val gameList = list.mapIndexed { index, pair ->
+            val gameList = list.mapIndexed { index, _ ->
                 DPSingleGame(id = id, stage = stage).apply {
                     if (completeGameList.contains("$stage-$index")) {
                         this.isComplete = true

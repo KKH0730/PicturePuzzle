@@ -1,7 +1,6 @@
 package com.seno.game.util
 
 import android.graphics.Rect
-import android.inputmethodservice.Keyboard
 import android.view.ViewTreeObserver
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalView

@@ -123,8 +123,6 @@ fun KakaoLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit
 ) {
-    val context = LocalContext.current
-
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
@@ -188,8 +186,6 @@ fun FaceBookLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit
 ) {
-    val context = LocalContext.current
-
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_facebook)
     ) {

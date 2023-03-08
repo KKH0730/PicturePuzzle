@@ -60,6 +60,10 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
 
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${enableCrashReporting}"/>
+
         <service android:name=".service.TerminationDetectService"
             android:stopWithTask="false"/>
 

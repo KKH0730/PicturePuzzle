@@ -76,14 +76,11 @@ fun HomeUI(
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
 
-    var isEnableSoloPlay by remember { mutableStateOf(true) }
-
     context.LifecycleEventListener {
         when (it) {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-                isEnableSoloPlay = true
                 nickname = PrefsManager.nickname
                 profile = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
@@ -202,8 +199,6 @@ fun HomeUI(
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = {
-                    isEnableSoloPlay = false
-
                     DPSinglePlayListActivity.start(context = context)
                     context.overridePendingTransition(
                         R.anim.slide_right_enter,

@@ -555,7 +555,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         isShowHint = false
                     }
                 }
-                this@DPSinglePlayActivity.rewardedAd?.show(this@DPSinglePlayActivity) { rewardItem -> isShowHint = true }
+                this@DPSinglePlayActivity.rewardedAd?.show(this@DPSinglePlayActivity) { isShowHint = true }
             }
         }
 

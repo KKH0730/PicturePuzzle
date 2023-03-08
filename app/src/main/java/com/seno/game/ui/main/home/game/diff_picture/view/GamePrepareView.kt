@@ -193,7 +193,7 @@ class GamePrepareView @JvmOverloads constructor(
             override fun run() {
                 try {
                     prepareCount.value
-                        ?.takeIf { prepareCount.value != -1 }
+                        .takeIf { prepareCount.value != -1 }
                         ?.run {
                             prepareCount.value -= 1
                         } ?: run {

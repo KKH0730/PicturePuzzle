@@ -19,6 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# 어노테이션 바꾸지 않는 옵션.
+-keepattributes *Annotation*
+
+# 소스 파일의 라인을 섞지 않는 옵션.
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
 
 -keep class com.kakao.sdk.**.model.* { <fields>; }
 -keep class * extends com.google.gson.TypeAdapter

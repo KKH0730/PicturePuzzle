@@ -1,7 +1,6 @@
 package com.seno.game.ui.main
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -24,7 +23,6 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.service.TerminationDetectService
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeLoadingScreen
@@ -43,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
-
-        startService(Intent(this@MainActivity, TerminationDetectService::class.java))
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
             SplashActivity.start(context = this@MainActivity)

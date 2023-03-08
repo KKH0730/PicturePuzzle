@@ -56,12 +56,12 @@ class KakaoAccountManager(private val context: Context) {
                     UserApiClient.rx.loginWithKakaoAccount(context)
                 }
             }
-            .subscribe({ token ->
+            .subscribe({
                 getClientProfileInfo(
                     onSignInSucceed = onSignInSucceed,
                     onSignInFailed = onSignInFailed,
                 )
-            }, { error ->
+            }, {
                 onSignInFailed.invoke()
             })
             .addTo(disposables)
@@ -79,7 +79,7 @@ class KakaoAccountManager(private val context: Context) {
                     onSignInSucceed = onSignInSucceed,
                     onSignInFailed = onSigInFailed,
                 )
-            }, { error -> onSigInFailed.invoke() })
+            }, { onSigInFailed.invoke() })
             .addTo(disposables)
     }
 

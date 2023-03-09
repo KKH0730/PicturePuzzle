@@ -393,11 +393,11 @@ fun AccountButtonContainer(
             }
         }
     } else {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
-                    .weight(weight = 1f)
                     .noRippleClickable { onClickLogout.invoke() }
+                    .align(alignment = Alignment.Center)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.bg_dialog_button_y),
@@ -411,23 +411,43 @@ fun AccountButtonContainer(
                     modifier = Modifier.align(alignment = Alignment.Center)
                 )
             }
-            Box(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .noRippleClickable { onClickManageProfile.invoke() }
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.bg_dialog_button_n),
-                    contentDescription = null,
-                    modifier = Modifier.align(alignment = Alignment.Center)
-                )
-                Text(
-                    text = stringResource(id = R.string.home_setting_account_profile),
-                    color = colorResource(id = R.color.color_bbd0ff),
-                    fontSize = 16.textDp,
-                    modifier = Modifier.align(alignment = Alignment.Center)
-                )
-            }
         }
+
+//        Row(modifier = Modifier.fillMaxWidth()) {
+//            Box(
+//                modifier = Modifier
+//                    .weight(weight = 1f)
+//                    .noRippleClickable { onClickLogout.invoke() }
+//            ) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.bg_dialog_button_y),
+//                    contentDescription = null,
+//                    modifier = Modifier.align(alignment = Alignment.Center)
+//                )
+//                Text(
+//                    text = stringResource(id = R.string.home_setting_account_logout),
+//                    color = Color.White,
+//                    fontSize = 16.textDp,
+//                    modifier = Modifier.align(alignment = Alignment.Center)
+//                )
+//            }
+//            Box(
+//                modifier = Modifier
+//                    .weight(weight = 1f)
+//                    .noRippleClickable { onClickManageProfile.invoke() }
+//            ) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.bg_dialog_button_n),
+//                    contentDescription = null,
+//                    modifier = Modifier.align(alignment = Alignment.Center)
+//                )
+//                Text(
+//                    text = stringResource(id = R.string.home_setting_account_profile),
+//                    color = colorResource(id = R.color.color_bbd0ff),
+//                    fontSize = 16.textDp,
+//                    modifier = Modifier.align(alignment = Alignment.Center)
+//                )
+//            }
+//        }
     }
 }

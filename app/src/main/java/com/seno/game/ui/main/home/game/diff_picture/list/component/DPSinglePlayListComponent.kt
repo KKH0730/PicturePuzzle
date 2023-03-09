@@ -32,6 +32,7 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.main.home.game.diff_picture.list.GameListState
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.list.rememberGameListState
 import kotlinx.coroutines.delay
@@ -214,6 +215,7 @@ fun LifePointGuideTerm() {
 @Composable
 fun SingleGameGridList(
     stageInfos: List<List<DPSingleGame>>,
+    gameListState: GameListState,
     onChangedStage: (Int) -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
     pagerPage: Int,
@@ -234,11 +236,11 @@ fun SingleGameGridList(
         }
     }
 
-    val gameListState = rememberGameListState(
-        gridState = rememberLazyGridState(),
-        pagerState = rememberPagerState(initialPage = pagerPage),
-        stageInfos = mutableStateOf(stageInfos),
-    )
+//    val gameListState = rememberGameListState(
+//        gridState = rememberLazyGridState(),
+//        pagerState = rememberPagerState(initialPage = pagerPage),
+//        stageInfos = mutableStateOf(stageInfos),
+//    )
 
     gameListState.coroutineScope.launch() {
         gameListState.pagerState.scrollToPage(pagerPage)

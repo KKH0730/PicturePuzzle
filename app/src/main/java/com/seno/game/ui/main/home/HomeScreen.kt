@@ -30,10 +30,18 @@ import com.seno.game.util.MusicPlayUtil
 
 @Composable
 fun HomeScreen() {
+    val context = LocalContext.current
     val homeViewModel = hiltViewModel<HomeViewModel>()
+    val homeState = rememberHomeState(
+        facebookAccountManager = FacebookAccountManager(activity = context as MainActivity),
+        googleAccountManager = GoogleAccountManager(activity = context),
+        naverAccountManager = NaverAccountManager(),
+        kakaoAccountManager = KakaoAccountManager(context = context)
+    )
 
     HomeUI(
         savedGameInfo = homeViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value,
+        homeState = homeState,
         onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
         onChangeFinishedBackgroundVolume = {
             homeViewModel.reqUpdateBackgroundVolume(
@@ -56,6 +64,7 @@ fun HomeScreen() {
 @Composable
 fun HomeUI(
     savedGameInfo: SavedGameInfo,
+    homeState: HomeState,
     onChangedBackgroundVolume: (Float) -> Unit,
     onChangeFinishedBackgroundVolume: (Float) -> Unit,
     onChangedEffectVolume: (Float) -> Unit,
@@ -64,26 +73,13 @@ fun HomeUI(
     onChangedPush: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
-    val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
-    val googleAccountManager = GoogleAccountManager(activity = context)
-    val naverAccountManager = NaverAccountManager()
-    val kakaoAccountManager = KakaoAccountManager(context = context)
-
-    var isShowQuitDialog by remember { mutableStateOf(false) }
-    var isShowLogoutDialog by remember { mutableStateOf(false) }
-    var isShowSettingDialog by remember { mutableStateOf(false) }
-    var isShowPrepareDialog by remember{ mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var nickname by remember { mutableStateOf(PrefsManager.nickname) }
-    var profile by remember { mutableStateOf("") }
-
-    context.LifecycleEventListener {
+    (context as MainActivity).LifecycleEventListener {
         when (it) {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-                nickname = PrefsManager.nickname
-                profile = PrefsManager.profileUri
+                homeState.nickname.value = PrefsManager.nickname
+                homeState.profile.value = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
             }
             Lifecycle.Event.ON_PAUSE -> {
@@ -98,48 +94,48 @@ fun HomeUI(
         }
     }
 
-    if (isShowQuitDialog) {
+    if (homeState.isShowQuitDialog.value) {
         QuitDialog(
-            onClickYes = { (context as MainActivity).finish() },
-            onClickNo = { isShowQuitDialog = false },
-            onDismissed = { isShowQuitDialog = false }
+            onClickYes = { context.finish() },
+            onClickNo = { homeState.isShowQuitDialog.value = false },
+            onDismissed = { homeState.isShowQuitDialog.value = false }
         )
     }
 
-    if (isShowLogoutDialog) {
+    if (homeState.isShowLogoutDialog.value) {
         LogoutDialog(
             onClickYes = {
-                isLoading = true
-                isShowLogoutDialog = false
+                homeState.isLoading.value = true
+                homeState.isShowLogoutDialog.value = false
 
                 AccountManager.startLogout(
-                    facebookAccountManager = facebookAccountManager,
-                    googleAccountManager = googleAccountManager,
-                    naverAccountManager = naverAccountManager,
-                    kakaoAccountManager = kakaoAccountManager,
+                    facebookAccountManager = homeState.facebookAccountManager,
+                    googleAccountManager = homeState.googleAccountManager,
+                    naverAccountManager = homeState.naverAccountManager,
+                    kakaoAccountManager = homeState.kakaoAccountManager,
                     isCompleteLogout = {
-                        isLoading = false
-                        isShowLogoutDialog = false
+                        homeState.isLoading.value = false
+                        homeState.isShowLogoutDialog.value = false
 
                         PrefsManager.apply {
-                            PrefsManager.nickname = context.resources.createRandomNickname()
+                            nickname = context.resources.createRandomNickname()
                             profileUri = ""
                         }
-                        nickname = PrefsManager.nickname
-                        profile = ""
+                        homeState.nickname.value= PrefsManager.nickname
+                        homeState.profile.value = ""
 
                         context.toast("로그아웃 성공")
                     }
                 )
             },
-            onClickNo = { isShowLogoutDialog = false },
-            onDismissed = { isShowLogoutDialog = false }
+            onClickNo = { homeState.isShowLogoutDialog.value = false },
+            onDismissed = { homeState.isShowLogoutDialog.value = false }
         )
     }
 
-    if (isShowSettingDialog) {
+    if (homeState.isShowSettingDialog.value) {
         SettingDialog(
-            onClickClose = { isShowSettingDialog = false },
+            onClickClose = { homeState.isShowSettingDialog.value = false },
             backgroundVolume = savedGameInfo.backgroundVolume,
             onChangedBackgroundVolume = onChangedBackgroundVolume,
             onChangedFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
@@ -150,18 +146,18 @@ fun HomeUI(
             onChangedPush = onChangedPush,
             onClickLogin = { context.startActivity(SignGateActivity::class.java) },
             onClickLogout = {
-                isShowSettingDialog = false
-                isShowLogoutDialog = true
+                homeState.isShowSettingDialog.value = false
+                homeState.isShowLogoutDialog.value = true
             },
             onClickManageProfile = {},
-            onDismissed = { isShowSettingDialog = false }
+            onDismissed = { homeState.isShowSettingDialog.value = false }
         )
     }
 
-    if (isShowPrepareDialog) {
+    if (homeState.isShowPrepareDialog.value) {
         PrepareDialog(
-            onDismissed = { isShowPrepareDialog = false },
-            onClickConfirm = {  isShowPrepareDialog = false }
+            onDismissed = { homeState.isShowPrepareDialog.value = false },
+            onClickConfirm = {  homeState.isShowPrepareDialog.value = false }
         )
     }
 
@@ -177,8 +173,8 @@ fun HomeUI(
             Spacer(modifier = Modifier.height(14.dp))
             Row {
                 ProfileContainer(
-                    nickname = nickname,
-                    profile = profile,
+                    nickname = homeState.nickname.value,
+                    profile = homeState.profile.value,
                     onClick = { context.startActivity(MyProfileActivity::class.java) }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
@@ -191,7 +187,7 @@ fun HomeUI(
                             MusicPlayUtil.pause(isBackgroundSound = true)
                         }
                     },
-                    onClickSetting = { isShowSettingDialog = true }
+                    onClickSetting = { homeState.isShowSettingDialog.value = true }
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
@@ -213,14 +209,14 @@ fun HomeUI(
                         R.anim.slide_right_exit
                     )
                 },
-                onClickMultiPlay = { isShowPrepareDialog = true },
-                onClickQuit = { isShowQuitDialog = true },
+                onClickMultiPlay = { homeState.isShowPrepareDialog.value = true },
+                onClickQuit = { homeState.isShowQuitDialog.value = true },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(height = 56.dp))
         }
 
-        if (isLoading) {
+        if (homeState.isLoading.value) {
             LoadingView()
         }
     }

@@ -24,8 +24,6 @@ class HomeViewModel @Inject constructor(
     private val configUseCase: GameConfigUseCase,
 ) : BaseViewModel() {
 
-    private var isFirstLogin = true
-
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 

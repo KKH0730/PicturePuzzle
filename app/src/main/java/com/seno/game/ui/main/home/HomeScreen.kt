@@ -72,6 +72,7 @@ fun HomeUI(
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
+    var isShowPrepareDialog by remember{ mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profile by remember { mutableStateOf("") }
@@ -157,6 +158,13 @@ fun HomeUI(
         )
     }
 
+    if (isShowPrepareDialog) {
+        PrepareDialog(
+            onDismissed = { isShowPrepareDialog = false },
+            onClickConfirm = {  isShowPrepareDialog = false }
+        )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.ic_home_background),
@@ -205,7 +213,7 @@ fun HomeUI(
                         R.anim.slide_right_exit
                     )
                 },
-                onClickMultiPlay = {},
+                onClickMultiPlay = { isShowPrepareDialog = true },
                 onClickQuit = { isShowQuitDialog = true },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )

@@ -94,6 +94,7 @@ dependencies {
     implementation(Dependency.AndroidX.MATERIAL)
     implementation(Dependency.AndroidX.CONSTRAINT_LAYOUT)
     implementation(Dependency.AndroidX.RECYCLERVIEW)
+    implementation(Dependency.AndroidX.SPLASH)
 
     // KTX
     implementation(Dependency.KTX.CORE)

@@ -31,6 +31,7 @@ object Dependency {
         const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:2.1.4"
         const val MATERIAL = "com.google.android.material:material:1.6.1"
         const val RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.2.1"
+        const val SPLASH = "androidx.core:core-splashscreen:1.0.0"
     }
 
     object JETBRAINS {

@@ -163,12 +163,17 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 PrefsManager.diffPictureHeartCount -= 1
                 reqUpdateSavedGameInfo()
 
-                if (currentRoundPosition <= finalRoundPosition - 1) {
+                if (currentRoundPosition <= finalRoundPosition) {
+                    val nextGameRound = if (currentRoundPosition == finalRoundPosition) {
+                        0
+                    } else {
+                        currentRoundPosition + 1
+                    }
                     _currentGameRound.emit(
                         StartGameModel(
-                            currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
+                            currentGameModel = _gameList.value[_currentStage.value][nextGameRound],
                             currentStagePosition = _currentStage.value,
-                            currentRoundPosition = currentRoundPosition + 1,
+                            currentRoundPosition = nextGameRound,
                             finalRoundPosition = finalRoundPosition
                         )
                     )
@@ -184,7 +189,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
         var id = 0
         val stageInfos = stageInfos.mapIndexed { stage, list ->
-            val gameList = list.mapIndexed { index, _ ->
+            val gameList = List(list.size) { index ->
                 DPSingleGame(id = id, stage = stage).apply {
                     if (completeGameList.contains("$stage-$index")) {
                         this.isComplete = true

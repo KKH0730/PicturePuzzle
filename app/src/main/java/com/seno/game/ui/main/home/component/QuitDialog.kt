@@ -46,14 +46,14 @@ fun QuitDialog(
                     color = colorResource(id = R.color.color_b8c0ff),
                     fontSize = 16.textDp
                 )
-                Spacer(modifier = Modifier.height(height = 28.dp))
+                Spacer(modifier = Modifier.height(height = 15.dp))
                 Row() {
                     Spacer(modifier = Modifier.width(width = 10.dp))
                     QuitDialogNoButton(onClick = onClickNo)
                     QuitDialogYesButton(onClick = onClickYes)
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
-                Spacer(modifier = Modifier.height(height = 25.dp))
+                Spacer(modifier = Modifier.height(height = 20.dp))
             }
         }
     }

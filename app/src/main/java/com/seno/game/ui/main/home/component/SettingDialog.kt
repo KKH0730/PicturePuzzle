@@ -156,7 +156,6 @@ fun SoundControlPanel(
             onValueChanged = onChangedEffectVolume,
             onValueChangeFinished = onChangedFinishedEffectVolume
         )
-        Spacer(modifier = Modifier.height(height = 6.dp))
         SwitchUnit(
             text = stringResource(id = R.string.home_setting_sound_vibration),
             isVibrationSwitch = true,

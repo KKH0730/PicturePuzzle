@@ -60,7 +60,7 @@ fun LogoutDialog(
                     LogoutDialogYesButton(onClick = onClickYes)
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
-                Spacer(modifier = Modifier.height(height = 25.dp))
+                Spacer(modifier = Modifier.height(height = 20.dp))
             }
         }
     }

@@ -37,33 +37,40 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.account.my_profile.MyProfileActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false" />
         <activity
             android:name=".ui.splash.SplashActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Splash" />
+            android:theme="@style/Theme.Splash"
+            android:exported="false" />
         <activity
             android:name=".ui.FindGameActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false" />
         <activity
             android:name=".ui.CreateGameActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.account.sign_gate.SignGateActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.main.home.game.diff_picture.multi.DiffPictureGameActivity"
+            android:theme="@style/Theme.DiffGame"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.main.home.game.areagame.AreaGameActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.main.home.game.humminjeongeumgame.HunMinJeongEumActivity"
+            android:theme="@style/Theme.Base"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />

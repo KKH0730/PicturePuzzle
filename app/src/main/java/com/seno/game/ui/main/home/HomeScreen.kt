@@ -2,7 +2,7 @@ package com.seno.game.ui.main.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -14,12 +14,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
-import com.seno.game.extensions.startActivity
-import com.seno.game.extensions.toast
+import com.seno.game.extensions.showSnackBar
 import com.seno.game.manager.*
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.LifecycleEventListener
@@ -124,7 +122,7 @@ fun HomeUI(
                         homeState.nickname.value= PrefsManager.nickname
                         homeState.profile.value = ""
 
-                        context.toast("로그아웃 성공")
+                        context.window.decorView.rootView.showSnackBar(message = "로그아웃 성공")
                     }
                 )
             },
@@ -144,7 +142,7 @@ fun HomeUI(
             onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
             onChangedVibration = onChangedVibration,
             onChangedPush = onChangedPush,
-            onClickLogin = { context.startActivity(SignGateActivity::class.java) },
+            onClickLogin = { SignGateActivity.start(context = context) },
             onClickLogout = {
                 homeState.isShowSettingDialog.value = false
                 homeState.isShowLogoutDialog.value = true
@@ -175,7 +173,9 @@ fun HomeUI(
                 ProfileContainer(
                     nickname = homeState.nickname.value,
                     profile = homeState.profile.value,
-                    onClick = { context.startActivity(MyProfileActivity::class.java) }
+                    onClick = {
+//                        context.startActivity(MyProfileActivity::class.java)
+                    }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(

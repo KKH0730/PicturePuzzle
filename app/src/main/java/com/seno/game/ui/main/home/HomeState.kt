@@ -1,18 +1,14 @@
 package com.seno.game.ui.main.home
 
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.runtime.*
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.main.MainActivity
-import com.seno.game.ui.main.home.game.diff_picture.list.GameListState
-import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
-import kotlinx.coroutines.CoroutineScope
 
 data class HomeState(
     val facebookAccountManager: FacebookAccountManager,

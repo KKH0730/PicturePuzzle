@@ -1,5 +1,6 @@
 package com.seno.game.ui.account.sign_gate
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -7,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import com.seno.game.extensions.showSnackBar
+import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
@@ -35,13 +38,13 @@ class SignGateActivity : AppCompatActivity() {
                         kakaoAccountManager = kakaoAccountManager,
                         onSignInSucceed = {
                             runOnUiThread {
-                                toast("로그인 성공")
+                                window.decorView.rootView.showSnackBar(message = "로그인 성공")
                             }
 
                         },
                         onSignInFailed = {
                             runOnUiThread {
-                                toast("로그인 실패")
+                                window.decorView.rootView.showSnackBar(message = "로그인 실패")
                             }
                         },
                         onClickClose = { finish() }
@@ -62,5 +65,11 @@ class SignGateActivity : AppCompatActivity() {
             facebookAccountManager.onActivityResult(requestCode, resultCode, data)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    companion object {
+        fun start(context: Context) {
+            context.startActivity(SignGateActivity::class.java)
+        }
     }
 }

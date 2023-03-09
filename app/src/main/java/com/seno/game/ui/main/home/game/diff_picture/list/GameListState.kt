@@ -6,6 +6,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class GameListState @OptIn(ExperimentalPagerApi::class) constructor(
     val gridState: LazyGridState,
@@ -13,6 +14,12 @@ class GameListState @OptIn(ExperimentalPagerApi::class) constructor(
     val stageInfos: MutableState<List<List<DPSingleGame>>>,
     val coroutineScope: CoroutineScope
 ) {
+    @OptIn(ExperimentalPagerApi::class)
+    fun scrollToPosition(page: Int) {
+        coroutineScope.launch {
+            pagerState.scrollToPage(page = page)
+        }
+    }
 }
 
 @OptIn(ExperimentalPagerApi::class)

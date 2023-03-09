@@ -236,15 +236,7 @@ fun SingleGameGridList(
         }
     }
 
-//    val gameListState = rememberGameListState(
-//        gridState = rememberLazyGridState(),
-//        pagerState = rememberPagerState(initialPage = pagerPage),
-//        stageInfos = mutableStateOf(stageInfos),
-//    )
-
-    gameListState.coroutineScope.launch() {
-        gameListState.pagerState.scrollToPage(pagerPage)
-    }
+    gameListState.scrollToPosition(page = pagerPage)
 
     LaunchedEffect(key1 = gameListState.pagerState) {
         snapshotFlow { gameListState.pagerState.currentPage }.collect {

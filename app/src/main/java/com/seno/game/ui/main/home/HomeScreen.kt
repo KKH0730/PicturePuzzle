@@ -24,7 +24,7 @@ import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
-import com.seno.game.util.MusicPlayUtil
+import com.seno.game.util.SoundUtil
 
 @Composable
 fun HomeScreen() {
@@ -78,16 +78,11 @@ fun HomeUI(
             Lifecycle.Event.ON_RESUME -> {
                 homeState.nickname.value = PrefsManager.nickname
                 homeState.profile.value = PrefsManager.profileUri
-                MusicPlayUtil.restart(isBackgroundSound = true)
+                SoundUtil.restartBackgroundBGM()
             }
-            Lifecycle.Event.ON_PAUSE -> {
-            }
-            Lifecycle.Event.ON_STOP -> {
-                MusicPlayUtil.pause(isBackgroundSound = true)
-            }
-            Lifecycle.Event.ON_DESTROY -> {
-                MusicPlayUtil.release(isBackgroundSound = true)
-            }
+            Lifecycle.Event.ON_PAUSE -> {}
+            Lifecycle.Event.ON_STOP -> {}
+            Lifecycle.Event.ON_DESTROY -> {}
             else -> return@LifecycleEventListener
         }
     }
@@ -180,11 +175,13 @@ fun HomeUI(
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(
                     onToggledSound = {
-                        val isPlaying = MusicPlayUtil.isPlaying
+                        val isPlaying = SoundUtil.isBGMPlaying
                         if (isPlaying == null || !isPlaying) {
-                            MusicPlayUtil.restart(isBackgroundSound = true)
+                            SoundUtil.restartBackgroundBGM()
+                            PrefsManager.isActiveBackgroundBGM = true
                         } else {
-                            MusicPlayUtil.pause(isBackgroundSound = true)
+                            SoundUtil.pause(isBackgroundSound = true)
+                            PrefsManager.isActiveBackgroundBGM = false
                         }
                     },
                     onClickSetting = { homeState.isShowSettingDialog.value = true }

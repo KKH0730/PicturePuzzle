@@ -20,7 +20,7 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
-import com.seno.game.util.MusicPlayUtil
+import com.seno.game.util.SoundUtil
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -82,12 +82,12 @@ fun HomeQuickMenuContainer(
 
 @Composable
 fun SoundOnOffButton(onToggledSound: () -> Unit) {
-    val isPlaying = MusicPlayUtil.isPlaying
+    val isPlaying = SoundUtil.isBGMPlaying
     if (isPlaying != null) {
         var isPlayingSound by remember { mutableStateOf(isPlaying) }
         IconButton(onClick = {
             onToggledSound.invoke()
-            isPlayingSound = MusicPlayUtil.isPlaying ?: false
+            isPlayingSound = SoundUtil.isBGMPlaying ?: false
         }) {
             Image(
                 painter = if (isPlayingSound) {

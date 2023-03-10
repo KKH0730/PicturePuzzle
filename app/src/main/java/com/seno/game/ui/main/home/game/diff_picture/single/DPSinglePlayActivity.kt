@@ -32,6 +32,7 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
 import com.seno.game.util.AnimationUtils
+import com.seno.game.util.SoundUtil
 import dagger.hilt.android.AndroidEntryPoint
 import hideNavigationBar
 import kotlinx.coroutines.delay
@@ -128,6 +129,8 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
                 launch {
                     viewModel.drawRightAnswerMark.collect { point ->
+                        SoundUtil.startRightAnswerSoundMediaPlayer(context = this@DPSinglePlayActivity)
+
                         val answerCenterX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
@@ -174,6 +177,8 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
                 launch {
                     viewModel.drawWrongAnswerMark.collect {
+                        SoundUtil.startWrongAnswerSoundMediaPlayer(context = this@DPSinglePlayActivity)
+
                         var lottieAnimationView: LottieAnimationView? = null
                         lottieAnimationView = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = it.first,
@@ -259,6 +264,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
         rewardedAd?.fullScreenContentCallback = null
         binding.cvTimerView.release()
+        SoundUtil.release(isBackgroundSound = false)
         super.onDestroy()
     }
 

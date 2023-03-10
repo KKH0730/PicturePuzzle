@@ -2,6 +2,7 @@ package com.seno.game.ui.splash
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
@@ -25,6 +25,7 @@ import hideNavigationBar
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         window.hideNavigationBar()
         createRandomNickname()
 

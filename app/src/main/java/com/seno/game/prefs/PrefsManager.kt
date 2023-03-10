@@ -84,4 +84,10 @@ object PrefsManager {
         set(value) {
             Prefs.putLong("diffPictureHeartChangedTime", value)
         }
+
+    var isActiveBackgroundBGM: Boolean
+        get() = Prefs.getBoolean("isActiveBackgroundBGM", true)
+        set(isActive) {
+            Prefs.putBoolean("isActiveBackgroundBGM", isActive)
+        }
 }

@@ -12,7 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Customize your theme here. -->
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@drawable/ic_home_background</item>
     </style>
 
     <style name="Theme.App.Splash" parent="Theme.Base"/>

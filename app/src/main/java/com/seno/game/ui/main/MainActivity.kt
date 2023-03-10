@@ -3,6 +3,7 @@ package com.seno.game.ui.main
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
@@ -28,7 +29,7 @@ import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeLoadingScreen
 import com.seno.game.ui.splash.SplashActivity
-import com.seno.game.util.MusicPlayUtil
+import com.seno.game.util.SoundUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -43,6 +44,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         printHashKey()
         installSplashScreen()
+
+        if (PrefsManager.isActiveBackgroundBGM) {
+            SoundUtil.startBackgroundSound(this)
+        }
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
             SplashActivity.start(context = this@MainActivity)
@@ -131,8 +136,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        if (PrefsManager.isActiveBackgroundBGM) {
+            SoundUtil.restartBackgroundBGM()
+        }
+        super.onResume()
+    }
+
+    override fun onPause() {
+        SoundUtil.pause(isBackgroundSound = true)
+        super.onPause()
+    }
+
     override fun onDestroy() {
-        MusicPlayUtil.release(isBackgroundSound = true)
+        SoundUtil.release(isBackgroundSound = true)
         super.onDestroy()
     }
 

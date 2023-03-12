@@ -27,6 +27,7 @@ class GameCompleteDialog @JvmOverloads constructor(
         binding.apply {
             dialog = this@GameCompleteDialog
         }
+        binding.clRoot.setOnClickListener {}
         initView()
     }
 

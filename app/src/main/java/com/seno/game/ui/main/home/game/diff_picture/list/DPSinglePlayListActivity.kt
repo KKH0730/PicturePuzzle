@@ -9,25 +9,31 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.seno.game.R
-import com.seno.game.extensions.*
+import com.seno.game.extensions.showSnackBar
+import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
+import com.seno.game.util.SoundUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DPSinglePlayListActivity : AppCompatActivity() {
-    private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
+    private val viewModel by viewModels<DPSinglePlayListViewModel>()
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 result.data?.let { intent ->
+                    if (PrefsManager.isActiveBackgroundBGM) {
+                        SoundUtil.restartBackgroundBGM()
+                    }
+
                     viewModel.reqUpdateSavedGameInfo()
 
                     val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
@@ -64,9 +70,9 @@ class DPSinglePlayListActivity : AppCompatActivity() {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     DPSinglePlayListScreen(
-                        stageInfos = viewModel.gameList.collectAsState().value,
-                        stage = viewModel.currentStage.collectAsState().value,
-                        enablePlayButton = viewModel.enablePlayButton.collectAsState().value,
+                        stageInfos = viewModel.gameList.collectAsStateWithLifecycle().value,
+                        stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
+                        enablePlayButton = viewModel.enablePlayButton.collectAsStateWithLifecycle().value,
                         onChangedStage = viewModel::onChangedPage,
                         onClickBack = { finish() },
                         onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },

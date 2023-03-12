@@ -3,7 +3,6 @@ package com.seno.game.ui.main
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
@@ -44,10 +43,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         printHashKey()
         installSplashScreen()
-
-        if (PrefsManager.isActiveBackgroundBGM) {
-            SoundUtil.startBackgroundSound(this)
-        }
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
             SplashActivity.start(context = this@MainActivity)
@@ -134,23 +129,6 @@ class MainActivity : AppCompatActivity() {
                 launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
             }
         }
-    }
-
-    override fun onResume() {
-        if (PrefsManager.isActiveBackgroundBGM) {
-            SoundUtil.restartBackgroundBGM()
-        }
-        super.onResume()
-    }
-
-    override fun onPause() {
-        SoundUtil.pause(isBackgroundSound = true)
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        SoundUtil.release(isBackgroundSound = true)
-        super.onDestroy()
     }
 
     private fun reqAuthentication(callback: (Boolean) -> Unit) {

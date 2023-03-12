@@ -4,7 +4,7 @@ buildscript {
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id(Plugins.ANDROID_GRADLE_PLUGIN) version("7.4.1") apply false
+    id(Plugins.ANDROID_GRADLE_PLUGIN) version("7.2.0") apply false
     id(Plugins.LIBRARY) version("7.2.2") apply false
     id(Plugins.KOTLIN) version("1.7.0") apply false
     id(Plugins.HILT_AGP) version("2.44.2") apply false

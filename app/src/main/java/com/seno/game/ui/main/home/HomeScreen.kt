@@ -78,7 +78,6 @@ fun HomeUI(
             Lifecycle.Event.ON_RESUME -> {
                 homeState.nickname.value = PrefsManager.nickname
                 homeState.profile.value = PrefsManager.profileUri
-                SoundUtil.restartBackgroundBGM()
             }
             Lifecycle.Event.ON_PAUSE -> {}
             Lifecycle.Event.ON_STOP -> {}

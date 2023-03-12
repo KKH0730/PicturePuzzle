@@ -21,7 +21,7 @@ import javax.inject.Inject
 const val TOTAL_STAGE = 5
 
 @HiltViewModel
-class DiffPictureSingleGameViewModel @Inject constructor(
+class DPSinglePlayListViewModel @Inject constructor(
     private val diffPictureUseCase: DiffPictureUseCase
 ) : ViewModel() {
     private val _message = MutableSharedFlow<String>()

@@ -10,6 +10,7 @@ import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.extensions.saveCompleteDPGameRound
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
@@ -109,6 +110,8 @@ class DPSinglePlayViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             launch(Dispatchers.Main) {
+                currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
+
                 gameInfo.answer?.answerPointList?.let {
                     if (currentAnswerCount == it.size - 1) {
                         _onShowCompleteGameDialog.emit(Any())

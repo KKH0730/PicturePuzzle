@@ -268,6 +268,11 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         super.onDestroy()
     }
 
+    override fun onStart() {
+        SoundUtil.pause(isBackgroundSound = true)
+        super.onStart()
+    }
+
     @SuppressLint("SetTextI18n")
     private fun initSetting() {
         binding.apply {
@@ -298,8 +303,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
             onClickPositiveButton = {
                 this.dismiss()
-
-                currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
                 Intent()
                     .apply {
                         putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
@@ -311,8 +314,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             }
             onClickNegativeButton = {
                 this.dismiss()
-                currentRoundPosition.saveCompleteDPGameRound(currentStagePosition)
-
                 Intent()
                     .apply {
                         putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)

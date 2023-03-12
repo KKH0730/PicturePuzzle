@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,6 +21,7 @@ import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.util.SoundUtil
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -66,14 +68,9 @@ fun ProfileContainer(
 }
 
 @Composable
-fun HomeQuickMenuContainer(
-    onToggledSound: () -> Unit,
-    onClickSetting: () -> Unit,
-) {
+fun HomeQuickMenuContainer(onClickSetting: () -> Unit, ) {
     Column() {
-        SoundOnOffButton(
-            onToggledSound = onToggledSound
-        )
+        SoundOnOffButton()
         SettingButton(
             onClickSetting = onClickSetting
         )
@@ -81,23 +78,33 @@ fun HomeQuickMenuContainer(
 }
 
 @Composable
-fun SoundOnOffButton(onToggledSound: () -> Unit) {
+fun SoundOnOffButton() {
+    val context = LocalContext.current
     val isPlaying = SoundUtil.isBGMPlaying
-    if (isPlaying != null) {
-        var isPlayingSound by remember { mutableStateOf(isPlaying) }
-        IconButton(onClick = {
-            onToggledSound.invoke()
-            isPlayingSound = SoundUtil.isBGMPlaying ?: false
-        }) {
-            Image(
-                painter = if (isPlayingSound) {
-                    painterResource(id = R.drawable.ic_sound_on)
-                } else {
-                    painterResource(id = R.drawable.ic_sound_off)
-                },
-                contentDescription = null
-            )
+    var isPlayingSound by remember { mutableStateOf(isPlaying) }
+    IconButton(onClick = {
+        val isBGMPlaying = SoundUtil.isBGMPlaying
+        if (isBGMPlaying == null || !isBGMPlaying) {
+            if (isBGMPlaying == null) {
+                SoundUtil.startBackgroundSound(context = context)
+            } else {
+                SoundUtil.restartBackgroundBGM()
+            }
+            PrefsManager.isActiveBackgroundBGM = true
+        } else {
+            SoundUtil.pause(isBackgroundSound = true)
+            PrefsManager.isActiveBackgroundBGM = false
         }
+        isPlayingSound = PrefsManager.isActiveBackgroundBGM
+    }) {
+        Image(
+            painter = if (isPlayingSound != null && isPlayingSound == true) {
+                painterResource(id = R.drawable.ic_sound_on)
+            } else {
+                painterResource(id = R.drawable.ic_sound_off)
+            },
+            contentDescription = null
+        )
     }
 }
 

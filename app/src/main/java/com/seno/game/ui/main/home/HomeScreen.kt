@@ -172,19 +172,7 @@ fun HomeUI(
                     }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
-                HomeQuickMenuContainer(
-                    onToggledSound = {
-                        val isPlaying = SoundUtil.isBGMPlaying
-                        if (isPlaying == null || !isPlaying) {
-                            SoundUtil.restartBackgroundBGM()
-                            PrefsManager.isActiveBackgroundBGM = true
-                        } else {
-                            SoundUtil.pause(isBackgroundSound = true)
-                            PrefsManager.isActiveBackgroundBGM = false
-                        }
-                    },
-                    onClickSetting = { homeState.isShowSettingDialog.value = true }
-                )
+                HomeQuickMenuContainer(onClickSetting = { homeState.isShowSettingDialog.value = true })
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
             Spacer(modifier = Modifier.height(height = 92.dp))

@@ -63,7 +63,6 @@ class DrawCanvas : View {
         invalidate()
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(Color.WHITE)
         greenLength = 0

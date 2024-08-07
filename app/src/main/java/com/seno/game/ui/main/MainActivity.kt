@@ -40,9 +40,8 @@ class MainActivity : AppCompatActivity() {
         printHashKey()
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
-//            SplashActivity.start(context = this@MainActivity)
-//            finish()
-            DPSinglePlayListActivity.start(context = this)
+            SplashActivity.start(context = this@MainActivity)
+            finish()
         } else {
             setContent {
                 AppTheme {

@@ -77,13 +77,19 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
             return
         }
         val duplicatedGameList = _gameList.value[_currentStage.value].toMutableList()
-        duplicatedGameList.indexOf(selectedItem)
-            .takeIf { it != -1 }
-            ?.let {
-                selectedGame?.isSelect = false
-                duplicatedGameList[it] = duplicatedGameList[it].copy().apply { isSelect = true }
-                selectedGame = duplicatedGameList[it]
-            }
+
+        val beforeSelectedItemIndex = duplicatedGameList.indexOfFirst { it.id == selectedGame?.id }
+        if (beforeSelectedItemIndex != -1) {
+            duplicatedGameList[beforeSelectedItemIndex] = duplicatedGameList[beforeSelectedItemIndex].copy(isSelect = false)
+        }
+
+
+        val selectedItemIndex = duplicatedGameList.indexOf(selectedItem)
+        if (selectedItemIndex != -1) {
+            duplicatedGameList[selectedItemIndex] = duplicatedGameList[selectedItemIndex].copy(isSelect = true)
+
+            selectedGame = duplicatedGameList[selectedItemIndex]
+        }
 
         val newGameList = _gameList.value.mapIndexed { index, list ->
             if (index == _currentStage.value) {
@@ -130,6 +136,7 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
     fun refreshGameList() {
         val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
         var id = 0
+        var isFindNotCompleteGame = false
         val stageInfos = stageInfos.mapIndexed { stage, list ->
             val gameList = list.mapIndexed { index, pair ->
                 DPSingleGame(id = id, stage = stage).apply {
@@ -139,13 +146,18 @@ class DiffPictureSingleGameViewModel @Inject constructor() : ViewModel() {
                     id += 1
                 }
             }
-            kotlin.runCatching {
-                gameList.first { !it.isComplete }
-                    .apply { this.isSelect = true }
-                    .also { selectedGame = it }
-            }.onFailure {
-                selectedGame = null
-                it.printStackTrace()
+            if (!isFindNotCompleteGame) {
+                kotlin.runCatching {
+                    gameList.first { !it.isComplete }
+                        .apply { this.isSelect = true }
+                        .also {
+                            selectedGame = it
+                            isFindNotCompleteGame = true
+                        }
+                }.onFailure {
+                    selectedGame = null
+                    it.printStackTrace()
+                }
             }
             gameList
         }

@@ -1,9 +1,7 @@
 package com.seno.game.ui.game.areagame
 
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityAreaGameBinding
@@ -17,7 +15,6 @@ class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
 ) {
     private lateinit var opencvUtil: AreaOpencvUtil
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

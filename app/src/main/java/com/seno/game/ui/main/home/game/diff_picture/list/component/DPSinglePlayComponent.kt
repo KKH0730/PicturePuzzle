@@ -1,21 +1,32 @@
 package com.seno.game.ui.main.home.game.diff_picture.list.component
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.view.View
+import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -28,27 +39,55 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.list.rememberGameListState
+import com.seno.game.util.ad.AdmobRewardedAdUtil
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 const val SECOND = 1000
 const val MINUTE_1 = 60000L
 const val MINUTE_3 = MINUTE_1 * 3
 const val TOTAL_HEART_COUNT = 5
 
+private fun getHeartCount(prevHeartCount: Int, currentTime: Long, prevChargeHeartTime: Long): Int {
+    val heartsNeededForCharge = ((currentTime - prevChargeHeartTime) / MINUTE_3)
+    return if (heartsNeededForCharge + prevHeartCount >= TOTAL_HEART_COUNT) {
+        TOTAL_HEART_COUNT
+    } else {
+        heartsNeededForCharge.toInt() + prevHeartCount
+    }
+}
+
+private fun getHeartTime(heartCount: Int, currentTime: Long, prevChargeHeartTime: Long): Long {
+    val timeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
+    return if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
+        MINUTE_3
+    } else if (timeGab <= 0) {
+        MINUTE_3 + timeGab
+    } else {
+        timeGab
+    }
+}
+
 @Composable
 fun GameListHeader(
+    snackbarHostState: SnackbarHostState,
     onClickBack: () -> Unit,
     onChangedHeartTime: (Long) -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var heartCount by remember { mutableStateOf(PrefsManager.diffPictureHeartCount) }
     var heartTime by remember { mutableStateOf(MINUTE_3) }
+    val admobRewardedAdUtil by remember { mutableStateOf(AdmobRewardedAdUtil(activity = context as ComponentActivity)) }
 
     val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(key1 = lifeCycleOwner) {
@@ -61,12 +100,11 @@ fun GameListHeader(
             val prevHeartCount = PrefsManager.diffPictureHeartCount
             val prevChargeHeartTime = PrefsManager.diffPictureHeartChargedTime
 
-            val heartsNeededForCharge = ((currentTime - prevChargeHeartTime) / MINUTE_3)
-            heartCount = if (heartsNeededForCharge + prevHeartCount >= TOTAL_HEART_COUNT) {
-                TOTAL_HEART_COUNT
-            } else {
-                heartsNeededForCharge.toInt() + prevHeartCount
-            }.also {
+            heartCount = getHeartCount(
+                prevHeartCount = prevHeartCount,
+                currentTime = currentTime,
+                prevChargeHeartTime = prevChargeHeartTime
+            ).also {
                 PrefsManager.diffPictureHeartCount = it
 
                 if (prevHeartCount != it) {
@@ -75,14 +113,11 @@ fun GameListHeader(
                 }
             }
 
-            val timeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
-            heartTime = if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
-                MINUTE_3
-            } else if (timeGab <= 0) {
-                MINUTE_3 + timeGab
-            } else {
-                timeGab
-            }
+            heartTime = getHeartTime(
+                heartCount = heartCount,
+                currentTime = currentTime,
+                prevChargeHeartTime = prevChargeHeartTime
+            )
         }
         lifeCycleOwner.addObserver(observer)
         onDispose { lifeCycleOwner.removeObserver(observer) }
@@ -124,7 +159,37 @@ fun GameListHeader(
                 modifier = Modifier.noRippleClickable { onClickBack.invoke() }
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
-            GamePlayHeartTimer(heartTime = heartTime, modifier = Modifier.align(alignment = Alignment.Bottom))
+            GamePlayHeartTimer(
+                heartTime = heartTime,
+                heartCount = heartCount,
+                modifier = Modifier.align(alignment = Alignment.Bottom),
+                onClickTimer = { prevHeartCount ->
+                    if (prevHeartCount == TOTAL_HEART_COUNT) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "이미 하트가 충분합니다.",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    } else {
+                        admobRewardedAdUtil.loadRewardedAd(
+                            onAdFailedToLoad = {},
+                            onAdLoaded = {
+                                admobRewardedAdUtil.showRewardedAd(
+                                    onRewarded = {
+                                        PrefsManager.diffPictureHeartCount = prevHeartCount + 1
+                                        PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
+                                        onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
+
+                                        heartCount = prevHeartCount + 1
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+            )
             Spacer(modifier = Modifier.width(width = 16.dp))
         }
     }
@@ -160,12 +225,28 @@ fun GamePlayHeartPoint(heartCount: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GamePlayHeartTimer(heartTime: Long, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
+fun GamePlayHeartTimer(
+    heartTime: Long,
+    heartCount: Int,
+    modifier: Modifier = Modifier,
+    onClickTimer: (Int) -> Unit
+) {
+    Column(
+        modifier = modifier.clickable(
+            indication = rememberRipple(
+                bounded = false,
+                radius = 20.dp,
+                color = Color.Gray,
+            ),
+            interactionSource = MutableInteractionSource(),
+            onClick = { onClickTimer.invoke(heartCount) }
+        )
+    ) {
+        Spacer(modifier = Modifier.height(height = 10.dp))
         Text(
-            text = String.format("%02d", (heartTime / MINUTE_1)) +
-                ":" +
-                String.format("%02d", (heartTime % MINUTE_1) / 1000),
+            text = String.format("%02d", (heartTime / MINUTE_1))
+                + ":"
+                + String.format("%02d", (heartTime % MINUTE_1) / 1000),
             color = Color.White,
             fontSize = 16.textDp,
             fontWeight = FontWeight.Bold,

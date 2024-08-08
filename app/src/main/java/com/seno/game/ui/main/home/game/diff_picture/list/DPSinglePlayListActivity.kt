@@ -1,9 +1,12 @@
 package com.seno.game.ui.main.home.game.diff_picture.list
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -15,17 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
 import com.seno.game.extensions.*
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
+import com.seno.game.ui.main.home.game.diff_picture.list.component.TOTAL_HEART_COUNT
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
+import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
-class DPSinglePlayListActivity : AppCompatActivity() {
+class DPSinglePlayListActivity : ComponentActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
+    private val admobRewardedAdUtil: AdmobRewardedAdUtil by lazy { AdmobRewardedAdUtil(activity = this@DPSinglePlayListActivity) }
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {

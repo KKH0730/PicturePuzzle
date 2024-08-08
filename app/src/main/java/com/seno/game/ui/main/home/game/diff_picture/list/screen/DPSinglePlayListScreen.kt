@@ -1,9 +1,14 @@
 package com.seno.game.ui.main.home.game.diff_picture.list.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +22,7 @@ import com.seno.game.ui.main.home.game.diff_picture.list.component.PlayButton
 import com.seno.game.ui.main.home.game.diff_picture.list.component.SingleGameGridList
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DPSinglePlayListScreen(
     stageInfos: List<List<DPSingleGame>>,
@@ -29,31 +35,34 @@ fun DPSinglePlayListScreen(
     onChangedHeartTime: (Long) -> Unit
 ) {
     val pagerPage by rememberUpdatedState(newValue = stage)
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_home_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(height = 30.dp))
-            GameListHeader(onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
-            Spacer(modifier = Modifier.height(height = 53.dp))
-            LifePointGuideTerm()
-            Spacer(modifier = Modifier.height(height = 33.dp))
-            SingleGameGridList(
-                stageInfos = stageInfos,
-                onChangedStage = onChangedStage,
-                onClickGameItem = onClickGameItem,
-                pagerPage = pagerPage,
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+    val snackbarHostState = remember { SnackbarHostState() }
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)}) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_home_background),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
-            Spacer(modifier = Modifier.height(height = 40.dp))
-            PlayButton(enablePlayButton = enablePlayButton, onClick = onClickPlayButton)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Spacer(modifier = Modifier.height(height = 30.dp))
+                GameListHeader(snackbarHostState = snackbarHostState, onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
+                Spacer(modifier = Modifier.height(height = 53.dp))
+                LifePointGuideTerm()
+                Spacer(modifier = Modifier.height(height = 33.dp))
+                SingleGameGridList(
+                    stageInfos = stageInfos,
+                    onChangedStage = onChangedStage,
+                    onClickGameItem = onClickGameItem,
+                    pagerPage = pagerPage,
+                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(height = 40.dp))
+                PlayButton(enablePlayButton = enablePlayButton, onClick = onClickPlayButton)
+            }
         }
     }
 }

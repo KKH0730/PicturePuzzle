@@ -66,15 +66,11 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.game.diff_picture.multi.DiffPictureGameActivity"
+            android:name=".ui.main.home.game.areagame.AreaGameActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.game.areagame.AreaGameActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.game.humminjeongeumgame.HunMinJeongEumActivity"
+            android:name=".ui.main.home.game.humminjeongeumgame.HunMinJeongEumActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
@@ -109,13 +105,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
+                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
                 <data
                     android:host="oauth"
-                    android:scheme="@string/kakao_native_app_key" />
+                    android:scheme="@string/kakao_native_app_key_scheme" />
             </intent-filter>
         </activity>
     </application>

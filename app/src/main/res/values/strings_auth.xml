@@ -11,5 +11,6 @@
     <string name="social_login_info_naver_client_name">TEST 로그인</string>
 
     <!--Kakao-->
-    <string name="kakao_native_app_key">b413eca7b72ff6e5f9819ee8216d42a2</string>
+    <string name="kakao_native_app_key">d788c0311ceb93c2c70bbb9c984b1280</string>
+    <string name="kakao_native_app_key_scheme">kakaod788c0311ceb93c2c70bbb9c984b1280</string>
 </resources>

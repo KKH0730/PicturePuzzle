@@ -78,7 +78,6 @@ object Dependency {
     }
 
     object Kakao {
-        const val KAKAO_SDK_ALL = "com.kakao.sdk:v2-all:2.11.2"
         const val KAKAO_SDK_ALL_RX = "com.kakao.sdk:v2-all-rx:2.11.2"
     }
 

@@ -73,7 +73,6 @@ fun GoogleLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit,
 ) {
-    val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -120,8 +119,6 @@ fun KakaoLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit
 ) {
-    val context = LocalContext.current
-
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
@@ -185,8 +182,6 @@ fun FaceBookLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: () -> Unit
 ) {
-    val context = LocalContext.current
-
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_facebook)
     ) {
@@ -211,6 +206,7 @@ fun FaceBookLoginButton(
 
                 override fun onError(e: Exception?) {
                     Timber.e(e)
+                    onSignInFailed.invoke()
                 }
             }
         )

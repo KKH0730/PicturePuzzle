@@ -10,6 +10,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.seno.game.R
+import timber.log.Timber
 
 class AdmobRewardedAdUtil(private val activity: Activity) {
     private var rewardedAd: RewardedAd? = null
@@ -20,9 +21,14 @@ class AdmobRewardedAdUtil(private val activity: Activity) {
 
     @SuppressLint("VisibleForTests")
     fun loadRewardedAd(
+        onCalledBeforeLoadRewardedAd: (() -> Unit)? = null,
         onAdFailedToLoad: () -> Unit,
         onAdLoaded: () -> Unit,
+        onAdDismissedFullScreenContent: (() -> Unit)? = null,
+        onAdFailedToShowFullScreenContent: (() -> Unit)? = null
     ) {
+        onCalledBeforeLoadRewardedAd?.invoke()
+
         if (rewardedAd == null) {
             val adRequest = AdRequest.Builder().build()
             RewardedAd.load(activity, activity.getString(R.string.reward_ad_unit_id_for_test), adRequest,
@@ -34,6 +40,18 @@ class AdmobRewardedAdUtil(private val activity: Activity) {
 
                     override fun onAdLoaded(rewardedAd: RewardedAd) {
                         this@AdmobRewardedAdUtil.rewardedAd = rewardedAd
+                        this@AdmobRewardedAdUtil.rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                this@AdmobRewardedAdUtil.rewardedAd = null
+                                onAdFailedToShowFullScreenContent?.invoke()
+                            }
+
+                            override fun onAdDismissedFullScreenContent() {
+                                this@AdmobRewardedAdUtil.rewardedAd = null
+                                onAdDismissedFullScreenContent?.invoke()
+                            }
+                        }
                         onAdLoaded.invoke()
                     }
                 }
@@ -50,23 +68,16 @@ class AdmobRewardedAdUtil(private val activity: Activity) {
             return
         }
 
-        rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdShowedFullScreenContent() {
-            }
-
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                rewardedAd = null
-            }
-
-            override fun onAdDismissedFullScreenContent() {
-                rewardedAd = null
-            }
-        }
-
         rewardedAd?.show(
             activity
         ) { _ ->
             onRewarded.invoke()
         }
+    }
+
+    fun release() {
+        rewardedAd?.fullScreenContentCallback = null
+        rewardedAd = null
+
     }
 }

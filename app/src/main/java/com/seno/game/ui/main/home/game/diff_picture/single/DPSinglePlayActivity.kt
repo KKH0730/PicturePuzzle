@@ -18,12 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.airbnb.lottie.LottieAnimationView
 import com.fondesa.recyclerviewdivider.RecyclerViewDivider
-import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
@@ -32,9 +27,11 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
 import com.seno.game.util.AnimationUtils
+import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -42,12 +39,12 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     layoutResId = R.layout.activity_diff_picture_single_play
 ) {
     private val viewModel by viewModels<DPSinglePlayViewModel>()
+    private val admobRewardedAdUtil: AdmobRewardedAdUtil by lazy { AdmobRewardedAdUtil(this@DPSinglePlayActivity) }
     private val currentStagePosition: Int by lazy { intent.getIntExtra(STAGE_POSITION, -1) }
     private val currentRoundPosition: Int by lazy { intent.getIntExtra(CURRENT_ROUND_POSITION, -1) }
     private val finalRoundPosition: Int by lazy { intent.getIntExtra(FINAL_ROUND_POSITION, -1) }
     private var animatorSet: AnimatorSet? = null
 
-    private var rewardedAd: RewardedAd? = null
     private var isShowHint = false
     private var isContinueFailGame = false
 
@@ -253,7 +250,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             AnimationUtils.stopAnimation(animatorSet)
             animatorSet = null
         }
-        rewardedAd?.fullScreenContentCallback = null
+        admobRewardedAdUtil.release()
         binding.cvTimerView.release()
         super.onDestroy()
     }
@@ -282,8 +279,10 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     private fun setGameCompleteDialog() {
         binding.cvGameCompleteDialog.apply {
             if (currentRoundPosition != -1 && finalRoundPosition != -1) {
-                handleButtonUI(isFinalGame = currentRoundPosition == finalRoundPosition
-                        && currentStagePosition == TOTAL_STAGE - 1)
+                handleButtonUI(
+                    isFinalGame = currentRoundPosition == finalRoundPosition
+                            && currentStagePosition == TOTAL_STAGE - 1
+                )
             }
 
             onClickPositiveButton = {
@@ -321,48 +320,44 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 dismiss()
                 finish()
             }
-            onClickShowAD = {
-                val rewardedAdLoadCallback = object : RewardedAdLoadCallback() {
-                    override fun onAdFailedToLoad(p0: LoadAdError) {
-                        super.onAdFailedToLoad(p0)
-                        this@DPSinglePlayActivity.rewardedAd = null
+            onClickShowAD = onClickShowAD@{
+                if (binding.clLoadingView.visibility == View.VISIBLE) {
+                    return@onClickShowAD
+                }
+                binding.clLoadingView.visibility = View.VISIBLE
+                binding.cvTimerView.stopTimer()
+
+                admobRewardedAdUtil.loadRewardedAd(
+                    onAdFailedToLoad = {
+                        binding.clLoadingView.visibility = View.GONE
+                        isContinueFailGame = false
+                    },
+                    onAdLoaded = {
+                        isContinueFailGame = false
+                        admobRewardedAdUtil.showRewardedAd(
+                            onRewarded = { isContinueFailGame = true }
+                        )
+                    },
+                    onAdDismissedFullScreenContent = {
+                        if (isContinueFailGame) {
+                            dismiss()
+                            binding.ivTimer.setImageResource(R.drawable.ic_timer_normal)
+                            binding.tvRemainingTime.setTextColor(getColor(R.color.white))
+                            binding.clLoadingView.visibility = View.GONE
+                            binding.cvTimerView.run {
+                                resetTimer()
+                                timerRestart()
+                            }
+                        }
+
+                        isContinueFailGame = false
+                    },
+                    onAdFailedToShowFullScreenContent = {
+                        dismiss()
                         binding.clLoadingView.visibility = View.GONE
                         isContinueFailGame = false
                     }
-
-                    override fun onAdLoaded(rewardedAd: RewardedAd) {
-                        super.onAdLoaded(rewardedAd)
-                        this@DPSinglePlayActivity.rewardedAd = rewardedAd
-                        this@DPSinglePlayActivity.rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                            override fun onAdDismissedFullScreenContent() {
-                                super.onAdDismissedFullScreenContent()
-                                if (isContinueFailGame) {
-                                    dismiss()
-                                    binding.ivTimer.setImageResource(R.drawable.ic_timer_normal)
-                                    binding.tvRemainingTime.setTextColor(getColor(R.color.white))
-                                    binding.clLoadingView.visibility = View.GONE
-                                    binding.cvTimerView.run {
-                                        resetTimer()
-                                        timerRestart()
-                                    }
-                                }
-
-                                isContinueFailGame = false
-                                this@DPSinglePlayActivity.rewardedAd = null
-                            }
-
-                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                                super.onAdFailedToShowFullScreenContent(p0)
-                                this@DPSinglePlayActivity.rewardedAd = null
-                                dismiss()
-                                binding.clLoadingView.visibility = View.GONE
-                                isContinueFailGame = false
-                            }
-                        }
-                        this@DPSinglePlayActivity.rewardedAd?.show(this@DPSinglePlayActivity) { rewardItem -> isContinueFailGame = true }
-                    }
-                }
-                showRewardedAD(rewardedAdLoadCallback)
+                )
             }
         }
     }
@@ -494,67 +489,49 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
     }
 
-    private fun showRewardedAD(rewardedAdLoadCallback :RewardedAdLoadCallback) {
+    fun onClickHint() {
         if (binding.clLoadingView.visibility == View.VISIBLE) {
             return
         }
         binding.clLoadingView.visibility = View.VISIBLE
         binding.cvTimerView.stopTimer()
 
-        val adRequest = AdRequest.Builder().build()
-        // 리워드 광고 로드
-        RewardedAd.load(
-            this@DPSinglePlayActivity,
-            getString(R.string.reward_ad_unit_id_for_test),
-            adRequest,
-            rewardedAdLoadCallback
-        )
-    }
+        admobRewardedAdUtil.loadRewardedAd(
+            onAdFailedToLoad = {
+                binding.clLoadingView.visibility = View.GONE
+                binding.cvTimerView.timerRestart()
+                isShowHint = false
+            },
+            onAdLoaded = {
+                isShowHint = false
+                Timber.e("onAdLoaded : $isShowHint")
+                admobRewardedAdUtil.showRewardedAd(
+                    onRewarded = {
+                        isShowHint = true
+                        Timber.e("onRewarded : $isShowHint")
+                    }
+                )
+            },
+            onAdDismissedFullScreenContent = {
+                Timber.e("onAdDismissedFullScreenContent : $isShowHint")
+                if (isShowHint) {
+                    viewModel.drawAnswerHint(
+                        imageViewWidth = binding.ivOrigin.width.toFloat(),
+                        resizedLength = resizedLength,
+                        diff = diff
+                    )
+                }
+                binding.clLoadingView.visibility = View.GONE
+                binding.cvTimerView.timerRestart()
 
-    fun onClickHint() {
-        val rewardedAdLoadCallback = object : RewardedAdLoadCallback() {
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                super.onAdFailedToLoad(p0)
-                this@DPSinglePlayActivity.rewardedAd = null
+                isShowHint = false
+            },
+            onAdFailedToShowFullScreenContent = {
                 binding.clLoadingView.visibility = View.GONE
                 binding.cvTimerView.timerRestart()
                 isShowHint = false
             }
-
-            override fun onAdLoaded(rewardedAd: RewardedAd) {
-                super.onAdLoaded(rewardedAd)
-                this@DPSinglePlayActivity.rewardedAd = rewardedAd
-                this@DPSinglePlayActivity.rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                    override fun onAdDismissedFullScreenContent() {
-                        super.onAdDismissedFullScreenContent()
-                        if (isShowHint) {
-                            viewModel.drawAnswerHint(
-                                imageViewWidth = binding.ivOrigin.width.toFloat(),
-                                resizedLength = resizedLength,
-                                diff = diff
-                            )
-                        }
-                        binding.clLoadingView.visibility = View.GONE
-                        binding.cvTimerView.timerRestart()
-
-                        isShowHint = false
-                        this@DPSinglePlayActivity.rewardedAd = null
-                    }
-
-                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                        super.onAdFailedToShowFullScreenContent(p0)
-
-                        this@DPSinglePlayActivity.rewardedAd = null
-                        binding.clLoadingView.visibility = View.GONE
-                        binding.cvTimerView.timerRestart()
-                        isShowHint = false
-                    }
-                }
-                this@DPSinglePlayActivity.rewardedAd?.show(this@DPSinglePlayActivity) { rewardItem -> isShowHint = true }
-            }
-        }
-
-        showRewardedAD(rewardedAdLoadCallback)
+        )
     }
 
 //    fun onClickResult() {

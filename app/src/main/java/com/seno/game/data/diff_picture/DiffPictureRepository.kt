@@ -11,7 +11,7 @@ interface DiffPictureRepository {
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChangedTime: Long
+        heartChargedTime: Long
     ): Flow<Result<Unit>>
 
     suspend fun getDiffPictures(): Result<List<Pair<Uri, Uri>>>

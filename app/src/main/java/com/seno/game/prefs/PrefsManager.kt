@@ -1,7 +1,6 @@
 package com.seno.game.prefs
 
 import com.pixplicity.easyprefs.library.Prefs
-import timber.log.Timber
 
 object PrefsManager {
     var nickname: String
@@ -79,9 +78,9 @@ object PrefsManager {
             Prefs.putInt("diffPictureHeartCount", value)
         }
 
-    var diffPictureHeartChangedTime: Long
-        get() = Prefs.getLong("diffPictureHeartChangedTime", 0L)
+    var diffPictureHeartChargedTime: Long
+        get() = Prefs.getLong("diffPictureHeartChargedTime", 0L)
         set(value) {
-            Prefs.putLong("diffPictureHeartChangedTime", value)
+            Prefs.putLong("diffPictureHeartChargedTime", value)
         }
 }

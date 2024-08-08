@@ -20,14 +20,14 @@ class DiffPictureUseCase @Inject constructor(
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChangedTime: Long
+        heartChargedTime: Long
     ): Flow<Result<Unit>> =
         diffPictureRepository.updateSavedGameInfo(
             uid = uid,
             stage = stage,
             completeGameRound = completeGameRound,
             heartCount = heartCount,
-            heartChangedTime = heartChangedTime
+            heartChargedTime = heartChargedTime
         ).catchError(dispatcher = ioDispatcher)
 
 

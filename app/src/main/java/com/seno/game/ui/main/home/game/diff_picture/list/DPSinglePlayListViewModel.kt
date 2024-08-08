@@ -122,7 +122,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                         stage = PrefsManager.diffPictureStage,
                         completeGameRound = PrefsManager.diffPictureCompleteGameRound,
                         heartCount = heartCount,
-                        heartChangedTime = PrefsManager.diffPictureHeartChangedTime
+                        heartChargedTime = PrefsManager.diffPictureHeartChargedTime
                     ).collect()
                 }
             }
@@ -137,7 +137,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 PrefsManager.diffPictureHeartCount -= 1
 
                 if (PrefsManager.diffPictureHeartCount + 1 == 5) {
-                    PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
+                    PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
                     reqUpdateSavedGameInfo()
                 }
 

@@ -34,6 +34,6 @@ object ApiConstants {
         const val DIFF_PICTURE_GAME_CURRENT_STATE = "diffPictureGameCurrentStage"
         const val COMPLETE_GAME_ROUND = "completeGameRound"
         const val DIFF_PICTURE_GAME_HEART_COUNT = "diffPictureGameHeartCount"
-        const val DIFF_PICTURE_GAME_HEART_CHANGE_TIME = "diffPictureGameHeartChangedTime"
+        const val DIFF_PICTURE_GAME_HEART_CHARGED_TIME = "diffPictureGameHeartChargedTime"
     }
 }

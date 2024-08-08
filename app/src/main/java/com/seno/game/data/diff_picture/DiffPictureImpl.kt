@@ -33,14 +33,14 @@ class DiffPictureImpl @Inject constructor(
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChangedTime: Long,
+        heartChargedTime: Long,
     ): Flow<Result<Unit>> = flow {
         val updateSavedGameInfoTask = suspendCoroutine { continuation ->
             val map = mutableMapOf<String, Any>(
                 ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
                 ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
                 ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
-                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to heartChangedTime
+                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to heartChargedTime
             )
             kotlin.runCatching {
                 db.collection(ApiConstants.Collection.PROFILE)

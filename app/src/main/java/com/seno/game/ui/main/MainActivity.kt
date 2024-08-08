@@ -190,7 +190,7 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
                 diffPictureCompleteGameRound = round
             }
             diffPictureHeartCount = it.diffPictureHeartCount
-            diffPictureHeartChangedTime = it.diffPictureHeartChangedTime
+            diffPictureHeartChargedTime = it.diffPictureHeartChargedTime
         }
     }
 }

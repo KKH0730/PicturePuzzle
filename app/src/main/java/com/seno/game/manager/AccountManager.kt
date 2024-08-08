@@ -1,6 +1,5 @@
 package com.seno.game.manager
 
-import android.content.Context
 import android.net.Uri
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentSnapshot
@@ -253,7 +252,7 @@ object AccountManager {
             ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to PrefsManager.diffPictureStage,
             ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to PrefsManager.diffPictureCompleteGameRound,
             ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to PrefsManager.diffPictureHeartCount,
-            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME to PrefsManager.diffPictureHeartChangedTime
+            ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to PrefsManager.diffPictureHeartChargedTime
         )
 
         profileColRef
@@ -358,8 +357,8 @@ object AccountManager {
                         savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: diffPictureStage
                     this.diffPictureHeartCount =
                         savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: diffPictureHeartCount
-                    this.diffPictureHeartChangedTime =
-                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHANGE_TIME) ?: diffPictureHeartChangedTime
+                    this.diffPictureHeartChargedTime =
+                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: diffPictureHeartChargedTime
                 }
             }
             onSignInSucceed.invoke()

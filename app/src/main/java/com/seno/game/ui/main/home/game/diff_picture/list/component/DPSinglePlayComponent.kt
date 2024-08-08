@@ -59,65 +59,54 @@ fun GameListHeader(
 
             val currentTime = System.currentTimeMillis()
             val prevHeartCount = PrefsManager.diffPictureHeartCount
-            val prevChargeHeartTime = PrefsManager.diffPictureHeartChangedTime
+            val prevChargeHeartTime = PrefsManager.diffPictureHeartChargedTime
 
-            val onResumeChargeHeartCount = ((currentTime - PrefsManager.diffPictureHeartChangedTime) / MINUTE_3)
-            heartCount = if (onResumeChargeHeartCount + PrefsManager.diffPictureHeartCount >= TOTAL_HEART_COUNT) {
+            val heartsNeededForCharge = ((currentTime - prevChargeHeartTime) / MINUTE_3)
+            heartCount = if (heartsNeededForCharge + prevHeartCount >= TOTAL_HEART_COUNT) {
                 TOTAL_HEART_COUNT
             } else {
-                onResumeChargeHeartCount.toInt() + PrefsManager.diffPictureHeartCount
+                heartsNeededForCharge.toInt() + prevHeartCount
             }.also {
                 PrefsManager.diffPictureHeartCount = it
+
                 if (prevHeartCount != it) {
-                    PrefsManager.diffPictureHeartChangedTime = currentTime
-                    onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChangedTime)
+                    PrefsManager.diffPictureHeartChargedTime = if (prevChargeHeartTime == 0L) 0L else currentTime - (currentTime % prevChargeHeartTime)
+                    onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
                 }
             }
 
-            val onResumeTimeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
+            val timeGab = MINUTE_3 - (currentTime - prevChargeHeartTime)
             heartTime = if (prevChargeHeartTime == 0L || heartCount == TOTAL_HEART_COUNT) {
                 MINUTE_3
-            } else if (onResumeTimeGab <= 0) {
-                if (heartCount == TOTAL_HEART_COUNT) {
-                    0
-                } else {
-                    MINUTE_3 + onResumeTimeGab
-                }
+            } else if (timeGab <= 0) {
+                MINUTE_3 + timeGab
             } else {
-                onResumeTimeGab
+                timeGab
             }
         }
         lifeCycleOwner.addObserver(observer)
-        onDispose {
-            lifeCycleOwner.removeObserver(observer)
-        }
+        onDispose { lifeCycleOwner.removeObserver(observer) }
     }
 
     if (heartCount < TOTAL_HEART_COUNT) {
         LaunchedEffect(key1 = heartTime) {
-            if (heartTime > 0L) {
-                delay(1000)
-            }
-
             if (heartCount == TOTAL_HEART_COUNT) {
                 return@LaunchedEffect
             }
 
-            if (heartTime <= 0L) {
-                PrefsManager.diffPictureHeartChangedTime = System.currentTimeMillis()
-                onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChangedTime)
-
-                heartTime = MINUTE_3
-
+            if (heartTime > 0L) {
+                delay(1000)
+                heartTime -= SECOND
+            }  else {
                 if (heartCount < TOTAL_HEART_COUNT) {
                     heartCount += 1
                     PrefsManager.diffPictureHeartCount += 1
-                } else {
-                    heartCount -= 1
-                    PrefsManager.diffPictureHeartCount -= 1
+
+                    PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
+                    onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
                 }
-            } else {
-                heartTime -= SECOND
+
+                heartTime = MINUTE_3
             }
         }
     }
@@ -209,7 +198,7 @@ fun LifePointGuideTerm() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
 @Composable
 fun SingleGameGridList(
@@ -280,30 +269,32 @@ fun SingleGameGridList(
                     userScrollEnabled = false,
                     modifier = Modifier.width(width = 264.dp)
                 ) { page ->
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 36.dp),
-                        state = gameListState.gridState,
-                        contentPadding = PaddingValues(
-                            top = 40.dp,
-                            bottom = 24.dp,
-                            start = 20.dp,
-                            end = 20.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(space = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(space = 5.dp),
-                    ) {
-                        itemsIndexed(
-                            items = gameListState.stageInfos.value[page],
-                            key = { _, item: DPSingleGame -> item.id },
-                        ) { index: Int, dpSingleGame: DPSingleGame ->
-                            GameItem(
-                                index = index,
-                                dpSingleGame = dpSingleGame,
-                                isComplete = dpSingleGame.isComplete,
-                                isFistIsNotCompleteIndex = fistIsNotCompleteGame?.id,
-                                isSelected = dpSingleGame.isSelect,
-                                onClickGameItem = onClickGameItem
-                            )
+                    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(minSize = 36.dp),
+                            state = gameListState.gridState,
+                            contentPadding = PaddingValues(
+                                top = 40.dp,
+                                bottom = 24.dp,
+                                start = 20.dp,
+                                end = 20.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(space = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(space = 5.dp)
+                        ) {
+                            itemsIndexed(
+                                items = gameListState.stageInfos.value[page],
+                                key = { _, item: DPSingleGame -> item.id },
+                            ) { index: Int, dpSingleGame: DPSingleGame ->
+                                GameItem(
+                                    index = index,
+                                    dpSingleGame = dpSingleGame,
+                                    isComplete = dpSingleGame.isComplete,
+                                    isFistIsNotCompleteIndex = fistIsNotCompleteGame?.id,
+                                    isSelected = dpSingleGame.isSelect,
+                                    onClickGameItem = onClickGameItem
+                                )
+                            }
                         }
                     }
                 }
@@ -358,7 +349,7 @@ fun NavigateGameStageArrow(
         modifier = Modifier
             .alpha(alpha = if (isVisible) 1f else 0f)
             .noRippleClickable {
-                if (isVisible){
+                if (isVisible) {
                     onClick.invoke()
                 }
             }
@@ -380,7 +371,9 @@ fun PlayButton(
                 shape = RoundedCornerShape(size = 22.dp)
             )
             .noRippleClickable {
-                onClick.takeIf { enablePlayButton }?.invoke()
+                onClick
+                    .takeIf { enablePlayButton }
+                    ?.invoke()
             }
     ) {
         Text(

@@ -31,14 +31,13 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     val currentStage get() = _currentStage.asStateFlow()
 
     private val _gameList = MutableStateFlow(singleGameList)
-    val gameList get() = _gameList.asStateFlow()
+    val gameList: StateFlow<List<List<DPSingleGame>>> = _gameList.asStateFlow()
 
     private val _currentGameRound = MutableSharedFlow<StartGameModel>()
     val currentGameRound get() = _currentGameRound.asSharedFlow()
 
     private val _enablePlayButton = MutableStateFlow(true)
     val enablePlayButton get() = _enablePlayButton.asStateFlow()
-
     private val stageInfos: List<List<Pair<Int, Int>>>
         get() {
             val diffImages = getArrays(R.array.diff_picture_stage1)
@@ -50,35 +49,37 @@ class DiffPictureSingleGameViewModel @Inject constructor(
             }
         }
 
+    /**
+     * SharePreference 이용하여 클리어한 스테이지와 라운드를 저장
+     * 클리어한 스테이지와 라운드를 체크하여 게임 리스트를 생성
+     **/
     private val singleGameList: List<List<DPSingleGame>>
         get() {
             var id = 0
-            val completeGameList =
-                "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
+            var isCheckActiveStage = false
+            val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
+            val stageInfos: List<List<DPSingleGame>> = stageInfos.mapIndexed { stageIndex, list ->
+                List(list.size) { roundIndex ->
+                    val dpSingleGame = DPSingleGame(id = id++, stage = stageIndex).apply {
+                        isComplete = completeGameList.contains("$stageIndex-$roundIndex")
 
-            val stageInfos: List<List<DPSingleGame>> = stageInfos.mapIndexed { stage, list ->
-                list.mapIndexed { index, _ ->
-
-                    DPSingleGame(id = id, stage = stage).apply {
-                        if (completeGameList.contains("$stage-$index")) {
-                            this.isComplete = true
-                        }
-                        id += 1
+                        // 현재 도전해야 할 스테이지 표시
+                        isSelect = !isComplete && !isCheckActiveStage
                     }
+                    if (dpSingleGame.isSelect && !isCheckActiveStage) {
+                        isCheckActiveStage = true
+                        selectedGame = dpSingleGame
+                    }
+                    dpSingleGame
                 }
-            }
-
-            kotlin.runCatching {
-                stageInfos[_currentStage.value].first { !it.isComplete }
-            }.onSuccess {
-                it.isSelect = true
-                selectedGame = it
-            }.onFailure {
-                it.printStackTrace()
             }
 
             return stageInfos
         }
+
+    fun refreshGameList() {
+        _gameList.value = singleGameList
+    }
 
     private var selectedGame: DPSingleGame? = null
 
@@ -90,23 +91,26 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         if (selectedGame?.id == selectedItem.id) {
             return
         }
-        val duplicatedGameList = _gameList.value[_currentStage.value].toMutableList()
-        duplicatedGameList.indexOf(selectedItem)
-            .takeIf { it != -1 }
-            ?.let {
-                selectedGame?.isSelect = false
-                duplicatedGameList[it] = duplicatedGameList[it].copy().apply { isSelect = true }
-                selectedGame = duplicatedGameList[it]
-            }
+        val newGameList = _gameList.value[_currentStage.value].toMutableList()
 
-        val newGameList = _gameList.value.mapIndexed { index, list ->
+        val previousSelectedGameIndex = newGameList.indexOfFirst { it.id == selectedGame?.id }
+        if (previousSelectedGameIndex != -1) {
+            newGameList[previousSelectedGameIndex] = newGameList[previousSelectedGameIndex].copy(isSelect = false)
+        }
+
+        val currentSelectedGameIndex = newGameList.indexOfFirst { it.id == selectedItem.id }
+        if (currentSelectedGameIndex != -1) {
+            newGameList[currentSelectedGameIndex] = newGameList[currentSelectedGameIndex].copy(isSelect = true)
+            selectedGame = newGameList[currentSelectedGameIndex]
+        }
+
+        _gameList.value = _gameList.value.mapIndexed { index, list ->
             if (index == _currentStage.value) {
-                duplicatedGameList
+                newGameList
             } else {
                 list
             }
         }
-        _gameList.value = newGameList
     }
 
     fun reqUpdateSavedGameInfo(heartCount: Int = PrefsManager.diffPictureHeartCount) {
@@ -138,7 +142,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 }
 
                 val gameList = _gameList.value[_currentStage.value]
-                val selectedGameIndex = gameList.indexOf(selectedGame)
+                val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
                 if (selectedGameIndex != -1) {
                     _currentGameRound.emit(
                         StartGameModel(
@@ -175,33 +179,6 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 _message.emit(getString(R.string.diff_game_no_heart))
             }
         }
-    }
-
-    fun refreshGameList() {
-        val completeGameList = "${PrefsManager.diffPictureCompleteGameRound.split(",").toMutableList()}"
-        var id = 0
-        val stageInfos = stageInfos.mapIndexed { stage, list ->
-            val gameList = list.mapIndexed { index, pair ->
-                DPSingleGame(id = id, stage = stage).apply {
-                    if (completeGameList.contains("$stage-$index")) {
-                        this.isComplete = true
-                    }
-                    id += 1
-                }
-            }
-            gameList
-        }
-
-        kotlin.runCatching {
-            stageInfos[_currentStage.value].first { !it.isComplete }
-        }.onSuccess {
-            it.isSelect = true
-            selectedGame = it
-        }.onFailure {
-            it.printStackTrace()
-        }
-
-        _gameList.value = stageInfos
     }
 
     fun setNextStage() {

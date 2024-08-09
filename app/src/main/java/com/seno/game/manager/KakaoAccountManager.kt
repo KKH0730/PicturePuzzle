@@ -11,6 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import java.lang.Exception
 
 class KakaoAccountManager(private val context: Context) {
     var disposables = CompositeDisposable()
@@ -22,7 +23,7 @@ class KakaoAccountManager(private val context: Context) {
 
     fun login(
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit
+        onSignInFailed: (Exception?) -> Unit
     ) {
         if (isKakaoTalkInstalled) {
             loginKakaoTalk(
@@ -39,7 +40,7 @@ class KakaoAccountManager(private val context: Context) {
 
     private fun loginKakaoTalk(
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit
+        onSignInFailed: (Exception?) -> Unit
     ) {
         // 카카오톡으로 로그인
         UserApiClient.rx.loginWithKakaoTalk(context)
@@ -61,14 +62,14 @@ class KakaoAccountManager(private val context: Context) {
                     onSignInFailed = onSignInFailed,
                 )
             }, { error ->
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(Exception(error.message))
             })
             .addTo(disposables)
     }
 
     private fun loginKakaoAccount(
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSigInFailed: (Exception?) -> Unit
     ) {
         UserApiClient.rx.loginWithKakaoAccount(context)
             .subscribeOn(Schedulers.io())
@@ -78,13 +79,13 @@ class KakaoAccountManager(private val context: Context) {
                     onSignInSucceed = onSignInSucceed,
                     onSignInFailed = onSigInFailed,
                 )
-            }, { error -> onSigInFailed.invoke() })
+            }, { error -> onSigInFailed.invoke(Exception(error.message)) })
             .addTo(disposables)
     }
 
     private fun getClientProfileInfo(
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit
+        onSignInFailed: (Exception?) -> Unit
     ){
         UserApiClient.rx.me()
             .flatMap { user ->
@@ -109,13 +110,7 @@ class KakaoAccountManager(private val context: Context) {
             .subscribe({
                 if (it != null) {
                     if (it.email != null && it.kakaoUid != null) {
-                        val email = it.email.run {
-                            if (this.contains("naver.com")) {
-                                this.replace("naver.com","kakao.com")
-                            } else {
-                                this
-                            }
-                        }
+                        val email = it.email
                         val kakaoUid = it.kakaoUid
                         val nickname = it.nickname ?: ""
                         val profileUri = it.profileUri ?: ""
@@ -130,12 +125,12 @@ class KakaoAccountManager(private val context: Context) {
                             onSignInFailed = onSignInFailed
                         )
                     } else {
-                        onSignInFailed.invoke()
+                        onSignInFailed.invoke(Exception("email or kakaoUid is null"))
                     }
                 } else {
-                    onSignInFailed.invoke()
+                    onSignInFailed.invoke(Exception("kakaoUser is null"))
                 }
-            }, { onSignInFailed.invoke() })
+            }, { onSignInFailed.invoke(Exception(it.message)) })
             .addTo(disposables)
     }
 

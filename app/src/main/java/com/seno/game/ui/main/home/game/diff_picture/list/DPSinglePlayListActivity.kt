@@ -34,10 +34,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DPSinglePlayListActivity : ComponentActivity() {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
-    private val admobRewardedAdUtil: AdmobRewardedAdUtil by lazy { AdmobRewardedAdUtil(activity = this@DPSinglePlayListActivity) }
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 result.data?.let { intent ->
                     viewModel.reqUpdateSavedGameInfo()
 

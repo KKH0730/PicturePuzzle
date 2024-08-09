@@ -4,9 +4,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -46,6 +48,9 @@ class FirebaseRequest {
     suspend fun signInWithCredential(credential: AuthCredential) = suspendCoroutine { continuation ->
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener { task -> continuation.resume(task) }
+            .addOnFailureListener {
+                Timber.e("exception : $it")
+            }
     }
 
     fun reauthenticate(credential: AuthCredential): Task<Void>? =

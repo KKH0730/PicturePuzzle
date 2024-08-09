@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -129,18 +130,18 @@ object AccountManager {
         credential: AuthCredential,
         platform: PlatForm,
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             val signInTask = firebaseRequest.signInWithCredential(credential = credential)
             if (!signInTask.isSuccessful) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(signInTask.exception)
                 return@launch
             }
 
             val uid = signInTask.result.user?.uid
             if (uid == null) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(Exception("uid is null"))
                 return@launch
             } else {
                 val isProfileDocExist = isExistProfileDocument(uid = uid)
@@ -184,12 +185,12 @@ object AccountManager {
         nickname: String?,
         profileUri: String?,
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             when (val createUserWithEmailAndPasswordResult = firebaseRequest.createUserWithEmailAndPassword(email, password)) {
                 null -> {
-                    onSignInFailed.invoke()
+                    onSignInFailed.invoke(Exception("Result is null"))
                 }
                 is FirebaseAuthUserCollisionException -> {
                     val signInUserWithEmailAndPasswordResult = firebaseRequest.signInWithEmailAndPassword(
@@ -198,7 +199,7 @@ object AccountManager {
                     )
 
                     if (signInUserWithEmailAndPasswordResult == null || signInUserWithEmailAndPasswordResult is Exception) {
-                        onSignInFailed.invoke()
+                        onSignInFailed.invoke(Exception("FirebaseAuthUserCollisionException"))
                     } else {
                         val user = (signInUserWithEmailAndPasswordResult as AuthResult).user
                         getProfileInfo(
@@ -269,20 +270,20 @@ object AccountManager {
         nickname: String?,
         profileUri: String?,
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit,
     ) {
         uid?.let {
             profileUri?.saveDiskCacheData(size = null)
 
             val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname)
             if (!userInfoTask.isSuccessful) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(userInfoTask.exception)
                 return
             }
 
             val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
             if (!savedGameInfoTask.isSuccessful) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(savedGameInfoTask.exception)
                 return
             }
 
@@ -293,7 +294,7 @@ object AccountManager {
             }
 
             onSignInSucceed.invoke()
-        } ?: onSignInFailed.invoke()
+        } ?: onSignInFailed.invoke(Exception("uid is null"))
     }
 
     private suspend fun getUserInfo(
@@ -316,12 +317,12 @@ object AccountManager {
     private suspend fun getProfileInfo(
         uid: String?,
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit,
     ) {
         uid?.let {
             val userInfoTask = getUserInfo(uid = uid)
             if (!userInfoTask.isSuccessful) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(userInfoTask.exception)
                 return
             }
 
@@ -341,7 +342,7 @@ object AccountManager {
             }
             val savedGameInfoTask = getDiffPictureGameInfo(uid = uid)
             if (!savedGameInfoTask.isSuccessful) {
-                onSignInFailed.invoke()
+                onSignInFailed.invoke(savedGameInfoTask.exception)
                 return
             }
 
@@ -362,7 +363,7 @@ object AccountManager {
                 }
             }
             onSignInSucceed.invoke()
-        } ?: onSignInFailed.invoke()
+        } ?: onSignInFailed.invoke(Exception("uid is null"))
     }
 
     fun startLogout(

@@ -9,6 +9,7 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
 import timber.log.Timber
+import java.lang.Exception
 
 class NaverAccountManager {
 
@@ -16,7 +17,7 @@ class NaverAccountManager {
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
         onSignInSucceed: () -> Unit,
-        onSigInFailed: () -> Unit
+        onSigInFailed: (Exception?) -> Unit
     ) {
         NaverIdLoginSDK.authenticate(context, launcher, object : OAuthLoginCallback {
             override fun onSuccess() {
@@ -45,7 +46,7 @@ class NaverAccountManager {
                     override fun onFailure(httpStatus: Int, message: String) {
                         val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                         val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                        onSigInFailed.invoke()
+                        onSigInFailed.invoke(Exception(message))
                     }
 
                     override fun onError(errorCode: Int, message: String) {
@@ -71,7 +72,7 @@ class NaverAccountManager {
 
     fun onActivityResult(
         onSignInSucceed: () -> Unit,
-        onSignInFailed: () -> Unit
+        onSignInFailed: (java.lang.Exception?) -> Unit
     ) {
         NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
             override fun onSuccess(result: NidProfileResponse) {

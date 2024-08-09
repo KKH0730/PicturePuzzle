@@ -32,7 +32,7 @@ fun SocialLoginContainer(
     kakaoAccountManager: KakaoAccountManager,
     onClickSocialLogin: () -> Unit,
     onSignInSucceed: () -> Unit,
-    onSignInFailed: () -> Unit,
+    onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
 
     Row(
@@ -42,7 +42,7 @@ fun SocialLoginContainer(
             googleAccountManager = googleAccountManager,
             onClickSocialLogin = onClickSocialLogin,
             onSignInSucceed = onSignInSucceed,
-            onSignInFailed = onSignInFailed
+            onSignInFailed = onSignInFailed,
         )
         KakaoLoginButton(
             kakaoAccountManager = kakaoAccountManager,
@@ -71,7 +71,7 @@ fun GoogleLoginButton(
     googleAccountManager: GoogleAccountManager,
     onClickSocialLogin: () -> Unit,
     onSignInSucceed: () -> Unit,
-    onSignInFailed: () -> Unit,
+    onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
         rememberLauncherForActivityResult(
@@ -117,7 +117,7 @@ fun KakaoLoginButton(
     kakaoAccountManager: KakaoAccountManager,
     onClickSocialLogin: () -> Unit,
     onSignInSucceed: () -> Unit,
-    onSignInFailed: () -> Unit
+    onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
@@ -135,7 +135,7 @@ fun NaverLoginButton(
     naverAccountManager: NaverAccountManager,
     onClickSocialLogin: () -> Unit,
     onSignInSucceed: () -> Unit,
-    onSignInFailed: () -> Unit
+    onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
     val context = LocalContext.current
     val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
@@ -180,7 +180,7 @@ fun FaceBookLoginButton(
     facebookAccountManager: FacebookAccountManager,
     onClickSocialLogin: () -> Unit,
     onSignInSucceed: () -> Unit,
-    onSignInFailed: () -> Unit
+    onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_facebook)
@@ -206,7 +206,7 @@ fun FaceBookLoginButton(
 
                 override fun onError(e: Exception?) {
                     Timber.e(e)
-                    onSignInFailed.invoke()
+                    onSignInFailed.invoke(e)
                 }
             }
         )

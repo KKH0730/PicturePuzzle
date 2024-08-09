@@ -504,16 +504,11 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             },
             onAdLoaded = {
                 isShowHint = false
-                Timber.e("onAdLoaded : $isShowHint")
                 admobRewardedAdUtil.showRewardedAd(
-                    onRewarded = {
-                        isShowHint = true
-                        Timber.e("onRewarded : $isShowHint")
-                    }
+                    onRewarded = { isShowHint = true }
                 )
             },
             onAdDismissedFullScreenContent = {
-                Timber.e("onAdDismissedFullScreenContent : $isShowHint")
                 if (isShowHint) {
                     viewModel.drawAnswerHint(
                         imageViewWidth = binding.ivOrigin.width.toFloat(),

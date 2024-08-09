@@ -3,10 +3,18 @@ package com.seno.game.ui.account.my_profile
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.seno.game.R
 import com.seno.game.extensions.textDp
 import com.seno.game.prefs.PrefsManager
@@ -42,6 +50,21 @@ fun GuidTextContainer() {
 
 @Composable
 fun MyProfile(onClickClose: () -> Unit) {
+    var nickName by remember { mutableStateOf(PrefsManager.nickname) }
+    var profileUri by remember { mutableStateOf(PrefsManager.profileUri) }
+
+    val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(key1 = lifeCycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                nickName = PrefsManager.nickname
+                profileUri = PrefsManager.profileUri
+            }
+        }
+        lifeCycleOwner.addObserver(observer)
+        onDispose { lifeCycleOwner.removeObserver(observer) }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,9 +73,12 @@ fun MyProfile(onClickClose: () -> Unit) {
         MyProfileHeader(onClickClose = onClickClose)
         NicknameContainer(
             modifier = Modifier.offset(y = 102.dp),
-            nickName = PrefsManager.nickname
+            nickName = nickName
         )
-        ProfileImage(modifier = Modifier.offset(x = 16.dp, y = 66.dp))
+        ProfileImage(
+            modifier = Modifier.offset(x = 16.dp, y = 66.dp),
+            profileUri = profileUri
+        )
     }
 }
 

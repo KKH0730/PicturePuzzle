@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.seno.game.R
+import com.seno.game.extensions.snackbar
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
@@ -41,10 +44,13 @@ class SignGateActivity : AppCompatActivity() {
                             }
 
                         },
-                        onSignInFailed = {
+                        onSignInFailed = { exception ->
                             runOnUiThread {
-                                toast("로그인 실패")
-                                finish()
+                                if (exception is FirebaseAuthUserCollisionException) {
+                                    snackbar(message = getString(R.string.alert_duplicated_id))
+                                } else {
+                                    snackbar(message = "로그인 실패")
+                                }
                             }
                         },
                         onClickClose = { finish() }

@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun MyProfileHeader(
@@ -45,20 +47,35 @@ fun MyProfileHeader(
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier = Modifier) {
+fun ProfileImage(
+    modifier: Modifier = Modifier,
+    profileUri: String
+) {
     Box(
         modifier = modifier
             .clip(shape = CircleShape)
             .size(size = 72.dp)
             .background(color = colorResource(id = R.color.color_b8c0ff))
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_user_profile),
-            contentDescription = null,
-            modifier = Modifier
-                .size(size = 64.dp)
-                .align(alignment = Alignment.Center)
-        )
+        if (profileUri.isEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_user_profile),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(size = 64.dp)
+                    .align(alignment = Alignment.Center)
+            )
+        } else {
+            GlideImage(
+                imageModel = profileUri,
+                contentScale = ContentScale.Crop,
+                placeHolder =  painterResource(id = R.drawable.ic_user_profile),
+                modifier = Modifier
+                    .size(size = 64.dp)
+                    .clip(CircleShape)
+                    .align(alignment = Alignment.Center)
+            )
+        }
     }
 }
 

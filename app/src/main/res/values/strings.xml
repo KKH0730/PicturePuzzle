@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">game</string>
 
+    <!-- common -->
+    <string name="confirm">확인</string>
+
     <!-- AD -->
     <string name="admob_app_id">ca-app-pub-5813878503406225~5288452366</string>
     <string name="banner_ad_unit_id">ca-app-pub-5813878503406225/1232877035</string>
@@ -41,6 +44,7 @@
     <string name="alert_dialog_restart">재시작</string>
     <string name="alert_dialog_confirm">확인</string>
     <string name="alert_dialog_dismiss">취소</string>
+    <string name="alert_duplicated_id">해당 아이디와 동일한 계정이 이미 존재합니다.</string>
 
     <!-- Home -->
     <string name="home_quit_message">앗, 떠나시나요?</string>

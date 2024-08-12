@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,12 +50,12 @@ fun UserInfoContainer(
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)) {
                     UserInfoPanel(
                         label = stringResource(id = R.string.my_profile_sso),
-                        value = when(PrefsManager.platform) {
-                            PlatForm.FACEBOOK.value -> stringResource(id = R.string.facebook)
-                            PlatForm.GOOGLE.value -> stringResource(id = R.string.google)
-                            PlatForm.KAKAO.value -> stringResource(id = R.string.kakao)
-                            PlatForm.NAVER.value -> stringResource(id = R.string.naver)
-                            else -> "익명 로그인"
+                        drawableRight = when(PrefsManager.platform) {
+                            PlatForm.FACEBOOK.value -> painterResource(id = R.drawable.ic_sns_facebook)
+                            PlatForm.GOOGLE.value -> painterResource(id = R.drawable.ic_sns_google)
+                            PlatForm.KAKAO.value -> painterResource(id = R.drawable.ic_sns_kakao)
+                            PlatForm.NAVER.value -> painterResource(id = R.drawable.ic_sns_naver)
+                            else -> painterResource(id = R.drawable.bg_timer_wrong_answer)
                         }
                     )
                     UserInfoSpacer()
@@ -78,6 +80,39 @@ fun UserInfoContainer(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun UserInfoPanel(
+    label: String,
+    drawableRight: Painter? = null,
+    onClick: (() -> Unit)? = null
+) {
+    Column {
+        Spacer(modifier = Modifier.height(height = 14.dp))
+        Row {
+            Text(
+                text = label,
+                color = colorResource(id = R.color.color_FF2F2F2F),
+                fontSize = 12.textDp,
+                fontWeight = FontWeight.W600
+            )
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.noRippleClickable { onClick?.invoke() }
+            ) {
+                drawableRight?.let {
+                    Image(
+                        painter = it,
+                        contentDescription = "right_arrow",
+                        modifier = Modifier.size(size = 14.dp)
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(height = 14.dp))
     }
 }
 

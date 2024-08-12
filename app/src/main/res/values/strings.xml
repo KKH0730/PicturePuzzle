@@ -27,10 +27,19 @@
     <!-- MyProfile -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
     <string name="account_google_login">Google 아이디로 로그인</string>
-    <string name="my_profile_guide">로그인을 하면 닉네임과 아바타 변경이 가능해져요!</string>
+    <string name="my_profile_guide">로그인을 하면 닉네임과 프로필 변경이 가능해져요!</string>
     <string name="my_profile_login">로그인</string>
+    <string name="my_profile_logout">로그아웃</string>
     <string name="my_profile_create_account">계정생성</string>
     <string name="my_profile_close">닫기</string>
+    <string name="my_profile_sso">간편 로그인</string>
+    <string name="my_profile_nickname">닉네임</string>
+    <string name="my_profile_version">버전정보</string>
+    <string name="my_profile_withdrawal">탈퇴하기</string>
+    <string name="my_profile_withdrawal_description_1">정말로 탈퇴하시나요?</string>
+    <string name="my_profile_withdrawal_description_2">탈퇴 후 게임 데이터는 복구할 수 없습니다.</string>
+    <string name="my_profile_withdrawal_n">역시 안할래</string>
+    <string name="my_profile_withdrawal_y">응!할거야</string>
 
     <!-- SignGate -->
     <string name="sign_gate_title">3초 간편로그인!</string>

@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
@@ -60,7 +61,8 @@ fun ProfileContainer(
                 "$nickname ${stringResource(id = R.string.guest2)}"
             },
             color = colorResource(id = R.color.color_fbf8cc),
-            fontSize = 14.textDp
+            fontSize = 18.textDp,
+            fontWeight = FontWeight.W600
         )
     }
 }

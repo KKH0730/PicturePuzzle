@@ -1,5 +1,6 @@
 package com.seno.game.ui.main.home
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -28,6 +29,7 @@ import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.util.MusicPlayUtil
+import com.seno.game.view.LogoutDialog
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -66,7 +68,7 @@ fun HomeUI(
     onChangedPush: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
-    val facebookAccountManager = FacebookAccountManager(activity = context as MainActivity)
+    val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
     val googleAccountManager = GoogleAccountManager(activity = context)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
@@ -124,8 +126,10 @@ fun HomeUI(
                         isShowLogoutDialog = false
 
                         PrefsManager.apply {
-                            PrefsManager.nickname = context.resources.createRandomNickname()
-                            profileUri = ""
+                            this.nickname = context.resources.createRandomNickname()
+                            this.platform = ""
+                            this.profileUri = ""
+                            this.isShowAD = true
                         }
                         nickname = PrefsManager.nickname
                         profile = ""

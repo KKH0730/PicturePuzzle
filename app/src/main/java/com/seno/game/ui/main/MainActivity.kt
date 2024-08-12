@@ -19,12 +19,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
+import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.service.TerminationDetectService
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeLoadingScreen
@@ -37,65 +37,66 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printHashKey()
 
-        startService(Intent(this@MainActivity, TerminationDetectService::class.java))
+        createRandomNickname()
 
-        if (!intent.getBooleanExtra("isSplashFinish", false)) {
-            SplashActivity.start(context = this@MainActivity)
-            finish()
-        } else {
-            setContent {
-                AppTheme {
-                    Surface(Modifier.fillMaxSize()) {
-                        var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
-                        var isNetworkError by remember { mutableStateOf(false) }
+        setContent {
+            AppTheme {
+                Surface(Modifier.fillMaxSize()) {
+                    var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
+                    var isNetworkError by remember { mutableStateOf(false) }
 
-                        startObserve(
-                            onCallbackSavedGameInfo = { savedGameInfo = it },
-                            onCallbackNetworkError = { isNetworkError = it }
-                        )
+                    startObserve(
+                        onCallbackSavedGameInfo = { savedGameInfo = it },
+                        onCallbackNetworkError = { isNetworkError = it }
+                    )
 
-                        setOrReqAuthentication(callback = { isAuthenticated ->
-                            if (isAuthenticated) {
-                                reqSavedGameInfo(
-                                    savedGameInfo = savedGameInfo,
-                                    isTaskSuccess = { isTaskSuccess ->
-                                        if (!isTaskSuccess) {
-                                            isNetworkError = true
-                                        }
+                    setOrReqAuthentication(callback = { isAuthenticated ->
+                        if (isAuthenticated) {
+                            reqSavedGameInfo(
+                                savedGameInfo = savedGameInfo,
+                                isTaskSuccess = { isTaskSuccess ->
+                                    if (!isTaskSuccess) {
+                                        isNetworkError = true
                                     }
-                                )
-                            }
-                        })
-
-                        if (isNetworkError) {
-                            RestartDialog(
-                                title = getString(R.string.network_error_title),
-                                content = getString(R.string.network_error),
-                                confirmText = getString(R.string.alert_dialog_restart),
-                                onClickConfirm = { this@MainActivity.restartApp() }
+                                }
                             )
-                        } else {
-                            if (savedGameInfo != null) {
-                                // 저장된 게임 데이터 Load
-                                savedGameInfo.savedGameInfoToLocalDB()
+                        }
+                    })
 
-                                // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                                HomeLoadingScreen()
-                                MainScreen()
-                            } else {
-                                HomeLoadingScreen()
-                            }
+                    if (isNetworkError) {
+                        RestartDialog(
+                            title = getString(R.string.network_error_title),
+                            content = getString(R.string.network_error),
+                            confirmText = getString(R.string.alert_dialog_restart),
+                            onClickConfirm = { this@MainActivity.restartApp() }
+                        )
+                    } else {
+                        if (savedGameInfo != null) {
+                            // 저장된 게임 데이터 Load
+                            savedGameInfo.savedGameInfoToLocalDB()
+
+                            // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
+                            HomeLoadingScreen()
+                            MainScreen()
+                        } else {
+                            HomeLoadingScreen()
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun createRandomNickname() {
+        if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {
+            resources.createRandomNickname()
         }
     }
 
@@ -179,6 +180,7 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
     this?.let {
         PrefsManager.apply {
             nickname = it.nickname
+            platform = it.platform
             profileUri = it.profileUri
             backgroundVolume = it.backgroundVolume
             effectVolume = it.effectVolume

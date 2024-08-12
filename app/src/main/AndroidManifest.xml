@@ -58,9 +58,6 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
 
-        <service android:name=".service.TerminationDetectService"
-            android:stopWithTask="false"/>
-
         <activity
             android:name=".ui.account.sign_gate.SignGateActivity"
             android:exported="false"

@@ -8,12 +8,20 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.seno.game.App
+import com.seno.game.BuildConfig
 
-private var metrics: DisplayMetrics = App.getInstance().resources.displayMetrics
-
-val screenWidth get() = metrics.widthPixels
-val screenHeight get() = metrics.heightPixels
+val screenWidth: Int
+    get() {
+        val metrics = App.getInstance().resources.displayMetrics
+        return metrics.widthPixels
+    }
+val screenHeight: Int
+    get() {
+        val metrics = App.getInstance().resources.displayMetrics
+        return metrics.heightPixels
+    }
 
 fun Int.textDp(density: Density): TextUnit = with(density) {
     this@textDp.dp.toSp()

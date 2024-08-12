@@ -2,17 +2,20 @@ package com.seno.game.manager
 
 import android.net.Uri
 import com.google.firebase.auth.*
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.R
 import com.seno.game.data.network.ApiConstants
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
+import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.lang.Exception
 import kotlin.coroutines.resume
@@ -23,11 +26,11 @@ private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
 private const val LOGIN_TYPE_NAVER = "naver.com"
 private const val LOGIN_TYPE_KAKAO = "kakao.com"
 
-enum class PlatForm(name: String) {
-    KAKAO(name = "kakao"),
-    GOOGLE(name = "google"),
-    FACEBOOK(name = "facebook"),
-    NAVER(name = "naver")
+enum class PlatForm(val value: String) {
+    KAKAO(value = "kakao"),
+    GOOGLE(value = "google"),
+    FACEBOOK(value = "facebook"),
+    NAVER(value = "naver")
 }
 
 object AccountManager {
@@ -48,6 +51,15 @@ object AccountManager {
         get() = currentUser != null
 
     val profileColRef = FirebaseFirestore.getInstance().collection("profile")
+
+    fun getSaveGameInfoColRef(uid: String): CollectionReference {
+        return FirebaseFirestore.getInstance()
+            .collection("profile")
+            .document(uid)
+            .collection("save_game_info")
+    }
+
+    const val DIFF_PICTURE_DOC = "diff_picture"
 
     private val authProviderId: String
         get() {
@@ -224,6 +236,39 @@ object AccountManager {
         }
     }
 
+    private suspend fun setProfileInfo(
+        uid: String?,
+        platform: PlatForm,
+        nickname: String?,
+        profileUri: String?,
+        onSignInSucceed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit,
+    ) {
+        uid?.let {
+            profileUri?.saveDiskCacheData(size = null)
+
+            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname)
+            if (!userInfoTask.isSuccessful) {
+                onSignInFailed.invoke(userInfoTask.exception)
+                return
+            }
+
+            val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
+            if (!savedGameInfoTask.isSuccessful) {
+                onSignInFailed.invoke(savedGameInfoTask.exception)
+                return
+            }
+
+            PrefsManager.apply {
+                nickname?.let { this.nickname = it }
+                this.platform = platform.value
+                profileUri?.let { this.profileUri = it }
+            }
+
+            onSignInSucceed.invoke()
+        } ?: onSignInFailed.invoke(Exception("uid is null"))
+    }
+
     private suspend fun setUserInfo(
         uid: String,
         platform: PlatForm,
@@ -234,7 +279,7 @@ object AccountManager {
         val map = mutableMapOf(
             ApiConstants.UserInfo.UID to uid,
             ApiConstants.UserInfo.NICKNAME to userNickname,
-            ApiConstants.UserInfo.PLATFORM to platform.name,
+            ApiConstants.UserInfo.PLATFORM to platform.value,
             ApiConstants.UserInfo.PROFILE_URI to userProfileUri,
             ApiConstants.UserInfo.BACKGROUND_VOLUME to PrefsManager.backgroundVolume.toString(),
             ApiConstants.UserInfo.EFFECT_VOLUME to PrefsManager.effectVolume.toString(),
@@ -262,39 +307,6 @@ object AccountManager {
             .document(ApiConstants.Document.DIFF_PICTURE)
             .set(savedGameInfoMap)
             .addOnCompleteListener { task -> continuation.resume(task) }
-    }
-
-    private suspend fun setProfileInfo(
-        uid: String?,
-        platform: PlatForm,
-        nickname: String?,
-        profileUri: String?,
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: (Exception?) -> Unit,
-    ) {
-        uid?.let {
-            profileUri?.saveDiskCacheData(size = null)
-
-            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname)
-            if (!userInfoTask.isSuccessful) {
-                onSignInFailed.invoke(userInfoTask.exception)
-                return
-            }
-
-            val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
-            if (!savedGameInfoTask.isSuccessful) {
-                onSignInFailed.invoke(savedGameInfoTask.exception)
-                return
-            }
-
-            PrefsManager.apply {
-                nickname?.let { this.nickname = it }
-                this.platform = platform.name
-                profileUri?.let { this.profileUri = it }
-            }
-
-            onSignInSucceed.invoke()
-        } ?: onSignInFailed.invoke(Exception("uid is null"))
     }
 
     private suspend fun getUserInfo(
@@ -400,6 +412,26 @@ object AccountManager {
         })
     }
 
+    suspend fun startWithdrawal(
+        isCompleteWithdrawal: () -> Unit,
+        onFail: () -> Unit
+    ) {
+        val uid = firebaseUid
+        if (uid.isNullOrEmpty()) {
+            withContext(Dispatchers.Main) { onFail.invoke() }
+            return
+        }
+
+        val deleteAuthTask = withdrawalFirebase()
+        if (!deleteAuthTask.isSuccessful) {
+            withContext(Dispatchers.Main) { onFail.invoke() }
+            return
+        }
+
+        deleteUserInfo(uid = uid)
+        withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
+    }
+
     private fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
         if (onSignOutCallbackListener == null) {
             return
@@ -428,6 +460,24 @@ object AccountManager {
         firebaseRequest.signInAnonymous()
             .addOnFailureListener { onFail.invoke() }
             .addOnSuccessListener { onSuccess.invoke() }
+    }
+
+    private suspend fun withdrawalFirebase() = suspendCoroutine { continuation ->
+        firebaseRequest.currentUser?.delete()
+            ?.addOnCompleteListener { task -> continuation.resume(task) }
+    }
+
+    private suspend fun deleteUserInfo(
+        uid: String,
+    ) = suspendCoroutine { continuation ->
+        Timber.e("uid : $uid")
+        FirebaseFirestore.getInstance().runTransaction { transaction ->
+            transaction.delete(getSaveGameInfoColRef(uid = uid).document(DIFF_PICTURE_DOC))
+            transaction.delete(profileColRef.document(uid))
+        }.addOnCompleteListener { task ->
+            Timber.e("deleteUserInfo addOnCompleteListener : ${task.isSuccessful}")
+            continuation.resume(task)
+        }
     }
 }
 

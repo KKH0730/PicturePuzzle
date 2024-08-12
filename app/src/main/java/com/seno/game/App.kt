@@ -10,6 +10,7 @@ import com.pixplicity.easyprefs.library.Prefs
 import dagger.hilt.android.HiltAndroidApp
 import org.opencv.android.OpenCVLoader
 import timber.log.Timber
+import java.util.regex.Pattern
 
 @HiltAndroidApp
 class App : Application() {
@@ -17,6 +18,13 @@ class App : Application() {
     companion object {
         private lateinit var instance: App
         fun getInstance(): App = instance
+
+        fun getAppVersionName(): String {
+            val regex = Pattern.compile("^(\\d+\\.)?(\\d+\\.)?(\\d+)")
+            return with(regex.matcher(BuildConfig.VERSION_NAME)) {
+                if (find()) group() else ""
+            }
+        }
     }
 
 

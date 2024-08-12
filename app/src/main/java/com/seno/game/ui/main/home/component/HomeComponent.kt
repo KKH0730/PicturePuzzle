@@ -27,7 +27,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun ProfileContainer(
     nickname: String,
-    profile: String,
+    profileUri: String,
     onClick: () -> Unit,
 ) {
     Row(
@@ -35,7 +35,7 @@ fun ProfileContainer(
         modifier = Modifier.noRippleClickable { onClick.invoke() }
     ) {
         Spacer(modifier = Modifier.width(width = 16.dp))
-        if (profile.isEmpty()) {
+        if (profileUri.isEmpty()) {
             Image(
                 painter = painterResource(id = R.drawable.ic_profile_not_login),
                 contentDescription = null,
@@ -45,7 +45,7 @@ fun ProfileContainer(
             )
         } else {
             GlideImage(
-                imageModel = profile,
+                imageModel = profileUri,
                 contentScale = ContentScale.Crop,
                 placeHolder =  painterResource(id = R.drawable.ic_profile_not_login),
                 modifier = Modifier

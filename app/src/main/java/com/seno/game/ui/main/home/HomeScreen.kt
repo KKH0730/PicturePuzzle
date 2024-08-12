@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -23,13 +24,13 @@ import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
+import com.seno.game.ui.common.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.util.MusicPlayUtil
-import com.seno.game.view.LogoutDialog
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -78,7 +79,7 @@ fun HomeUI(
     var isShowSettingDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
-    var profile by remember { mutableStateOf("") }
+    var profileUri by remember { mutableStateOf("") }
 
     var isEnableSoloPlay by remember { mutableStateOf(true) }
 
@@ -89,7 +90,7 @@ fun HomeUI(
             Lifecycle.Event.ON_RESUME -> {
                 isEnableSoloPlay = true
                 nickname = PrefsManager.nickname
-                profile = PrefsManager.profileUri
+                profileUri = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
             }
             Lifecycle.Event.ON_PAUSE -> {
@@ -113,8 +114,14 @@ fun HomeUI(
     }
 
     if (isShowLogoutDialog) {
-        LogoutDialog(
-            onClickYes = {
+        CommonCustomDialog(
+            image = painterResource(R.drawable.ic_dialog_cat_wow),
+            mainDescription = stringResource(id = R.string.home_logout_message1),
+            subDescription = stringResource(id = R.string.home_logout_message2),
+            leftButtonText = stringResource(id = R.string.home_logout_n),
+            rightButtonText = stringResource(id = R.string.home_logout_y),
+            onClickLeft = { isShowLogoutDialog = false },
+            onClickRight = {
                 isLoading = true
                 AccountManager.startLogout(
                     facebookAccountManager = facebookAccountManager,
@@ -132,13 +139,12 @@ fun HomeUI(
                             this.isShowAD = true
                         }
                         nickname = PrefsManager.nickname
-                        profile = ""
+                        profileUri = ""
 
                         context.toast("로그아웃 성공")
                     }
                 )
             },
-            onClickNo = { isShowLogoutDialog = false },
             onDismissed = { isShowLogoutDialog = false }
         )
     }
@@ -177,7 +183,7 @@ fun HomeUI(
             Row {
                 ProfileContainer(
                     nickname = nickname,
-                    profile = profile,
+                    profileUri = profileUri,
                     onClick = { context.startActivity(MyProfileActivity::class.java) }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))

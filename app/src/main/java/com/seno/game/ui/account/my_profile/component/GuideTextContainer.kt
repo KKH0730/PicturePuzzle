@@ -13,8 +13,8 @@ import com.seno.game.R
 import com.seno.game.extensions.textDp
 
 @Composable
-fun GuideTextContainer(isAnonymous: Boolean) {
-    if (isAnonymous) {
+fun GuideTextContainer(isSignedIn: Boolean) {
+    if (!isSignedIn) {
         Text(
             text = stringResource(id = R.string.my_profile_guide),
             fontSize = 14.textDp,

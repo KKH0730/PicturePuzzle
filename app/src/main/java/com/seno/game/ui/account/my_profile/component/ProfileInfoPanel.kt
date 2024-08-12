@@ -31,7 +31,7 @@ import com.skydoves.landscapist.glide.GlideImage
 fun ProfileInfoPanel(
     nickname: String,
     profileUri: String,
-    isAnonymous: Boolean,
+    isSignedIn: Boolean,
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit
 ) {
@@ -45,7 +45,7 @@ fun ProfileInfoPanel(
         NicknameContainer(nickName = nickname)
         Spacer(modifier = Modifier.weight(weight = 1f))
         ButtonContainer(
-            isAnonymous = isAnonymous,
+            isSignedIn = isSignedIn,
             onClickLogin = onClickLogin,
             onClickLogout = onClickLogout
         )
@@ -98,14 +98,14 @@ fun NicknameContainer(nickName: String) {
 
 @Composable
 fun ButtonContainer(
-    isAnonymous: Boolean,
+    isSignedIn: Boolean,
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit
 ) {
-    if (isAnonymous) {
-        LoginButton(onClick = onClickLogin)
-    } else {
+    if (isSignedIn) {
         LogoutButton(onClickLogout = onClickLogout)
+    } else {
+        LoginButton(onClick = onClickLogin)
     }
 }
 

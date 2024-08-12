@@ -343,7 +343,7 @@ fun AccountPanel(
             )
             Spacer(modifier = Modifier.height(height = 18.dp))
             Text(
-                text = if (AccountManager.isAnonymous) {
+                text = if (!AccountManager.isSignedIn) {
                     stringResource(id = R.string.home_setting_account_no_member)
                 } else {
                     String.format(
@@ -373,7 +373,7 @@ fun AccountButtonContainer(
     onClickLogout: () -> Unit,
     onClickManageProfile: () -> Unit,
 ) {
-    if (AccountManager.isAnonymous) {
+    if (!AccountManager.isSignedIn) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier

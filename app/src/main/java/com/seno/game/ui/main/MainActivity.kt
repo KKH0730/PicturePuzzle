@@ -57,18 +57,28 @@ class MainActivity : ComponentActivity() {
                         onCallbackNetworkError = { isNetworkError = it }
                     )
 
-                    setOrReqAuthentication(callback = { isAuthenticated ->
-                        if (isAuthenticated) {
-                            reqSavedGameInfo(
-                                savedGameInfo = savedGameInfo,
-                                isTaskSuccess = { isTaskSuccess ->
-                                    if (!isTaskSuccess) {
-                                        isNetworkError = true
-                                    }
+                    if (AccountManager.isUser) {
+                        reqSavedGameInfo(
+                            savedGameInfo = savedGameInfo,
+                            isTaskSuccess = { isTaskSuccess ->
+                                if (!isTaskSuccess) {
+                                    isNetworkError = true
                                 }
-                            )
-                        }
-                    })
+                            }
+                        )
+                    }
+//                    setOrReqAuthentication(callback = { isAuthenticated ->
+//                        if (isAuthenticated) {
+//                            reqSavedGameInfo(
+//                                savedGameInfo = savedGameInfo,
+//                                isTaskSuccess = { isTaskSuccess ->
+//                                    if (!isTaskSuccess) {
+//                                        isNetworkError = true
+//                                    }
+//                                }
+//                            )
+//                        }
+//                    })
 
                     if (isNetworkError) {
                         RestartDialog(
@@ -78,15 +88,20 @@ class MainActivity : ComponentActivity() {
                             onClickConfirm = { this@MainActivity.restartApp() }
                         )
                     } else {
-                        if (savedGameInfo != null) {
-                            // 저장된 게임 데이터 Load
-                            savedGameInfo.savedGameInfoToLocalDB()
+                        if (AccountManager.isUser) {
+                            if (savedGameInfo != null) {
+                                // 저장된 게임 데이터 Load
+                                savedGameInfo.savedGameInfoToLocalDB()
 
-                            // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                            HomeLoadingScreen()
-                            MainScreen()
+                                // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
+                                HomeLoadingScreen()
+                                MainScreen()
+                            } else {
+                                HomeLoadingScreen()
+                            }
                         } else {
                             HomeLoadingScreen()
+                            MainScreen()
                         }
                     }
                 }

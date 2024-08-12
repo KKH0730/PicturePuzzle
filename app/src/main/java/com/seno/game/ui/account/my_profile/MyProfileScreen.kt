@@ -63,7 +63,7 @@ fun MyProfileScreen(
     var isShowWidthdrawalDialog by remember { mutableStateOf(false) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profileUri by remember { mutableStateOf(PrefsManager.profileUri) }
-    var isAnonymous by remember { mutableStateOf(AccountManager.isAnonymous) }
+    var isSignedIn by remember { mutableStateOf(AccountManager.isSignedIn) }
 
 
     val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
@@ -72,7 +72,7 @@ fun MyProfileScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 nickname = PrefsManager.nickname
                 profileUri = PrefsManager.profileUri
-                isAnonymous = AccountManager.isAnonymous
+                isSignedIn = AccountManager.isSignedIn
             }
         }
         lifeCycleOwner.addObserver(observer)
@@ -105,7 +105,7 @@ fun MyProfileScreen(
                         }
                         nickname = PrefsManager.nickname
                         profileUri = ""
-                        isAnonymous = true
+                        isSignedIn = false
 
                         context.toast("로그아웃 성공")
                     }
@@ -139,7 +139,7 @@ fun MyProfileScreen(
                             }
                             nickname = PrefsManager.nickname
                             profileUri = ""
-                            isAnonymous = true
+                            isSignedIn = false
 
 
                             context.toast("회원탈퇴 성공")
@@ -175,15 +175,15 @@ fun MyProfileScreen(
             ProfileInfoPanel(
                 nickname = nickname,
                 profileUri = profileUri,
-                isAnonymous = isAnonymous,
+                isSignedIn = isSignedIn,
                 onClickLogin = onClickLogin,
                 onClickLogout = { isShowLogoutDialog = true }
             )
             Spacer(modifier = Modifier.height(height = 28.dp))
-            GuideTextContainer(isAnonymous = isAnonymous)
+            GuideTextContainer(isSignedIn = isSignedIn)
             Spacer(modifier = Modifier.height(height = 15.dp))
             UserInfoContainer(
-                isAnonymous = isAnonymous,
+                isSignedIn = isSignedIn,
                 onClickChangeNickname = {},
                 onClickWithdrawal = { isShowWidthdrawalDialog = true }
             )

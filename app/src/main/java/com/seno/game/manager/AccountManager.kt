@@ -52,7 +52,7 @@ object AccountManager {
 
     val profileColRef = FirebaseFirestore.getInstance().collection("profile")
 
-    fun getSaveGameInfoColRef(uid: String): CollectionReference {
+    private fun getSaveGameInfoColRef(uid: String): CollectionReference {
         return FirebaseFirestore.getInstance()
             .collection("profile")
             .document(uid)
@@ -447,10 +447,11 @@ object AccountManager {
 
     fun signOutFirebase(isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
-        signInAnonymous(
-            onSuccess = isCompleteLogout,
-            onFail = isCompleteLogout
-        )
+        isCompleteLogout.invoke()
+//        signInAnonymous(
+//            onSuccess = isCompleteLogout,
+//            onFail = isCompleteLogout
+//        )
     }
 
     fun signInAnonymous(
@@ -470,14 +471,10 @@ object AccountManager {
     private suspend fun deleteUserInfo(
         uid: String,
     ) = suspendCoroutine { continuation ->
-        Timber.e("uid : $uid")
         FirebaseFirestore.getInstance().runTransaction { transaction ->
             transaction.delete(getSaveGameInfoColRef(uid = uid).document(DIFF_PICTURE_DOC))
             transaction.delete(profileColRef.document(uid))
-        }.addOnCompleteListener { task ->
-            Timber.e("deleteUserInfo addOnCompleteListener : ${task.isSuccessful}")
-            continuation.resume(task)
-        }
+        }.addOnCompleteListener { task -> continuation.resume(task) }
     }
 }
 

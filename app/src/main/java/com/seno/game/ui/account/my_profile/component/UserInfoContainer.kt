@@ -34,11 +34,11 @@ import com.seno.game.prefs.PrefsManager
 
 @Composable
 fun UserInfoContainer(
-    isAnonymous: Boolean,
+    isSignedIn: Boolean,
     onClickChangeNickname: () -> Unit,
     onClickWithdrawal: () -> Unit
 ) {
-    if (!isAnonymous) {
+    if (isSignedIn) {
         Box(modifier = Modifier.padding(horizontal = 16.dp)) {
             Card(
                 shape = RoundedCornerShape(size = 16.dp),

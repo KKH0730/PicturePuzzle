@@ -36,8 +36,7 @@ fun LoadingView() {
     LaunchedEffect(composition) {
         lottieAnimatable.animate(
             composition = composition,
-            clipSpec = LottieClipSpec.Frame(0, 1200),
-            initialProgress = 0f,
+            initialProgress = 0.2f,
             iterations = LottieConstants.IterateForever
         )
     }
@@ -45,10 +44,16 @@ fun LoadingView() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .alpha(alpha = 0.7f)
-            .background(color = Color.Black)
             .noRippleClickable { }
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(alpha = 0.7f)
+                .background(color = Color.Black)
+        ) {
+
+        }
         LottieAnimation(
             composition = composition,
             progress = { lottieAnimatable.progress },
@@ -56,6 +61,7 @@ fun LoadingView() {
             modifier = Modifier
                 .size(size = 200.dp)
                 .align(alignment = Alignment.Center)
+                .alpha(alpha = 1f)
         )
     }
 }

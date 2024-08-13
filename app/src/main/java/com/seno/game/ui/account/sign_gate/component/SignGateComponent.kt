@@ -77,6 +77,7 @@ fun GoogleLoginButton(
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
+            Timber.e("resultVode : ${it.resultCode}")
             if (it.resultCode == Activity.RESULT_OK) {
                 googleAccountManager.onActivityResult(
                     data = it.data,
@@ -95,14 +96,18 @@ fun GoogleLoginButton(
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Timber.e(e)
+                                onSignInFailed.invoke(e)
                             }
                         }
 
                         override fun onError(e: Exception?) {
                             Timber.e(e)
+                            onSignInFailed.invoke(e)
                         }
                     }
                 )
+            } else if (it.resultCode == Activity.RESULT_CANCELED) {
+                onSignInFailed.invoke(java.lang.Exception("user cancel"))
             }
         }
 
@@ -153,6 +158,7 @@ fun NaverLoginButton(
                     // 실패 or 에러
                     val errorCode = NaverIdLoginSDK.getLastErrorCode().code
                     val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                    onSignInFailed.invoke(java.lang.Exception(errorDescription))
                 }
             }
         }

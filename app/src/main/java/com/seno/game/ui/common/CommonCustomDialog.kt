@@ -1,10 +1,12 @@
 package com.seno.game.ui.common
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
@@ -37,42 +40,49 @@ fun CommonCustomDialog(
     onClickRight: () -> Unit,
     onDismissed: () -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissed) {
-        Card(
-            backgroundColor = Color.White,
-            shape = RoundedCornerShape(size = 30.dp)
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Spacer(modifier = Modifier.height(height = 35.dp))
-                Image(
-                    painter = image,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(width = 56.dp)
-                        .height(height = 59.dp)
-                )
-                Spacer(modifier = Modifier.height(height = 14.dp))
-                Text(
-                    text = mainDescription,
-                    color = colorResource(id = R.color.color_b8c0ff),
-                    fontSize = 16.textDp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(height = 7.dp))
-                Text(
-                    text = subDescription,
-                    color = colorResource(id = R.color.color_b8c0ff),
-                    fontSize = 14.textDp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(height = 11.dp))
-                Row() {
-                    Spacer(modifier = Modifier.width(width = 10.dp))
-                    CommonDialogLeftButton(leftButtonText = leftButtonText, onClick = onClickLeft)
-                    CommonDialogRightButton(rightButtonText = rightButtonText, onClick = onClickRight)
-                    Spacer(modifier = Modifier.width(width = 10.dp))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .alpha(alpha = 0.7f)
+            .background(color = Color.Black)
+    ) {
+        Dialog(onDismissRequest = onDismissed) {
+            Card(
+                backgroundColor = Color.White,
+                shape = RoundedCornerShape(size = 30.dp)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(height = 35.dp))
+                    Image(
+                        painter = image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(width = 56.dp)
+                            .height(height = 59.dp)
+                    )
+                    Spacer(modifier = Modifier.height(height = 14.dp))
+                    Text(
+                        text = mainDescription,
+                        color = colorResource(id = R.color.color_b8c0ff),
+                        fontSize = 16.textDp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(height = 7.dp))
+                    Text(
+                        text = subDescription,
+                        color = colorResource(id = R.color.color_b8c0ff),
+                        fontSize = 14.textDp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(height = 11.dp))
+                    Row() {
+                        Spacer(modifier = Modifier.width(width = 10.dp))
+                        CommonDialogLeftButton(leftButtonText = leftButtonText, onClick = onClickLeft)
+                        CommonDialogRightButton(rightButtonText = rightButtonText, onClick = onClickRight)
+                        Spacer(modifier = Modifier.width(width = 10.dp))
+                    }
+                    Spacer(modifier = Modifier.height(height = 25.dp))
                 }
-                Spacer(modifier = Modifier.height(height = 25.dp))
             }
         }
     }

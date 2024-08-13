@@ -37,6 +37,7 @@ import com.seno.game.prefs.PrefsManager
 @Composable
 fun UserInfoContainer(
     isSignedIn: Boolean,
+    nickname: String,
     onClickChangeNickname: () -> Unit,
     onClickWithdrawal: () -> Unit
 ) {
@@ -61,7 +62,7 @@ fun UserInfoContainer(
                     UserInfoSpacer()
                     UserInfoPanel(
                         label = stringResource(id = R.string.my_profile_nickname),
-                        value = PrefsManager.nickname,
+                        value = nickname,
                         drawableRight = Icons.Filled.KeyboardArrowRight,
                         onClick = onClickChangeNickname
                     )
@@ -107,7 +108,7 @@ fun UserInfoPanel(
                     Image(
                         painter = it,
                         contentDescription = "right_arrow",
-                        modifier = Modifier.size(size = 14.dp)
+                        modifier = Modifier.size(size = 20.dp)
                     )
                 }
             }

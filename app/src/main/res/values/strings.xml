@@ -3,6 +3,7 @@
 
     <!-- common -->
     <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
 
     <!-- AD -->
     <string name="admob_app_id">ca-app-pub-5813878503406225~5288452366</string>
@@ -40,6 +41,12 @@
     <string name="my_profile_withdrawal_description_2">탈퇴 후 게임 데이터는 복구할 수 없습니다.</string>
     <string name="my_profile_withdrawal_n">역시 안할래</string>
     <string name="my_profile_withdrawal_y">응!할거야</string>
+    <string name="my_profile_nickname_edit_label">새 닉네임</string>
+    <string name="my_profile_nickname_edit_content_empty">새 닉네임을 입력하세요.</string>
+    <string name="my_profile_logout_success">로그아웃 성공</string>
+    <string name="my_profile_logout_fail">로그아웃 실패</string>
+    <string name="my_profile_withdrawal_success">회원탈퇴 성공</string>
+    <string name="my_profile_withdrawal_fail">회원탈퇴 실패</string>
 
     <!-- SignGate -->
     <string name="sign_gate_title">3초 간편로그인!</string>

@@ -36,4 +36,8 @@ class GameConfigUseCase @Inject constructor(
     suspend fun reqUpdateADOnOff(uid: String, isShowAD: Boolean): Flow<Result<Boolean>> {
         return configRepository.updateADOnOff(uid = uid, isShowAD = isShowAD).catchError(dispatcher = ioDispatcher)
     }
+
+    suspend fun reqUpdateNickname(uid: String, nickname: String): Flow<Result<String>> {
+        return configRepository.updateNickname(uid = uid, nickname = nickname).catchError(dispatcher = ioDispatcher)
+    }
 }

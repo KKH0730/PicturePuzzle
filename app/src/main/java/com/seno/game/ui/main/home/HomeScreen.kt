@@ -141,7 +141,7 @@ fun HomeUI(
                         nickname = PrefsManager.nickname
                         profileUri = ""
 
-                        context.toast("로그아웃 성공")
+                        context.toast(context.getString(R.string.my_profile_logout_success))
                     }
                 )
             },

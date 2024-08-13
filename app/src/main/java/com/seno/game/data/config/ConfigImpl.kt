@@ -140,4 +140,22 @@ class ConfigImpl @Inject constructor(
                 }
             )
         }
+
+    override suspend fun updateNickname(uid: String, nickname: String): Flow<Result<String>> =
+        flow {
+            val updateNicknameTask = suspendCoroutine { continuation ->
+                db.collection(ApiConstants.Collection.PROFILE)
+                    .document(uid)
+                    .update("nickname", nickname)
+                    .addOnCompleteListener { task -> continuation.resume(task) }
+            }
+
+            emit(
+                if (updateNicknameTask.isSuccessful) {
+                    Result.Success(nickname)
+                } else {
+                    Result.Error(updateNicknameTask.exception?.cause)
+                }
+            )
+        }
 }

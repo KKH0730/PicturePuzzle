@@ -16,4 +16,6 @@ interface ConfigRepository {
     suspend fun updatePushOnOff(uid: String, isPushOn: Boolean) : Flow<Result<Boolean>>
 
     suspend fun updateADOnOff(uid: String, isShowAD: Boolean) : Flow<Result<Boolean>>
+
+    suspend fun updateNickname(uid: String, nickname: String) : Flow<Result<String>>
 }

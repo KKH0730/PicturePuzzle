@@ -130,6 +130,10 @@ object Dependency {
         const val GLIDE_COMPOSE = "com.github.skydoves:landscapist-glide:$VERSION_COMPOSE"
     }
 
+    object Lottie {
+        const val COMPOSE_LOTTIE = "com.airbnb.android:lottie-compose:6.0.1"
+    }
+
     object Etc {
         const val EASY_PREFS = "com.pixplicity.easyprefs:EasyPrefs:1.10.0"
         const val QR = "com.journeyapps:zxing-android-embedded:3.6.0"

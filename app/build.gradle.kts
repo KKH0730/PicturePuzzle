@@ -162,6 +162,9 @@ dependencies {
     implementation(Dependency.Glide.GLIDE_COMPILER)
     implementation(Dependency.Glide.GLIDE_COMPOSE)
 
+    // Lottie
+    implementation(Dependency.Lottie.COMPOSE_LOTTIE)
+
     // Etc
     implementation(Dependency.Etc.EASY_PREFS)
     implementation(Dependency.Etc.QR)

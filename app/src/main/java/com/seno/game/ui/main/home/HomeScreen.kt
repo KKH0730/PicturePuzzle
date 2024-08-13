@@ -105,6 +105,68 @@ fun HomeUI(
         }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_home_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Row {
+                HomeProfileContainer(
+                    nickname = nickname,
+                    profileUri = profileUri,
+                    onClick = { context.startActivity(MyProfileActivity::class.java) }
+                )
+                Spacer(modifier = Modifier.weight(weight = 1f))
+                HomeQuickMenuContainer(
+                    onToggledSound = {
+                        val isPlaying = MusicPlayUtil.isPlaying
+                        if (isPlaying == null || !isPlaying) {
+                            MusicPlayUtil.restart(isBackgroundSound = true)
+                        } else {
+                            MusicPlayUtil.pause(isBackgroundSound = true)
+                        }
+                    },
+                    onClickSetting = { isShowSettingDialog = true }
+                )
+                Spacer(modifier = Modifier.width(width = 6.dp))
+            }
+            Spacer(modifier = Modifier.height(height = 92.dp))
+            Image(
+                painter = painterResource(id = R.drawable.ic_splash),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(width = 216.dp)
+                    .aspectRatio(ratio = 2.37f)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            GamePlayContainer(
+                onClickSoloPlay = {
+                    isEnableSoloPlay = false
+
+                    DPSinglePlayListActivity.start(context = context)
+                    context.overridePendingTransition(
+                        R.anim.slide_right_enter,
+                        R.anim.slide_right_exit
+                    )
+                },
+                onClickMultiPlay = {},
+                onClickQuit = { isShowQuitDialog = true },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(height = 56.dp))
+        }
+
+        if (isLoading) {
+            LoadingView()
+        }
+    }
+
     if (isShowQuitDialog) {
         QuitDialog(
             onClickYes = { (context as MainActivity).finish() },
@@ -168,67 +230,5 @@ fun HomeUI(
             onClickManageProfile = {},
             onDismissed = { isShowSettingDialog = false }
         )
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_home_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            Spacer(modifier = Modifier.height(14.dp))
-            Row {
-                ProfileContainer(
-                    nickname = nickname,
-                    profileUri = profileUri,
-                    onClick = { context.startActivity(MyProfileActivity::class.java) }
-                )
-                Spacer(modifier = Modifier.weight(weight = 1f))
-                HomeQuickMenuContainer(
-                    onToggledSound = {
-                        val isPlaying = MusicPlayUtil.isPlaying
-                        if (isPlaying == null || !isPlaying) {
-                            MusicPlayUtil.restart(isBackgroundSound = true)
-                        } else {
-                            MusicPlayUtil.pause(isBackgroundSound = true)
-                        }
-                    },
-                    onClickSetting = { isShowSettingDialog = true }
-                )
-                Spacer(modifier = Modifier.width(width = 6.dp))
-            }
-            Spacer(modifier = Modifier.height(height = 92.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_splash),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(width = 216.dp)
-                    .aspectRatio(ratio = 2.37f)
-                    .align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.weight(weight = 1f))
-            GamePlayContainer(
-                onClickSoloPlay = {
-                    isEnableSoloPlay = false
-
-                    DPSinglePlayListActivity.start(context = context)
-                    context.overridePendingTransition(
-                        R.anim.slide_right_enter,
-                        R.anim.slide_right_exit
-                    )
-                },
-                onClickMultiPlay = {},
-                onClickQuit = { isShowQuitDialog = true },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(height = 56.dp))
-        }
-
-        if (isLoading) {
-            LoadingView()
-        }
     }
 }

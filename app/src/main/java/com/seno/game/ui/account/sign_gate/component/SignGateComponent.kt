@@ -77,7 +77,6 @@ fun GoogleLoginButton(
         rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
-            Timber.e("resultVode : ${it.resultCode}")
             if (it.resultCode == Activity.RESULT_OK) {
                 googleAccountManager.onActivityResult(
                     data = it.data,

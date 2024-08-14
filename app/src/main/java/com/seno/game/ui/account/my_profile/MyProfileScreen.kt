@@ -10,11 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -53,28 +48,23 @@ fun MyProfileScreen(
 ) {
     val accountViewModel = hiltViewModel<AccountViewModel>()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
-    val googleAccountManager = GoogleAccountManager(activity = context as ComponentActivity)
+    val googleAccountManager = GoogleAccountManager(activity = context)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
-    var isLoading by remember { mutableStateOf(false) }
-    var isShowLogoutDialog by remember { mutableStateOf(false) }
-    var isShowWithdrawalDialog by remember { mutableStateOf(false) }
-    var isShowEditNicknameDialog by remember { mutableStateOf(false) }
-    var nickname by remember { mutableStateOf(PrefsManager.nickname) }
-    var profileUri by remember { mutableStateOf(PrefsManager.profileUri) }
-    var isSignedIn by remember { mutableStateOf(AccountManager.isSignedIn) }
+    val profileState = rememberProfileState()
 
     val lifeCycleOwner = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                nickname = PrefsManager.nickname
-                profileUri = PrefsManager.profileUri
-                isSignedIn = AccountManager.isSignedIn
+                profileState.apply {
+                    setNickname(nickname = PrefsManager.nickname)
+                    setProfileUri(profileUri = PrefsManager.profileUri)
+                    setSignedIn(isSignedIn = AccountManager.isSignedIn)
+                }
             }
         }
         lifeCycleOwner.addObserver(observer)
@@ -92,85 +82,89 @@ fun MyProfileScreen(
             MyProfileHeader(onClickClose = onClickClose)
             Spacer(modifier = Modifier.height(height = 20.dp))
             ProfileInfoPanel(
-                nickname = nickname,
-                profileUri = profileUri,
-                isSignedIn = isSignedIn,
+                nickname = profileState.nickname.value,
+                profileUri = profileState.profileUri.value,
+                isSignedIn = profileState.isSignedIn.value,
                 onClickLogin = onClickLogin,
-                onClickLogout = { isShowLogoutDialog = true }
+                onClickLogout = { profileState.showLogoutDialog(isShow = true) }
             )
             Spacer(modifier = Modifier.height(height = 28.dp))
-            GuideTextContainer(isSignedIn = isSignedIn)
+            GuideTextContainer(isSignedIn = profileState.isSignedIn.value)
             Spacer(modifier = Modifier.height(height = 15.dp))
             UserInfoContainer(
-                isSignedIn = isSignedIn,
-                nickname = nickname,
-                onClickChangeNickname = { isShowEditNicknameDialog = true },
-                onClickWithdrawal = { isShowWithdrawalDialog = true }
+                isSignedIn = profileState.isSignedIn.value,
+                nickname = profileState.nickname.value,
+                onClickChangeNickname = { profileState.showEditNicknameDialog(isShow = true) },
+                onClickWithdrawal = { profileState.showWithdrawalDialog(isShow = true) }
             )
         }
     }
 
-    if (isShowLogoutDialog) {
+    if (profileState.isShowLogoutDialog.value) {
         CommonCustomDialog(
             image = painterResource(R.drawable.ic_dialog_cat_wow),
             mainDescription = stringResource(id = R.string.home_logout_message1),
             subDescription = stringResource(id = R.string.home_logout_message2),
             leftButtonText = stringResource(id = R.string.home_logout_n),
             rightButtonText = stringResource(id = R.string.home_logout_y),
-            onClickLeft = { isShowLogoutDialog = false },
+            onClickLeft = { profileState.showLogoutDialog(isShow = false) },
             onClickRight = {
-                isLoading = true
+                profileState.showLoading(isShow = true)
                 AccountManager.startLogout(
                     facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,
                     kakaoAccountManager = kakaoAccountManager,
                     isCompleteLogout = {
-                        isLoading = false
-                        isShowLogoutDialog = false
+                        profileState.showLoading(isShow = false)
+                        profileState.showLogoutDialog(isShow = false)
 
                         PrefsManager.apply {
                             this.nickname = context.resources.createRandomNickname()
                             this.platform = ""
                             this.profileUri = ""
                         }
-                        nickname = PrefsManager.nickname
-                        profileUri = ""
-                        isSignedIn = false
+                        profileState.apply {
+                            setNickname(nickname = PrefsManager.nickname)
+                            setProfileUri(profileUri = "")
+                            setSignedIn(isSignedIn = false)
+                        }
 
                         context.toast(context.getString(R.string.my_profile_logout_success))
                     }
                 )
             },
-            onDismissed = { isShowLogoutDialog = false }
+            onDismissed = { profileState.showLogoutDialog(isShow = false) }
         )
     }
 
-    if (isShowWithdrawalDialog) {
+    if (profileState.isShowWithdrawalDialog.value) {
         CommonCustomDialog(
             image = painterResource(R.drawable.ic_dialog_cat_crying),
             mainDescription = stringResource(id = R.string.my_profile_withdrawal_description_1),
             subDescription = stringResource(id = R.string.my_profile_withdrawal_description_2),
             leftButtonText = stringResource(id = R.string.my_profile_withdrawal_n),
             rightButtonText = stringResource(id = R.string.my_profile_withdrawal_y),
-            onClickLeft = { isShowWithdrawalDialog = false },
+            onClickLeft = { profileState.showWithdrawalDialog(isShow = false) },
             onClickRight = {
-                isLoading = true
+                profileState.showLoading(isShow = true)
 
-                scope.launch {
+                profileState.coroutineScope.launch {
                     AccountManager.startWithdrawal(
                         isCompleteWithdrawal = {
-                            isLoading = false
-                            isShowWithdrawalDialog = false
+                            profileState.showLoading(isShow = false)
+                            profileState.showWithdrawalDialog(isShow = false)
 
                             PrefsManager.apply {
                                 this.nickname = context.resources.createRandomNickname()
                                 this.platform = ""
                                 this.profileUri = ""
                             }
-                            nickname = PrefsManager.nickname
-                            profileUri = ""
-                            isSignedIn = false
+                            profileState.apply {
+                                setNickname(nickname = PrefsManager.nickname)
+                                setProfileUri(profileUri = "")
+                                setSignedIn(isSignedIn = false)
+                            }
 
                             context.toast(context.getString(R.string.my_profile_withdrawal_success))
 
@@ -188,29 +182,31 @@ fun MyProfileScreen(
                     )
                 }
             },
-            onDismissed = { isShowWithdrawalDialog = false }
+            onDismissed = { profileState.showWithdrawalDialog(isShow = false) }
         )
     }
 
-    if (isShowEditNicknameDialog) {
+    if (profileState.isShowEditNicknameDialog.value) {
         NicknameEditDialog(
-            initialNickname = nickname,
+            initialNickname = profileState.nickname.value,
             onConfirm = {
                 accountViewModel.reqUpdateNickname(
                     uid = AccountManager.firebaseUid,
                     nickname = it,
                     onComplete = { nick ->
                         PrefsManager.nickname = nick
-                        nickname = nick
-                        isShowEditNicknameDialog = false
+                        profileState.apply {
+                            setNickname(nickname = nick)
+                            showEditNicknameDialog(isShow = false)
+                        }
                     }
                 )
             },
-            onDismiss = { isShowEditNicknameDialog = false }
+            onDismiss = { profileState.showEditNicknameDialog(isShow = false) }
         )
     }
 
-    if (isLoading) {
+    if (profileState.isLoading.value) {
         LoadingView()
     }
 }

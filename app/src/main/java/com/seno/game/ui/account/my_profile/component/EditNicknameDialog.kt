@@ -79,14 +79,14 @@ fun NicknameEditDialog(
                         onValueChange = { nickname = it },
                         textStyle = TextStyle(
                             color = colorResource(id = R.color.color_FF2F2F2F),
-                            fontSize = 10.textDp,
+                            fontSize = 14.textDp,
                             fontWeight = FontWeight.W400
                         ),
                         label = {
                             Text(
                                 text = stringResource(id = R.string.my_profile_nickname_edit_label),
                                 color = colorResource(id = R.color.color_FF2F2F2F),
-                                fontSize = 10.textDp,
+                                fontSize = 14.textDp,
                                 fontWeight = FontWeight.W400
                             )
                         },
@@ -100,7 +100,7 @@ fun NicknameEditDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp),
+                            .padding(top = 12.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = onDismiss) {
@@ -136,6 +136,6 @@ fun NicknameEditDialog(
 
 @Preview
 @Composable
-fun NicknameEditDialogPreview() {
+fun Preview() {
     NicknameEditDialog("", {}, {})
 }

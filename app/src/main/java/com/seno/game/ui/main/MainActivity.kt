@@ -22,7 +22,7 @@ import com.seno.game.R
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
-import com.seno.game.model.SavedGameInfo
+import com.seno.game.data.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
@@ -37,11 +37,9 @@ import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        printHashKey()
         installSplashScreen()
 
         if (!intent.getBooleanExtra("isSplashFinish", false)) {
@@ -51,111 +49,10 @@ class MainActivity : AppCompatActivity() {
             setContent {
                 AppTheme {
                     Surface(Modifier.fillMaxSize()) {
-                        var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
-                        var isNetworkError by remember { mutableStateOf(false) }
-
-                        startObserve(
-                            onCallbackSavedGameInfo = { savedGameInfo = it },
-                            onCallbackNetworkError = { isNetworkError = it }
-                        )
-
-                        setOrReqAuthentication(callback = { isAuthenticated ->
-                            if (isAuthenticated) {
-                                reqSavedGameInfo(
-                                    savedGameInfo = savedGameInfo,
-                                    isTaskSuccess = { isTaskSuccess ->
-                                        if (!isTaskSuccess) {
-                                            isNetworkError = true
-                                        }
-                                    }
-                                )
-                            }
-                        })
-
-                        if (isNetworkError) {
-                            RestartDialog(
-                                title = getString(R.string.network_error_title),
-                                content = getString(R.string.network_error),
-                                confirmText = getString(R.string.alert_dialog_restart),
-                                onClickConfirm = { this@MainActivity.restartApp() }
-                            )
-                        } else {
-                            if (savedGameInfo != null) {
-                                // 저장된 게임 데이터 Load
-                                savedGameInfo.savedGameInfoToLocalDB()
-
-                                // HomeScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                                HomeLoadingScreen()
-                                MainScreen()
-                            } else {
-                                HomeLoadingScreen()
-                            }
-                        }
+                        MainScreen()
                     }
                 }
             }
-        }
-    }
-
-    private fun setOrReqAuthentication(callback: (Boolean) -> Unit) {
-        if (AccountManager.isUser) {
-            callback.invoke(true)
-        } else {
-            reqAuthentication { callback.invoke(it) }
-        }
-    }
-
-    private fun reqSavedGameInfo(
-        savedGameInfo: SavedGameInfo?,
-        isTaskSuccess: (Boolean) -> Unit
-    ) {
-        if (savedGameInfo == null) {
-            AccountManager.firebaseUid?.let {
-                mainViewModel.getSavedGameInfo(uid = it)
-                isTaskSuccess.invoke(true)
-            } ?: run {
-                isTaskSuccess.invoke(false)
-            }
-        }
-    }
-
-    private fun startObserve(
-        onCallbackSavedGameInfo: (SavedGameInfo?) -> Unit,
-        onCallbackNetworkError: (Boolean) -> Unit
-    ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { mainViewModel.savedGameInfoToLocalDB.collect(onCallbackSavedGameInfo::invoke)}
-                launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
-            }
-        }
-    }
-
-    private fun reqAuthentication(callback: (Boolean) -> Unit) {
-        if (AccountManager.isUser) {
-            callback(true)
-        } else {
-            AccountManager.signInAnonymous(
-                onSuccess = { callback(true) },
-                onFail = { callback(false) }
-            )
-        }
-    }
-
-    private fun printHashKey() {
-        try {
-            val info: PackageInfo =
-                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-            for (signature in info.signatures) {
-                val md: MessageDigest = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                val hashKey: String = String(Base64.encode(md.digest(), 0))
-                Timber.e("Hash Key: $hashKey")
-            }
-        } catch (e: NoSuchAlgorithmException) {
-            Timber.e("Hash Key: ${e.message}")
-        } catch (e: Exception) {
-            Timber.e("Hash Key: ${e.message}")
         }
     }
 
@@ -184,23 +81,6 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             }
             diffPictureHeartCount = it.diffPictureHeartCount
             diffPictureHeartChangedTime = it.diffPictureHeartChangedTime
-        }
-    }
-}
-
-@Composable
-fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
-    val eventHandler by rememberUpdatedState(newValue = event)
-    val lifecycle = this@LifecycleEventListener.lifecycle
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event ->
-            eventHandler(event)
-        }
-
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycle.removeObserver(observer)
         }
     }
 }

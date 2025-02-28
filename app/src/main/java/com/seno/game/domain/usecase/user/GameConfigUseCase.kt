@@ -1,10 +1,10 @@
 package com.seno.game.domain.usecase.user
 
-import com.seno.game.data.config.ConfigRepository
+import com.seno.game.data.network.repository.ConfigRepository
 import com.seno.game.di.coroutine.IoDispatcher
 import com.seno.game.extensions.catchError
-import com.seno.game.model.Result
-import com.seno.game.model.SavedGameInfo
+import com.seno.game.data.model.Result
+import com.seno.game.data.model.SavedGameInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

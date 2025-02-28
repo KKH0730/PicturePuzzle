@@ -5,9 +5,9 @@ import com.seno.game.R
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.domain.usecase.user.GameConfigUseCase
 import com.seno.game.extensions.getString
-import com.seno.game.model.DiffPictureGame
-import com.seno.game.model.Result
-import com.seno.game.model.SavedGameInfo
+import com.seno.game.data.model.DiffPictureGame
+import com.seno.game.data.model.Result
+import com.seno.game.data.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseViewModel
 import com.seno.game.util.SoundUtil

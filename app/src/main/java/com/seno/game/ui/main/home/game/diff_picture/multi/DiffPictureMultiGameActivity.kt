@@ -31,7 +31,6 @@ import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.screenWidth
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.component.GamePrepareView
-import com.seno.game.ui.main.home.game.diff_picture.DiffPictureGameViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.math.abs

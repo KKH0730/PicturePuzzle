@@ -3,8 +3,8 @@ package com.seno.game.data.mapper
 import com.google.firebase.firestore.DocumentSnapshot
 import com.seno.game.data.MapperType2
 import com.seno.game.data.network.ApiConstants
-import com.seno.game.model.SavedGameInfo
-import com.seno.game.model.response.UserInfoResponse
+import com.seno.game.data.model.SavedGameInfo
+import com.seno.game.data.model.response.UserInfoResponse
 import com.seno.game.prefs.PrefsManager
 import javax.inject.Inject
 

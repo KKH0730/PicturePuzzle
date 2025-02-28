@@ -212,8 +212,8 @@
     </string-array>
 
     <string-array name="diff_picture_stage1">
+        <item>diff_picture_stage_0_0</item>
         <item>diff_image1</item>
-        <item>diff_image2</item>
         <item>diff_image2</item>
         <item>diff_image2</item>
         <item>diff_image2</item>
@@ -230,9 +230,9 @@
     </string-array>
 
     <string-array name="diff_picture_copy_stage1">
+        <item>diff_picture_stage_0_0_copy</item>
         <item>diff_image1_copy</item>
-        <item>diff_image2_copy</item>
-        <item>diff_image2_copy</item>
+        <item>diff_image2</item>
         <item>diff_image2_copy</item>
         <item>diff_image2_copy</item>
         <item>diff_image2_copy</item>

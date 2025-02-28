@@ -169,12 +169,8 @@ fun NaverLoginButton(
         naverAccountManager.login(
             context = context,
             launcher = launcher,
-            onSignInSucceed = {
-                context.toast("로그인 성공")
-            },
-            onSigInFailed = {
-                context.toast("로그인 실패")
-            },
+            onSignInSucceed = onSignInSucceed,
+            onSigInFailed = onSignInFailed,
         )
     }
 }

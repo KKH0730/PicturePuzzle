@@ -1,5 +1,6 @@
 package com.seno.game.ui.main.home
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -16,15 +17,16 @@ import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.showSnackBar
 import com.seno.game.manager.*
-import com.seno.game.model.SavedGameInfo
+import com.seno.game.data.model.SavedGameInfo
+import com.seno.game.extensions.LifecycleEventListener
+import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.component.LoadingView
-import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
-import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
-import com.seno.game.util.SoundUtil
+import com.seno.game.ui.main.home.game.diff_picture.game_level_list.DPSinglePlayListActivity
 
 @Composable
 fun HomeScreen() {
@@ -37,7 +39,7 @@ fun HomeScreen() {
         kakaoAccountManager = KakaoAccountManager(context = context)
     )
 
-    HomeUI(
+    HomeMenuPanel(
         savedGameInfo = homeViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value,
         homeState = homeState,
         onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
@@ -60,7 +62,7 @@ fun HomeScreen() {
 }
 
 @Composable
-fun HomeUI(
+fun HomeMenuPanel(
     savedGameInfo: SavedGameInfo,
     homeState: HomeState,
     onChangedBackgroundVolume: (Float) -> Unit,
@@ -86,72 +88,17 @@ fun HomeUI(
         }
     }
 
-    if (homeState.isShowQuitDialog.value) {
-        QuitDialog(
-            onClickYes = { context.finish() },
-            onClickNo = { homeState.isShowQuitDialog.value = false },
-            onDismissed = { homeState.isShowQuitDialog.value = false }
-        )
-    }
-
-    if (homeState.isShowLogoutDialog.value) {
-        LogoutDialog(
-            onClickYes = {
-                homeState.isLoading.value = true
-                homeState.isShowLogoutDialog.value = false
-
-                AccountManager.startLogout(
-                    facebookAccountManager = homeState.facebookAccountManager,
-                    googleAccountManager = homeState.googleAccountManager,
-                    naverAccountManager = homeState.naverAccountManager,
-                    kakaoAccountManager = homeState.kakaoAccountManager,
-                    isCompleteLogout = {
-                        homeState.isLoading.value = false
-                        homeState.isShowLogoutDialog.value = false
-
-                        PrefsManager.apply {
-                            nickname = context.resources.createRandomNickname()
-                            profileUri = ""
-                        }
-                        homeState.nickname.value= PrefsManager.nickname
-                        homeState.profile.value = ""
-
-                        context.window.decorView.rootView.showSnackBar(message = "로그아웃 성공")
-                    }
-                )
-            },
-            onClickNo = { homeState.isShowLogoutDialog.value = false },
-            onDismissed = { homeState.isShowLogoutDialog.value = false }
-        )
-    }
-
-    if (homeState.isShowSettingDialog.value) {
-        SettingDialog(
-            onClickClose = { homeState.isShowSettingDialog.value = false },
-            backgroundVolume = savedGameInfo.backgroundVolume,
-            onChangedBackgroundVolume = onChangedBackgroundVolume,
-            onChangedFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
-            effectVolume = savedGameInfo.effectVolume,
-            onChangedEffectVolume = onChangedEffectVolume,
-            onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
-            onChangedVibration = onChangedVibration,
-            onChangedPush = onChangedPush,
-            onClickLogin = { SignGateActivity.start(context = context) },
-            onClickLogout = {
-                homeState.isShowSettingDialog.value = false
-                homeState.isShowLogoutDialog.value = true
-            },
-            onClickManageProfile = {},
-            onDismissed = { homeState.isShowSettingDialog.value = false }
-        )
-    }
-
-    if (homeState.isShowPrepareDialog.value) {
-        PrepareDialog(
-            onDismissed = { homeState.isShowPrepareDialog.value = false },
-            onClickConfirm = {  homeState.isShowPrepareDialog.value = false }
-        )
-    }
+    HomeDialogComposable(
+        activity = context,
+        homeState = homeState,
+        savedGameInfo = savedGameInfo,
+        onChangedBackgroundVolume = onChangedBackgroundVolume,
+        onChangeFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+        onChangedEffectVolume = onChangedEffectVolume,
+        onChangeFinishedEffectVolume = onChangeFinishedEffectVolume,
+        onChangedVibration = onChangedVibration,
+        onChangedPush = onChangedPush
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -203,5 +150,85 @@ fun HomeUI(
         if (homeState.isLoading.value) {
             LoadingView()
         }
+    }
+}
+
+@Composable
+fun HomeDialogComposable(
+    activity: Activity,
+    homeState: HomeState,
+    savedGameInfo: SavedGameInfo,
+    onChangedBackgroundVolume: (Float) -> Unit,
+    onChangeFinishedBackgroundVolume: (Float) -> Unit,
+    onChangedEffectVolume: (Float) -> Unit,
+    onChangeFinishedEffectVolume: (Float) -> Unit,
+    onChangedVibration: (Boolean) -> Unit,
+    onChangedPush: (Boolean) -> Unit,
+) {
+    if (homeState.isShowQuitDialog.value) {
+        QuitDialog(
+            onClickYes = { activity.finish() },
+            onClickNo = { homeState.isShowQuitDialog.value = false },
+            onDismissed = { homeState.isShowQuitDialog.value = false }
+        )
+    }
+
+    if (homeState.isShowLogoutDialog.value) {
+        LogoutDialog(
+            onClickYes = {
+                homeState.isLoading.value = true
+                homeState.isShowLogoutDialog.value = false
+
+                AccountManager.startLogout(
+                    facebookAccountManager = homeState.facebookAccountManager,
+                    googleAccountManager = homeState.googleAccountManager,
+                    naverAccountManager = homeState.naverAccountManager,
+                    kakaoAccountManager = homeState.kakaoAccountManager,
+                    isCompleteLogout = {
+                        homeState.isLoading.value = false
+                        homeState.isShowLogoutDialog.value = false
+
+                        PrefsManager.apply {
+                            nickname = activity.resources.createRandomNickname()
+                            profileUri = ""
+                        }
+                        homeState.nickname.value= PrefsManager.nickname
+                        homeState.profile.value = ""
+
+                        activity.window.decorView.rootView.showSnackBar(message = "로그아웃 성공")
+                    }
+                )
+            },
+            onClickNo = { homeState.isShowLogoutDialog.value = false },
+            onDismissed = { homeState.isShowLogoutDialog.value = false }
+        )
+    }
+
+    if (homeState.isShowSettingDialog.value) {
+        SettingDialog(
+            onClickClose = { homeState.isShowSettingDialog.value = false },
+            backgroundVolume = savedGameInfo.backgroundVolume,
+            onChangedBackgroundVolume = onChangedBackgroundVolume,
+            onChangedFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
+            effectVolume = savedGameInfo.effectVolume,
+            onChangedEffectVolume = onChangedEffectVolume,
+            onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
+            onChangedVibration = onChangedVibration,
+            onChangedPush = onChangedPush,
+            onClickLogin = { SignGateActivity.start(context = activity) },
+            onClickLogout = {
+                homeState.isShowSettingDialog.value = false
+                homeState.isShowLogoutDialog.value = true
+            },
+            onClickManageProfile = {},
+            onDismissed = { homeState.isShowSettingDialog.value = false }
+        )
+    }
+
+    if (homeState.isShowPrepareDialog.value) {
+        PrepareDialog(
+            onDismissed = { homeState.isShowPrepareDialog.value = false },
+            onClickConfirm = {  homeState.isShowPrepareDialog.value = false }
+        )
     }
 }

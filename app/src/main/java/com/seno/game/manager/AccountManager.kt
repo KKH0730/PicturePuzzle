@@ -1,20 +1,23 @@
 package com.seno.game.manager
 
-import android.content.Context
 import android.net.Uri
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.R
 import com.seno.game.data.network.ApiConstants
-import com.seno.game.data.network.FirebaseRequest
+import com.seno.game.data.network.AccountRequest
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -31,12 +34,12 @@ enum class PlatForm(name: String) {
 }
 
 object AccountManager {
-    private var firebaseRequest: FirebaseRequest = FirebaseRequest()
+    private var accountRequest: AccountRequest = AccountRequest()
     private val currentUser: FirebaseUser?
-        get() = firebaseRequest.currentUser
+        get() = accountRequest.currentUser
 
     val firebaseUid: String?
-        get() = firebaseRequest.currentUser?.uid
+        get() = accountRequest.currentUser?.uid
 
     val isSignedIn: Boolean
         get() = currentUser != null
@@ -96,36 +99,6 @@ object AccountManager {
             return FirebaseAuth.getInstance().currentUser?.photoUrl
         }
 
-    @JvmStatic
-    fun addAuthStateListener(onSignedIn: () -> Unit, onSignedOut: () -> Unit) {
-        val authStateListener = FirebaseAuth.AuthStateListener {
-            getFirebaseUserIdToken(
-                onSuccess = { onSignedIn.invoke() },
-                onFailure = {
-                    onSignedOut.invoke()
-                    Timber.e(it)
-                }
-            )
-        }
-        firebaseRequest.firebaseAuth.addAuthStateListener(authStateListener)
-    }
-
-    private fun getFirebaseUserIdToken(
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit,
-    ) {
-        currentUser?.let { firebaseUser ->
-            firebaseUser.getIdToken(true).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    task.result?.let { onSuccess.invoke() }
-                } else {
-                    task.exception?.let { onFailure.invoke(it) }
-                        ?: onFailure.invoke(Exception("Unknown FirebaseUser Id Token Error"))
-                }
-            }
-        } ?: onFailure(Exception("FirebaseUser is null"))
-    }
-
     fun signInWithCredential(
         credential: AuthCredential,
         platform: PlatForm,
@@ -133,7 +106,7 @@ object AccountManager {
         onSignInFailed: () -> Unit,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val signInTask = firebaseRequest.signInWithCredential(credential = credential)
+            val signInTask = accountRequest.signInWithCredential(credential = credential)
             if (!signInTask.isSuccessful) {
                 onSignInFailed.invoke()
                 return@launch
@@ -188,12 +161,12 @@ object AccountManager {
         onSignInFailed: () -> Unit,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            when (val createUserWithEmailAndPasswordResult = firebaseRequest.createUserWithEmailAndPassword(email, password)) {
+            when (val createUserWithEmailAndPasswordResult = accountRequest.createUserWithEmailAndPassword(email, password)) {
                 null -> {
                     onSignInFailed.invoke()
                 }
                 is FirebaseAuthUserCollisionException -> {
-                    val signInUserWithEmailAndPasswordResult = firebaseRequest.signInWithEmailAndPassword(
+                    val signInUserWithEmailAndPasswordResult = accountRequest.signInWithEmailAndPassword(
                         email = email,
                         password = password,
                     )
@@ -414,7 +387,7 @@ object AccountManager {
     }
 
     fun signOutFirebase(isCompleteLogout: () -> Unit) {
-        firebaseRequest.signOut()
+        accountRequest.signOut()
         signInAnonymous(
             onSuccess = isCompleteLogout,
             onFail = isCompleteLogout
@@ -425,10 +398,13 @@ object AccountManager {
         onSuccess: () -> Unit,
         onFail: () -> Unit,
     ) {
-        firebaseRequest.signInAnonymous()
+        accountRequest.signInAnonymous()
             .addOnFailureListener { onFail.invoke() }
             .addOnSuccessListener { onSuccess.invoke() }
     }
+
+    suspend fun signInAnonymous(): AuthResult = accountRequest.signInAnonymous().await()
+
 }
 
 interface OnSocialSignInCallbackListener {

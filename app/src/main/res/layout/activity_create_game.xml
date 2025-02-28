@@ -4,7 +4,7 @@
     <data>
         <variable
             name="eventListener"
-            type="com.seno.game.ui.OnCreateGameEventListener" />
+            type="com.seno.game.ui.main.home.game.diff_picture.create_game.OnCreateGameEventListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,7 +12,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.CreateGameActivity">
+        tools:context=".ui.main.home.game.diff_picture.create_game.CreateGameActivity">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivQRCode"

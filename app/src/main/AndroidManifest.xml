@@ -27,7 +27,7 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android?:allowBackup">
         <activity
-            android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
+            android:name=".ui.main.home.game.diff_picture.game_level_list.DPSinglePlayListActivity"
             android:theme="@style/Theme.DiffGame"
             android:exported="false" />
         <activity
@@ -44,11 +44,11 @@
             android:theme="@style/Theme.Splash"
             android:exported="false" />
         <activity
-            android:name=".ui.FindGameActivity"
+            android:name=".ui.main.home.game.diff_picture.find_game.FindGameActivity"
             android:theme="@style/Theme.Base"
             android:exported="false" />
         <activity
-            android:name=".ui.CreateGameActivity"
+            android:name=".ui.main.home.game.diff_picture.create_game.CreateGameActivity"
             android:theme="@style/Theme.Base"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -63,17 +63,6 @@
             android:theme="@style/Theme.DiffGame"
             android:exported="false"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.main.home.game.areagame.AreaGameActivity"
-            android:theme="@style/Theme.Base"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.main.home.game.humminjeongeumgame.HunMinJeongEumActivity"
-            android:theme="@style/Theme.Base"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateAlwaysVisible" />
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">

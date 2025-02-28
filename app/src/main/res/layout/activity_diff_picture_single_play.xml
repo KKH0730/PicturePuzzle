@@ -106,7 +106,7 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
 
-        <com.seno.game.ui.main.home.game.diff_picture.view.GamePrepareView
+        <com.seno.game.ui.main.home.game.diff_picture.component.GamePrepareView
             android:id="@+id/cvPrepareView"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -116,7 +116,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="gone"/>
 
-        <com.seno.game.ui.main.home.game.diff_picture.view.GameCompleteDialog
+        <com.seno.game.ui.main.home.game.diff_picture.component.GameCompleteDialog
             android:id="@+id/cvGameCompleteDialog"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -125,7 +125,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <com.seno.game.ui.main.home.game.diff_picture.view.GameFailDialog
+        <com.seno.game.ui.main.home.game.diff_picture.component.GameFailDialog
             android:id="@+id/cvGameFailDialog"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -135,7 +135,7 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
 
-        <com.seno.game.ui.main.home.game.diff_picture.view.GameTimerView
+        <com.seno.game.ui.main.home.game.diff_picture.component.GameTimerView
             android:id="@+id/cvTimerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

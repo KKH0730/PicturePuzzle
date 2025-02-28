@@ -11,11 +11,10 @@ import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getDrawableResourceId
 import com.seno.game.extensions.saveCompleteDPGameRound
-import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
-import com.seno.game.ui.main.home.game.diff_picture.model.DiffGameInfo
-import com.seno.game.ui.main.home.game.diff_picture.model.Point
+import com.seno.game.ui.main.home.game.diff_picture.game_level_list.TOTAL_STAGE
+import com.seno.game.data.model.DiffGameInfo
+import com.seno.game.data.model.Point
 import com.seno.game.ui.main.home.game.diff_picture.multi.ANSWER_CORRECTION
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity.Companion.CURRENT_ROUND_POSITION
 import com.seno.game.ui.main.home.game.diff_picture.single.model.AnswerMark

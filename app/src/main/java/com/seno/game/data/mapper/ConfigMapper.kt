@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.seno.game.data.Mapper
 import com.seno.game.data.network.ApiConstants
 import com.seno.game.manager.AccountManager
-import com.seno.game.model.response.UserInfoResponse
+import com.seno.game.data.model.response.UserInfoResponse
 import com.seno.game.prefs.PrefsManager
 import javax.inject.Inject
 

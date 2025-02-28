@@ -1,6 +1,6 @@
 package com.seno.game.extensions
 
-import com.seno.game.model.Result
+import com.seno.game.data.model.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

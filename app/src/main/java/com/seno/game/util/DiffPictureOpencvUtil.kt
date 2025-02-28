@@ -1,7 +1,8 @@
 package com.seno.game.util
 
 import android.graphics.Bitmap
-import com.seno.game.ui.main.home.game.diff_picture.model.Answer
+import com.seno.game.data.model.Answer
+import com.seno.game.data.model.Point
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -85,7 +86,7 @@ class DiffPictureOpencvUtil {
             Imgproc.cvtColor(diffMat, bin, Imgproc.COLOR_BGR2GRAY)
             Imgproc.threshold(bin, bin, 0.0, 255.0, Imgproc.THRESH_OTSU)
 
-            val pointList = ArrayList<com.seno.game.ui.main.home.game.diff_picture.model.Point>()
+            val pointList = ArrayList<Point>()
             val contours = ArrayList<MatOfPoint>()
             val hierarchy = Mat()
 
@@ -119,7 +120,8 @@ class DiffPictureOpencvUtil {
                 val centerX = (rect.x + (rect.width / 2)).toDouble()
                 val centerY = (rect.y + (rect.height / 2)).toDouble()
 
-                pointList.add(com.seno.game.ui.main.home.game.diff_picture.model.Point(
+                pointList.add(
+                    Point(
                     rectX = rect.x.toFloat(),
                     rectY = rect.y.toFloat(),
                     rectWidth = rect.width.toFloat(),
@@ -129,7 +131,8 @@ class DiffPictureOpencvUtil {
                     centerX = centerX.toFloat(),
                     centerY = centerY.toFloat(),
                     answerRadius = (rect.width.coerceAtLeast(rect.height) / 2).toFloat()
-                ))
+                )
+                )
 
                 Imgproc.circle(
                     src,

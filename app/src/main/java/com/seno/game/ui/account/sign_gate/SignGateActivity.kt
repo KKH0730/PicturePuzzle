@@ -3,16 +3,20 @@ package com.seno.game.ui.account.sign_gate
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.os.postDelayed
 import com.seno.game.extensions.showSnackBar
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
+import kotlinx.coroutines.delay
 
 class SignGateActivity : AppCompatActivity() {
     private lateinit var googleAccountManager: GoogleAccountManager
@@ -39,8 +43,10 @@ class SignGateActivity : AppCompatActivity() {
                         onSignInSucceed = {
                             runOnUiThread {
                                 window.decorView.rootView.showSnackBar(message = "로그인 성공")
+                                Handler(Looper.getMainLooper()).postDelayed(500) {
+                                    finish()
+                                }
                             }
-
                         },
                         onSignInFailed = {
                             runOnUiThread {

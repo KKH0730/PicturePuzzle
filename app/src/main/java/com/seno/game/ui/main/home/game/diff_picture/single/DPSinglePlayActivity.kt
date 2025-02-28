@@ -29,7 +29,7 @@ import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
 import com.seno.game.extensions.*
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
+import com.seno.game.ui.main.home.game.diff_picture.game_level_list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
 import com.seno.game.util.AnimationUtils
 import com.seno.game.util.SoundUtil

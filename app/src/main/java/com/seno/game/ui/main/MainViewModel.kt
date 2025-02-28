@@ -2,39 +2,45 @@ package com.seno.game.ui.main
 
 import androidx.lifecycle.viewModelScope
 import com.seno.game.domain.usecase.user.GameConfigUseCase
-import com.seno.game.model.Result
-import com.seno.game.model.SavedGameInfo
+import com.seno.game.data.model.Result
+import com.seno.game.data.model.SavedGameInfo
+import com.seno.game.data.network.AccountRequest
+import com.seno.game.manager.AccountManager
 import com.seno.game.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val configUseCase: GameConfigUseCase
+    private val configUseCase: GameConfigUseCase,
 ): BaseViewModel() {
-
     private val _showNetworkErrorEvent = MutableStateFlow(false)
     val showNetworkErrorEvent: StateFlow<Boolean> get() = _showNetworkErrorEvent.asStateFlow()
 
-    private val _savedGameInfoToLocalDB = MutableSharedFlow<SavedGameInfo?>()
-    val savedGameInfoToLocalDB: SharedFlow<SavedGameInfo?> get() = _savedGameInfoToLocalDB.asSharedFlow()
+    private val _savedGameInfoToLocalDB = MutableStateFlow<SavedGameInfo?>(null)
+    val savedGameInfoToLocalDB: StateFlow<SavedGameInfo?> get() = _savedGameInfoToLocalDB.asStateFlow()
+
+    init {
+        reqAuthenticationAndGetSaveGameInfo()
+    }
+
+    private fun reqAuthenticationAndGetSaveGameInfo() {
+        AccountManager.firebaseUid?.let { uid ->
+            getSavedGameInfo(uid = uid)
+        }
+    }
+
 
     fun getSavedGameInfo(uid: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
-                savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
-                    when (result) {
-                        is Result.Success -> {
-                            _savedGameInfoToLocalDB.emit(result.data)
-                        }
-                        is Result.Error -> { _showNetworkErrorEvent.value = true }
-                        else -> {}
-                    }
+            val savedUserInfoResponse = configUseCase.reqGetSavedGameInfo(params = uid)
+            savedUserInfoResponse.collect { result: Result<SavedGameInfo> ->
+                when (result) {
+                    is Result.Success -> _savedGameInfoToLocalDB.emit(result.data)
+                    is Result.Error -> _showNetworkErrorEvent.value = true
+                    else -> {}
                 }
             }
         }

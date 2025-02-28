@@ -44,9 +44,6 @@ object AccountManager {
     val isSignedIn: Boolean
         get() = currentUser != null
 
-    val isAnonymous: Boolean
-        get() = currentUser?.isAnonymous == true
-
     val isUser: Boolean
         get() = currentUser != null
 

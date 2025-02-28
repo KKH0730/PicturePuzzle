@@ -19,23 +19,21 @@ fun MainScreen() {
     val mainViewModel = hiltViewModel<MainViewModel>()
     val isShowNetworkErrorEvent = mainViewModel.showNetworkErrorEvent.collectAsStateWithLifecycle().value
     val savedGameInfo = mainViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value
+    savedGameInfo?.savedGameInfoToLocalDB()
 
     val context = LocalContext.current
-    if (isShowNetworkErrorEvent) {
-        RestartDialog(
-            title = context.getString(R.string.network_error_title),
-            content = context.getString(R.string.network_error),
-            confirmText = context.getString(R.string.alert_dialog_restart),
-            onClickConfirm = { (context as MainActivity).restartApp() }
-        )
-    } else {
-        val navController = rememberNavController()
+    val navController = rememberNavController()
 
-        if (savedGameInfo != null) {
-            savedGameInfo.savedGameInfoToLocalDB()
-            Box { NavigationGraph(navController = navController) }
+    Box {
+        if (isShowNetworkErrorEvent) {
+            RestartDialog(
+                title = context.getString(R.string.network_error_title),
+                content = context.getString(R.string.network_error),
+                confirmText = context.getString(R.string.alert_dialog_restart),
+                onClickConfirm = { (context as MainActivity).restartApp() }
+            )
         } else {
-            HomeLoadingScreen()
+            NavigationGraph(navController = navController)
         }
     }
 }

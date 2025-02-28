@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -346,26 +347,30 @@ object AccountManager {
         signOut(object : OnSignOutCallbackListener {
             override fun onSignOutFacebook() {
                 facebookAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase()
+                isCompleteLogout.invoke()
             }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
                     logoutListener = object : GoogleAccountManager.LogoutListener {
                         override fun onSuccessLogout() {
-                            signOutFirebase(isCompleteLogout = isCompleteLogout)
+                            signOutFirebase()
+                            isCompleteLogout.invoke()
                         }
                     })
             }
 
             override fun onSignOutNaver() {
                 naverAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase()
+                isCompleteLogout.invoke()
             }
 
             override fun onSignOutKakao() {
                 kakaoAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
+                signOutFirebase()
+                isCompleteLogout.invoke()
             }
         })
     }
@@ -375,6 +380,7 @@ object AccountManager {
             return
         }
 
+        Timber.e("authProviderId : $authProviderId")
         when (authProviderId) {
             LOGIN_TYPE_FACEBOOK -> onSignOutCallbackListener.onSignOutFacebook()
             LOGIN_TYPE_GOOGLE -> onSignOutCallbackListener.onSignOutGoogle()
@@ -383,24 +389,9 @@ object AccountManager {
         }
     }
 
-    fun signOutFirebase(isCompleteLogout: () -> Unit) {
+    fun signOutFirebase() {
         accountRequest.signOut()
-        signInAnonymous(
-            onSuccess = isCompleteLogout,
-            onFail = isCompleteLogout
-        )
     }
-
-    fun signInAnonymous(
-        onSuccess: () -> Unit,
-        onFail: () -> Unit,
-    ) {
-        accountRequest.signInAnonymous()
-            .addOnFailureListener { onFail.invoke() }
-            .addOnSuccessListener { onSuccess.invoke() }
-    }
-
-    suspend fun signInAnonymous(): AuthResult = accountRequest.signInAnonymous().await()
 
 }
 

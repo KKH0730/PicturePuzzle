@@ -1,4 +1,4 @@
-package com.seno.game.util
+package com.seno.game.theme
 
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme

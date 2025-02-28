@@ -220,7 +220,6 @@ fun HomeDialogComposable(
                 homeState.isShowSettingDialog.value = false
                 homeState.isShowLogoutDialog.value = true
             },
-            onClickManageProfile = {},
             onDismissed = { homeState.isShowSettingDialog.value = false }
         )
     }

@@ -23,7 +23,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.seno.game.R
 import com.seno.game.navigation.NavigationRoute
-import com.seno.game.util.NoRippleTheme
+import com.seno.game.theme.NoRippleTheme
 
 val BottomMenuList = listOf(
     NavigationRoute.HOME,

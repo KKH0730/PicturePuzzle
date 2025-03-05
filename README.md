@@ -11,8 +11,9 @@
  - Gson
  - Glide
  - Lottie
+ - Timber
  - OpenCV
- - Firebase(Firestore, Authentication)
+ - Firebase(Firestore, Authentication, Crashlytics)
  - Admob
  - Zeplin
  - Git

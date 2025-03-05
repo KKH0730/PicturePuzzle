@@ -4,8 +4,8 @@
  - Kotlin
  - Hilt
  - DataBinding
- - Viewmodel
- - Lifecycle
+ - Corountine + Flow : Asynchronous event handling
+ - AAC(Viewmodel, Lifecycle)
  - Retrofit2
  - Okhttp3
  - Gson

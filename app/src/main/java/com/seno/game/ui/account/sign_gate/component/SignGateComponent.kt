@@ -142,26 +142,6 @@ fun NaverLoginButton(
     onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
     val context = LocalContext.current
-    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            when (it.resultCode) {
-                Activity.RESULT_OK -> {
-                    naverAccountManager.onActivityResult(
-                        onSignInSucceed = onSignInSucceed,
-                        onSignInFailed = onSignInFailed
-                    )
-                }
-                Activity.RESULT_CANCELED -> {
-                    // 실패 or 에러
-                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                    val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                    onSignInFailed.invoke(java.lang.Exception(errorDescription))
-                }
-            }
-        }
-
 
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_naver)
@@ -169,21 +149,8 @@ fun NaverLoginButton(
         onClickSocialLogin.invoke()
         naverAccountManager.login(
             context = context,
-            onSignInSucceed = {
-                naverAccountManager.onActivityResult(
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
-
-                context.toast("로그인 성공")
-            },
-            onSigInFailed = {
-                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                onSignInFailed.invoke(java.lang.Exception(errorDescription))
-
-                context.toast("로그인 실패")
-            },
+            onSignInSucceed = onSignInSucceed,
+            onSigInFailed = onSignInFailed,
         )
     }
 }

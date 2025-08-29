@@ -42,7 +42,6 @@ class SignGateActivity : AppCompatActivity() {
                                 toast("로그인 성공")
                                 finish()
                             }
-
                         },
                         onSignInFailed = { exception ->
                             runOnUiThread {

@@ -31,8 +31,12 @@ class DiffPictureUseCase @Inject constructor(
         ).catchError(dispatcher = ioDispatcher)
 
 
-    suspend fun reqDiffPictures(): Result<List<Pair<Uri, Uri>>>  {
-        return diffPictureRepository.getDiffPictures()
+    suspend fun reqRoundDiffPicture(round: String): Result<Pair<String, String>> {
+        return diffPictureRepository.getRoundDiffPicture(round = round)
+    }
+
+    suspend fun reqAllDiffPictures(): Result<List<Pair<Uri, Uri>>>  {
+        return diffPictureRepository.getAllDiffPictures()
     }
 
     suspend fun createRoom(

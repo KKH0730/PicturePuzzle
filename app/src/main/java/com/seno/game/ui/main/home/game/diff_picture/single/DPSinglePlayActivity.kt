@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
@@ -18,6 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.airbnb.lottie.LottieAnimationView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fondesa.recyclerviewdivider.RecyclerViewDivider
 import com.google.android.gms.ads.AdRequest
 import com.seno.game.R
@@ -31,7 +34,9 @@ import com.seno.game.util.AnimationUtils
 import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -83,6 +88,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         setPrepareView()
         setGameCompleteDialog()
         setGameFailDialog()
+        setGameFinishDialog()
         setTimerView()
         setRecyclerView()
 
@@ -93,25 +99,34 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
     private fun observeFlow() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 launch {
-                    viewModel.diffImagePair.collect {
-                        setDiffPictureResource(resource1 = it.first, resource2 = it.second)
+                    viewModel.finishGame.collectLatest {
+                        binding.cvGameFinishDialog.show()
                     }
                 }
 
                 launch {
-                    viewModel.answerMarkList.collect {
+                    viewModel.diffImagePair.collectLatest {
+                        if (it == null) {
+                            return@collectLatest
+                        }
+                        setDiffPictureResource(bitmap1 = it.first, bitmap2 = it.second)
+                    }
+                }
+
+                launch {
+                    viewModel.answerMarkList.collectLatest {
                         (binding.rvAnswerMark.adapter as AnswerMarkAdapter).submitList(it)
                     }
                 }
 
                 launch {
-                    viewModel.onClearAnswer.collect { binding.clAnswerMark.removeAllViews() }
+                    viewModel.onClearAnswer.collectLatest { binding.clAnswerMark.removeAllViews() }
                 }
 
                 launch {
-                    viewModel.onShowCompleteGameDialog.collect {
+                    viewModel.onShowCompleteGameDialog.collectLatest {
                         animatorSet
                             ?.takeIf { it.isRunning }
                             .let { AnimationUtils.stopAnimation(it) }
@@ -123,7 +138,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 }
 
                 launch {
-                    viewModel.drawRightAnswerMark.collect { point ->
+                    viewModel.drawRightAnswerMark.collectLatest { point ->
                         val answerCenterX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
@@ -169,7 +184,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 }
 
                 launch {
-                    viewModel.drawWrongAnswerMark.collect {
+                    viewModel.drawWrongAnswerMark.collectLatest {
                         var lottieAnimationView: LottieAnimationView? = null
                         lottieAnimationView = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = it.first,
@@ -191,7 +206,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 }
 
                 launch {
-                    viewModel.drawAnswerHint.collect { point ->
+                    viewModel.drawAnswerHint.collectLatest { point ->
                         val answerCenterX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
@@ -362,6 +377,15 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
     }
 
+    private fun setGameFinishDialog() {
+        binding.cvGameFinishDialog.apply {
+            onClickPositiveButton = {
+                dismiss()
+                finish()
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun setTimerView() {
         binding.cvTimerView.post {
@@ -475,22 +499,20 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     // endregion TouchListener
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun setDiffPictureResource(@DrawableRes resource1: Int, @DrawableRes resource2: Int) {
-        binding.ivOrigin.post {
-            getDrawable(resource1)?.let {
-                binding.ivOrigin.setImageResource(resource1)
-            }
-        }
+    private fun setDiffPictureResource(bitmap1: Bitmap, bitmap2: Bitmap) {
+        Glide.with(this@DPSinglePlayActivity)
+            .load(bitmap1)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(binding.ivOrigin)
 
-        binding.ivCopy.post {
-            getDrawable(resource2)?.let {
-                binding.ivCopy.setImageResource(resource2)
-            }
-        }
+        Glide.with(this@DPSinglePlayActivity)
+            .load(bitmap2)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(binding.ivCopy)
     }
 
     fun onClickHint() {
-        if (binding.clLoadingView.visibility == View.VISIBLE) {
+        if (binding.clLoadingView.isVisible) {
             return
         }
         binding.clLoadingView.visibility = View.VISIBLE
@@ -547,18 +569,24 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         const val CURRENT_ROUND_POSITION = "currentRoundPosition"
         const val FINAL_ROUND_POSITION = "finalRoundPosition"
         const val STAGE_POSITION = "stagePosition"
+        const val IMAGE1 = "image1"
+        const val IMAGE2 = "image2"
 
         fun start(
             context: Context,
             stagePosition: Int,
             currentRoundPosition: Int,
             finalRoundPosition: Int,
+            image1: String,
+            image2: String,
             launcher: ActivityResultLauncher<Intent?>
         ) {
             context.startActivity(DPSinglePlayActivity::class.java, launcher) {
                 putExtra(STAGE_POSITION, stagePosition)
                 putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
                 putExtra(FINAL_ROUND_POSITION, finalRoundPosition)
+                putExtra(IMAGE1, image1)
+                putExtra(IMAGE2, image2)
             }
         }
     }

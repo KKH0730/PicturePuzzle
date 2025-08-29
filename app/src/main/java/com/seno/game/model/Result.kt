@@ -21,3 +21,10 @@ val <T> Result<T>.data: T?
 fun <T> Result<T>.successOr(fallback: T): T {
     return data ?: fallback
 }
+
+
+fun <T> Result<T>.isSuccess(): Boolean = this is Result.Success && this.data != null
+
+fun <T> Result<T>.successData(): T? = this.data
+
+fun <T> Result<T>.exceptionData() = (this as Result.Error).exception

@@ -21,6 +21,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
 import com.seno.game.extensions.*
+import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.main.home.game.diff_picture.list.component.TOTAL_HEART_COUNT
@@ -88,11 +89,15 @@ class DPSinglePlayListActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.currentGameRound.collect {
+                    it.images.saveDiskCacheData()
+
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,
                         stagePosition = it.currentStagePosition,
                         currentRoundPosition = it.currentRoundPosition,
                         finalRoundPosition = it.finalRoundPosition,
+                        image1 = it.images?.first ?: "",
+                        image2 = it.images?.second ?: "",
                         launcher = launcher
                     )
                     overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)

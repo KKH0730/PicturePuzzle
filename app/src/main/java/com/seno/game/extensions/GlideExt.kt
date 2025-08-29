@@ -2,6 +2,7 @@
 package com.seno.game.extensions
 
 import android.app.Application
+import android.graphics.Bitmap
 import android.graphics.Point
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -9,6 +10,8 @@ import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.seno.game.App
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val DEFAULT_OPTIONS = RequestOptions()
     .format(DecodeFormat.PREFER_RGB_565)
@@ -45,6 +48,16 @@ fun String.saveDiskCacheData(size: Point?) {
     }
 }
 
+fun Pair<String, String>?.saveDiskCacheData(size: Point? = null) {
+    if (size != null) {
+        getDiskCacheRequestManager().downloadOnly().load(this?.first).submit(size.x, size.y)
+        getDiskCacheRequestManager().downloadOnly().load(this?.second).submit(size.x, size.y)
+    } else {
+        getDiskCacheRequestManager().downloadOnly().load(this?.first).submit()
+        getDiskCacheRequestManager().downloadOnly().load(this?.second).submit()
+    }
+}
+
 fun List<String>.saveDiskCacheData(size: Point?) {
     this.forEach { url ->
         if (size != null) {
@@ -61,4 +74,19 @@ fun clearMemoryCache() {
 
 fun Application.clearDiskCache() {
     Thread { Glide.get(this).clearDiskCache() }.start()
+}
+
+suspend fun String.getBitmapFromUrl(): Bitmap? {
+    return withContext(Dispatchers.IO) {
+        try {
+            Glide.with(App.getInstance().applicationContext)
+                .asBitmap()
+                .load(this)
+                .submit()
+                .get()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 }

@@ -7,4 +7,5 @@ data class StartGameModel(
     val currentStagePosition: Int,
     val currentRoundPosition: Int,
     val finalRoundPosition: Int,
+    val images: Pair<String, String>?
 )

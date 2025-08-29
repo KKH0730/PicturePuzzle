@@ -16,6 +16,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class ProvideSinModule {
+    @DiffPictureStorageRef
     @Singleton
     @Provides
     fun provideStorageReference(): StorageReference {

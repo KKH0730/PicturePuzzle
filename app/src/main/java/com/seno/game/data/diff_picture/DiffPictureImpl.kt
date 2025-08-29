@@ -1,11 +1,13 @@
 package com.seno.game.data.diff_picture
 
 import android.net.Uri
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.seno.game.data.network.ApiConstants
+import com.seno.game.di.DiffPictureStorageRef
 import com.seno.game.di.network.DiffDocRef
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Player
@@ -16,13 +18,16 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class DiffPictureImpl @Inject constructor(
     private val db: FirebaseFirestore,
-    private val ref: StorageReference,
+    @DiffPictureStorageRef private val ref: StorageReference,
 ) : DiffPictureRepository {
 
     @DiffDocRef
@@ -64,31 +69,58 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDiffPictures(): Result<List<Pair<Uri, Uri>>> {
+    override suspend fun getRoundDiffPicture(round: String): Result<Pair<String, String>> {
+        val today = LocalDate.now()
+        val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val originImage = ref.child(formattedDate).child("${formattedDate}_${round}_1.png").downloadUrl.await()
+                val otherImage = ref.child(formattedDate).child("${formattedDate}_${round}_2.png").downloadUrl.await()
+                Timber.e("originImage : $originImage")
+                Timber.e("otherImage : $otherImage")
+                Result.Success(originImage.toString() to otherImage.toString())
+            } catch (e: Exception) {
+                Result.Error(exception = e)
+            }
+        }
+    }
+
+    override suspend fun getAllDiffPictures(): Result<List<Pair<Uri, Uri>>> {
+        val today = LocalDate.now()
+        val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
+
         return withContext(Dispatchers.IO) {
             try {
                 val uriPairList = arrayListOf<Pair<Uri, Uri>>()
-                ref.child("halloween").list(100)
-                    .addOnSuccessListener { listResult ->
+                val result = ref.child(formattedDate).listAll().await()
+                val allFiles = mutableListOf<StorageReference>()
+                allFiles.addAll(result.items)
 
-                        // 이미지 두개 들어있는 폴더들
-                        listResult.items.forEach { pictureFolderRef ->
-                            var firstUri: Uri? = null
-                            pictureFolderRef.listAll().addOnSuccessListener { pictureListResult ->
-                                pictureListResult.items.forEach { pictureRef ->
-                                    pictureRef.downloadUrl.addOnSuccessListener { uri ->
-                                        if (!pictureRef.name.contains("copy")) {
-                                            firstUri = uri
-                                        } else {
-                                            firstUri?.let {
-                                                uriPairList.add(it to uri)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }.await()
+                val allUrls = allFiles.map { it.downloadUrl.await() } // 모든 URL 가져오기
+
+
+//                ref.child(halloween).list(100)
+//                    .addOnSuccessListener { listResult ->
+//                        listResult.items.map { storageReference ->  }
+//                        // 이미지 두개 들어있는 폴더들
+//                        listResult.items.forEach { pictureFolderRef ->
+//                            var firstUri: Uri? = null
+//                            pictureFolderRef.listAll().addOnSuccessListener { pictureListResult ->
+//                                pictureListResult.items.forEach { pictureRef ->
+//                                    pictureRef.downloadUrl.addOnSuccessListener { uri ->
+//                                        if (!pictureRef.name.contains("copy")) {
+//                                            firstUri = uri
+//                                        } else {
+//                                            firstUri?.let {
+//                                                uriPairList.add(it to uri)
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }.await()
                 Result.Success(uriPairList)
             } catch (e: Exception) {
                 Result.Error(exception = e)

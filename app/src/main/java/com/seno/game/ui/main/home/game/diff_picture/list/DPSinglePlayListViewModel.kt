@@ -8,6 +8,8 @@ import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawableResourceId
 import com.seno.game.extensions.getString
 import com.seno.game.manager.AccountManager
+import com.seno.game.model.successData
+import com.seno.game.model.successOr
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
@@ -16,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 const val TOTAL_STAGE = 5
@@ -76,6 +79,12 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
             return stageInfos
         }
+
+    suspend fun reqRoundDiffPictures(round: String): Pair<String, String>? {
+        return withContext(Dispatchers.IO) {
+            diffPictureUseCase.reqRoundDiffPicture(round = round).successData()
+        }
+    }
 
     fun refreshGameList() {
         _gameList.value = singleGameList
@@ -144,12 +153,14 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 val gameList = _gameList.value[_currentStage.value]
                 val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
                 if (selectedGameIndex != -1) {
+                    Timber.e("selectedGameIndex : ${selectedGameIndex + 1}")
                     _currentGameRound.emit(
                         StartGameModel(
                             currentGameModel = gameList[selectedGameIndex],
                             currentStagePosition = _currentStage.value,
                             currentRoundPosition = selectedGameIndex,
-                            finalRoundPosition = _gameList.value[_currentStage.value].size - 1
+                            finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
+                            images = reqRoundDiffPictures((selectedGameIndex + 1).toString())
                         )
                     )
                 }
@@ -171,7 +182,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                             currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
                             currentStagePosition = _currentStage.value,
                             currentRoundPosition = currentRoundPosition + 1,
-                            finalRoundPosition = finalRoundPosition
+                            finalRoundPosition = finalRoundPosition,
+                            images = reqRoundDiffPictures((currentRoundPosition + 1).toString())
                         )
                     )
                 }

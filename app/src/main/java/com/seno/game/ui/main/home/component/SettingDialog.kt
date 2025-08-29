@@ -1,10 +1,12 @@
 package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +22,6 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.util.BlueRippleTheme
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -173,33 +174,29 @@ fun BackgroundVolumeSliderUnit(
     onValueChangeFinished: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(
-        LocalRippleTheme provides BlueRippleTheme,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = text,
-                fontSize = 14.textDp,
-                color = colorResource(id = R.color.color_b8c0ff),
-                modifier = Modifier.weight(weight = 4f)
-            )
-            Slider(
-                value = value,
-                onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
-                valueRange = 0.0f..1.0f,
-                onValueChangeFinished = { onValueChangeFinished.invoke(value) },
-                colors = SliderDefaults.colors(
-                    thumbColor = colorResource(id = R.color.color_bbd0ff),
-                    activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
-                ),
-                modifier = Modifier
-                    .weight(weight = 6f)
-                    .height(height = 40.dp),
-            )
-        }
+        Text(
+            text = text,
+            fontSize = 14.textDp,
+            color = colorResource(id = R.color.color_b8c0ff),
+            modifier = Modifier.weight(weight = 4f)
+        )
+        Slider(
+            value = value,
+            onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
+            valueRange = 0.0f..1.0f,
+            onValueChangeFinished = { onValueChangeFinished.invoke(value) },
+            colors = SliderDefaults.colors(
+                thumbColor = colorResource(id = R.color.color_bbd0ff),
+                activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
+            ),
+            modifier = Modifier
+                .weight(weight = 6f)
+                .height(height = 40.dp)
+        )
     }
 }
 
@@ -211,33 +208,29 @@ fun EffectVolumeSliderUnit(
     onValueChangeFinished: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(
-        LocalRippleTheme provides BlueRippleTheme,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = text,
-                fontSize = 14.textDp,
-                color = colorResource(id = R.color.color_b8c0ff),
-                modifier = Modifier.weight(weight = 4f)
-            )
-            Slider(
-                value = value,
-                onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
-                valueRange = 0.0f..1.0f,
-                onValueChangeFinished = { onValueChangeFinished.invoke(value) },
-                colors = SliderDefaults.colors(
-                    thumbColor = colorResource(id = R.color.color_bbd0ff),
-                    activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
-                ),
-                modifier = Modifier
-                    .weight(weight = 6f)
-                    .height(height = 40.dp),
-            )
-        }
+        Text(
+            text = text,
+            fontSize = 14.textDp,
+            color = colorResource(id = R.color.color_b8c0ff),
+            modifier = Modifier.weight(weight = 4f)
+        )
+        Slider(
+            value = value,
+            onValueChange = { onValueChanged.invoke((it * 100).roundToInt() / 100.0f) },
+            valueRange = 0.0f..1.0f,
+            onValueChangeFinished = { onValueChangeFinished.invoke(value) },
+            colors = SliderDefaults.colors(
+                thumbColor = colorResource(id = R.color.color_bbd0ff),
+                activeTrackColor = colorResource(id = R.color.color_80bbd0ff),
+            ),
+            modifier = Modifier
+                .weight(weight = 6f)
+                .height(height = 40.dp),
+        )
     }
 }
 
@@ -257,31 +250,27 @@ fun SwitchUnit(
         )
     }
 
-    CompositionLocalProvider(
-        LocalRippleTheme provides BlueRippleTheme,
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = text,
-                fontSize = 14.textDp,
-                color = colorResource(id = R.color.color_b8c0ff),
-                modifier = Modifier.align(alignment = Alignment.CenterStart)
-            )
-            Switch(
-                checked = isSwitchChecked,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                    checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
-                    uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
-                    uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
-                ),
-                onCheckedChange = {
-                    isSwitchChecked = it
-                    onCheckedChange.invoke(it)
-                },
-                modifier = Modifier.align(alignment = Alignment.CenterEnd)
-            )
-        }
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = text,
+            fontSize = 14.textDp,
+            color = colorResource(id = R.color.color_b8c0ff),
+            modifier = Modifier.align(alignment = Alignment.CenterStart)
+        )
+        Switch(
+            checked = isSwitchChecked,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                checkedTrackColor = colorResource(id = R.color.color_FFD6FF),
+                uncheckedThumbColor = colorResource(id = R.color.color_bbd0ff),
+                uncheckedTrackColor = colorResource(id = R.color.color_66FFD6FF),
+            ),
+            onCheckedChange = {
+                isSwitchChecked = it
+                onCheckedChange.invoke(it)
+            },
+            modifier = Modifier.align(alignment = Alignment.CenterEnd)
+        )
     }
 }
 
@@ -290,31 +279,27 @@ fun NotificationPanel(
     onChangedPush: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(
-        LocalRippleTheme provides BlueRippleTheme,
+    Column(
+        modifier = modifier.fillMaxWidth(0.83f)
     ) {
-        Column(
-            modifier = modifier.fillMaxWidth(0.83f)
-        ) {
-            Text(
-                text = stringResource(id = R.string.home_setting_notification),
-                fontSize = 16.textDp,
-                color = colorResource(id = R.color.color_b8c0ff)
-            )
-            Spacer(modifier = Modifier.height(height = 7.dp))
-            Box(
-                modifier = Modifier
-                    .height(height = 1.dp)
-                    .fillMaxWidth()
-                    .background(color = colorResource(id = R.color.color_bbd0ff))
-            )
-            Spacer(modifier = Modifier.height(height = 13.5.dp))
-            SwitchUnit(
-                text = stringResource(id = R.string.home_setting_notification_push),
-                isVibrationSwitch = false,
-                onCheckedChange = onChangedPush
-            )
-        }
+        Text(
+            text = stringResource(id = R.string.home_setting_notification),
+            fontSize = 16.textDp,
+            color = colorResource(id = R.color.color_b8c0ff)
+        )
+        Spacer(modifier = Modifier.height(height = 7.dp))
+        Box(
+            modifier = Modifier
+                .height(height = 1.dp)
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.color_bbd0ff))
+        )
+        Spacer(modifier = Modifier.height(height = 13.5.dp))
+        SwitchUnit(
+            text = stringResource(id = R.string.home_setting_notification_push),
+            isVibrationSwitch = false,
+            onCheckedChange = onChangedPush
+        )
     }
 }
 

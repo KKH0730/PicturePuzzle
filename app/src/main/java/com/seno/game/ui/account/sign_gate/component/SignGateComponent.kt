@@ -169,11 +169,19 @@ fun NaverLoginButton(
         onClickSocialLogin.invoke()
         naverAccountManager.login(
             context = context,
-            launcher = launcher,
             onSignInSucceed = {
+                naverAccountManager.onActivityResult(
+                    onSignInSucceed = onSignInSucceed,
+                    onSignInFailed = onSignInFailed
+                )
+
                 context.toast("로그인 성공")
             },
             onSigInFailed = {
+                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                onSignInFailed.invoke(java.lang.Exception(errorDescription))
+
                 context.toast("로그인 실패")
             },
         )

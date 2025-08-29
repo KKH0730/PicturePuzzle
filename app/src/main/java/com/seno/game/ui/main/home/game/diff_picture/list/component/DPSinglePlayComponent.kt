@@ -233,12 +233,7 @@ fun GamePlayHeartTimer(
 ) {
     Column(
         modifier = modifier.clickable(
-            indication = rememberRipple(
-                bounded = false,
-                radius = 20.dp,
-                color = Color.Gray,
-            ),
-            interactionSource = MutableInteractionSource(),
+            interactionSource = remember { MutableInteractionSource() },
             onClick = { onClickTimer.invoke(heartCount) }
         )
     ) {

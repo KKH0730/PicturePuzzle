@@ -1,19 +1,8 @@
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath(Plugins.ANDROID_GRADLE_PLUGIN)
-        classpath(Plugins.KOTLIN)
-        classpath(Plugins.HILT_AGP)
-        classpath(Plugins.KOTLIN_GRADLE)
-        classpath(Plugins.GOOGLE_SERVICE)
-        classpath(Plugins.CRASHLYTICS)
-    }
-}
-
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.plugin.compose) apply false
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
+    alias(libs.plugins.dagger.hilt) apply false
 }

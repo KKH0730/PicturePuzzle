@@ -167,14 +167,16 @@ class MainActivity : ComponentActivity() {
 
     private fun printHashKey() {
         try {
-            val info: PackageInfo =
-                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-            for (signature in info.signatures) {
-                val md: MessageDigest = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                val hashKey: String = String(Base64.encode(md.digest(), 0))
-                Timber.e("Hash Key: $hashKey")
+            val info: PackageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            info.signatures?.let {
+                for (signature in it) {
+                    val md: MessageDigest = MessageDigest.getInstance("SHA")
+                    md.update(signature.toByteArray())
+                    val hashKey: String = String(Base64.encode(md.digest(), 0))
+                    Timber.e("Hash Key: $hashKey")
+                }
             }
+
         } catch (e: NoSuchAlgorithmException) {
             Timber.e("Hash Key: ${e.message}")
         } catch (e: Exception) {

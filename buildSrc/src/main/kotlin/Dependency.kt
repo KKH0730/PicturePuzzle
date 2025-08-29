@@ -6,7 +6,6 @@ object Plugins {
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:7.2.2"
     const val HILT_AGP = "com.google.dagger:hilt-android-gradle-plugin:2.42"
     const val KOTLIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
-    const val KOTLIN_GRADLE = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
     const val GOOGLE_SERVICE = "com.google.gms:google-services:4.3.13"
     const val CRASHLYTICS = "com.google.firebase:firebase-crashlytics-gradle:2.9.2"
 }
@@ -93,7 +92,7 @@ object Dependency {
     }
 
     object Hilt {
-        private const val VERSION = "2.42"
+        private const val VERSION = "2.57.1"
         const val ANDROID = "com.google.dagger:hilt-android:$VERSION"
         const val COMPILER = "com.google.dagger:hilt-android-compiler:$VERSION"
         const val TESTING = "com.google.dagger:hilt-android-testing:$VERSION"

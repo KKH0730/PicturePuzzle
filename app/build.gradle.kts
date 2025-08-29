@@ -2,13 +2,14 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
-    id("kotlin-parcelize")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("dagger.hilt.android.plugin")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.plugin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.dagger.hilt)
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -17,12 +18,12 @@ val keystoreProperties = Properties()
 keystoreProperties.load(keystoreFileInputStream)
 
 android {
-    compileSdk = 33
-
+    compileSdk = 36
+    namespace = "com.seno.game"
     defaultConfig {
         applicationId = "com.seno.game"
-        minSdk = 23
-        targetSdk = 33
+        minSdk = 24
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
 
@@ -41,6 +42,8 @@ android {
 
     buildTypes {
         getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -67,20 +70,20 @@ android {
             manifestPlaceholders["enableCrashReporting"] = true
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = listOf("-Xjvm-default=compatibility")
+        jvmTarget = "11"
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
-    }
+
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
         compose = true
     }
 }
@@ -88,97 +91,88 @@ android {
 dependencies {
     implementation(project(":opencv"))
 
-    // AndroidX
-    implementation(Dependency.AndroidX.APP_COMPAT)
-    implementation(Dependency.AndroidX.MATERIAL)
-    implementation(Dependency.AndroidX.CONSTRAINT_LAYOUT)
-    implementation(Dependency.AndroidX.RECYCLERVIEW)
-
-    // KTX
-    implementation(Dependency.KTX.CORE)
-    implementation(Dependency.KTX.ACTIVITY_KTX)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.paging.runtime)
 
     // Compose
-    implementation(Dependency.Compose.ACTIVITY_COMPOSE)
-    implementation(Dependency.Compose.COMPOSE_MATERIAL)
-    implementation(Dependency.Compose.RUNTIME)
-    implementation(Dependency.Compose.UI)
-    implementation(Dependency.Compose.PREVIEW)
-    implementation(Dependency.Hilt.HILT_NAVIGATION)
-    implementation(Dependency.Lifecycle.VIEWMODEL_COMPOSE)
-    implementation(Dependency.Lifecycle.RUNTIME_COMPOSE)
-    implementation(Dependency.Paging.COMPOSE)
-    implementation(Dependency.Compose.COMPOSE_CONSTRAINT)
-    implementation(Dependency.Compose.NAVIGATION)
-    implementation("com.google.ar:core:1.30.0")
-    debugImplementation(Dependency.Compose.UI_TOOLING)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.preview)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.ui)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.constraintlayout)
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Firebase
-    implementation(platform(Dependency.Firebase.FIREBASE_BOM))
-    implementation(Dependency.Firebase.FIREBASE_FIRESTORE)
-    implementation(Dependency.Firebase.FIREBASE_ANALYTICS)
-    implementation(Dependency.Firebase.FIREBASE_AUTH)
-    implementation(Dependency.Firebase.FIREBASE_CRASHLYTICS)
-    implementation(Dependency.Firebase.FIREBASE_MESSAGING)
-    implementation(Dependency.Firebase.FIREBASE_STORAGE)
-
-    // Jetbrains
-    implementation(Dependency.JETBRAINS.COROUTINE_ANDROID)
-    implementation(Dependency.JETBRAINS.COROUTINE_PLAY_SERVICE)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storeage)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
 
     // Accompanist
-    implementation(Dependency.Accompanist.SYSTEM_UI_CONTROLLER)
-    implementation(Dependency.Accompanist.PAGER)
+    implementation(libs.accompanist.ui.controller)
+    implementation(libs.accompanist.pager)
 
     // Facebook
-    implementation(Dependency.Facebook.FACEBOOK_LOGIN)
-    implementation(Dependency.Facebook.FACEBOOK_APP_LINK)
+    implementation(libs.facebook.login)
+    implementation(libs.facebook.applink)
 
     // Naver
-    implementation(Dependency.Naver.NAVER_JDK8)
+    implementation(libs.naver.jdk)
 
     // Kakao
-    implementation(Dependency.Kakao.KAKAO_SDK_ALL_RX)
+    implementation(libs.kakao.sdk.all)
 
     // Google
-    implementation(Dependency.Google.PLAY_SERVICE_AUTH)
-    implementation(Dependency.Google.PLAY_SERVICE_ADS)
+    implementation(libs.gms.auth)
+    implementation(libs.gms.ads)
 
-    // Retrofit
-    implementation(Dependency.Retrofit.RETROFIT)
-    implementation(Dependency.Retrofit.GSON_CONVERTER)
-    implementation(Dependency.OkHttp.LOGGING_INTERCEPTOR)
+    // okhttp3
+    implementation (libs.okhttp3)
+    implementation (libs.okhttp3.logging.interceptor)
 
-    // RX
-    implementation(Dependency.Rx.RXJAVA)
-    implementation(Dependency.Rx.RXANDROID)
-    implementation(Dependency.Rx.RXKOTLIN)
+    //retrofit2
+    implementation (libs.retrofit2)
+    implementation (libs.retrofit2.converter.gson)
+
+    //gson
+    implementation(libs.gson)
 
     // Timber
-    implementation(Dependency.Timber.TIMBER)
+    implementation(libs.timber)
 
     // Glide
-    implementation(Dependency.Glide.GLIDE)
-    implementation(Dependency.Glide.GLIDE_COMPILER)
-    implementation(Dependency.Glide.GLIDE_COMPOSE)
+    implementation(libs.glide)
+    implementation(libs.glide.compose)
+    kapt(libs.glide.compiler)
 
     // Lottie
-    implementation(Dependency.Lottie.COMPOSE_LOTTIE)
-
-    // Etc
-    implementation(Dependency.Etc.EASY_PREFS)
-    implementation(Dependency.Etc.QR)
-    implementation(Dependency.Etc.LOTTIE)
-    implementation(Dependency.Etc.COMPOSE_LOTTIE)
-    implementation(Dependency.Etc.RECYCLERVIEW_DIVIDER)
+    implementation(libs.lottie)
+    implementation(libs.lottie.compose)
 
     // TEST
-    testImplementation(Dependency.Test.JUNIT)
-    androidTestImplementation(Dependency.AndroidTest.TEST_RUNNER)
-    androidTestImplementation(Dependency.AndroidTest.ESPRESSO_CORE)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
     // Hilt
-    implementation(Dependency.Hilt.ANDROID)
-    kapt(Dependency.Hilt.COMPILER)
-    testImplementation(Dependency.Hilt.TESTING)
+    implementation(libs.dagger.hilt)
+    implementation(libs.dagger.hilt.navigation.compose)
+    kapt(libs.dagger.hilt.compiler)
+
+    // Etc
+    implementation(libs.easy.prefs)
+    implementation(libs.zxing)
+    implementation(libs.recyclerview.divider)
 }

@@ -23,7 +23,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.seno.game.R
 import com.seno.game.navigation.NavigationRoute
-import com.seno.game.util.NoRippleTheme
 
 val BottomMenuList = listOf(
     NavigationRoute.HOME,
@@ -34,44 +33,42 @@ val BottomMenuList = listOf(
 
 @Composable
 fun BottomNavigationBar(navController: NavController, modifier: Modifier = Modifier){
-    CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme){
-        BottomNavigation(
-            backgroundColor = Color.White,
-            contentColor = Color.Green,
-            modifier = modifier.height(50.dp)
-        ) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
+    BottomNavigation(
+        backgroundColor = Color.White,
+        contentColor = Color.Green,
+        modifier = modifier.height(50.dp)
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
 
-            BottomMenuList.forEach { route ->
-                BottomNavigationItem(
-                    icon = { Icon(
-                        painter = painterResource(id = route.icon ?: R.drawable.ic_launcher_foreground),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )},
+        BottomMenuList.forEach { route ->
+            BottomNavigationItem(
+                icon = { Icon(
+                    painter = painterResource(id = route.icon ?: R.drawable.ic_launcher_foreground),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )},
 
-                    label = { Text(text = route.routeName, style = TextStyle(fontSize = 10.sp))},
-                    selected = currentDestination?.hierarchy?.any { it.route == route.routeName } == true,
-                    unselectedContentColor = Color.Yellow,
-                    onClick = {
-                        navController.navigate(route.routeName) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
-                            // 스택이 쌓이는 것을 방지
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            // 스택에 같은 화면이 쌓이는 것을 막음
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            // 재선택 시 이전 화면 유지
-                            restoreState = true
+                label = { Text(text = route.routeName, style = TextStyle(fontSize = 10.sp))},
+                selected = currentDestination?.hierarchy?.any { it.route == route.routeName } == true,
+                unselectedContentColor = Color.Yellow,
+                onClick = {
+                    navController.navigate(route.routeName) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        // 스택이 쌓이는 것을 방지
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
+                        // 스택에 같은 화면이 쌓이는 것을 막음
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        // 재선택 시 이전 화면 유지
+                        restoreState = true
                     }
-                )
-            }
+                }
+            )
         }
     }
 }

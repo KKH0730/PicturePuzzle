@@ -5,6 +5,7 @@ pluginManagement {
         mavenCentral()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -13,6 +14,7 @@ dependencyResolutionManagement {
         maven { setUrl("https://devrepo.kakao.com/nexus/content/groups/public/") }
     }
 }
+
 rootProject.name = "game"
 include(":app")
 include(":opencv")

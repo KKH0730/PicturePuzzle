@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -31,7 +32,6 @@ import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -130,7 +130,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
-                            imageContainerY = binding.llPictureContainer.y.toInt(),
+                            imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
@@ -144,7 +144,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
-                            imageContainerY = binding.llPictureContainer.y.toInt(),
+                            imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
@@ -174,7 +174,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         lottieAnimationView = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = it.first,
                             y = it.second,
-                            imageContainerY = binding.llPictureContainer.y.toInt(),
+                            imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.wrong_answer_mark,
                             speed = 5f,
                             maxProgress = 0.85f,
@@ -199,7 +199,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         lottieAnimationView1 = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
-                            imageContainerY = binding.llPictureContainer.y.toInt(),
+                            imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
@@ -217,7 +217,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         lottieAnimationView2 = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
-                            imageContainerY = binding.llPictureContainer.y.toInt(),
+                            imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
@@ -529,19 +529,19 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         )
     }
 
-//    fun onClickResult() {
-//        if (binding.ivResult.visibility == View.VISIBLE) {
-//            binding.clAnswerMark.visibility = View.VISIBLE
-//            binding.ivCopy.visibility = View.VISIBLE
-//            binding.ivResult.visibility = View.INVISIBLE
-//            binding.ivResult.setImageBitmap(null)
-//        } else {
-//            binding.clAnswerMark.visibility = View.INVISIBLE
-//            binding.ivCopy.visibility = View.INVISIBLE
-//            binding.ivResult.visibility = View.VISIBLE
-//            binding.ivResult.setImageBitmap(viewModel.getAnswer()?.answerMat.bitmapFrom())
-//        }
-//    }
+    fun onClickResult() {
+        if (binding.ivResult.isVisible) {
+            binding.clAnswerMark.visibility = View.VISIBLE
+            binding.ivCopy.visibility = View.VISIBLE
+            binding.ivResult.visibility = View.INVISIBLE
+            binding.ivResult.setImageBitmap(null)
+        } else {
+            binding.clAnswerMark.visibility = View.INVISIBLE
+            binding.ivCopy.visibility = View.INVISIBLE
+            binding.ivResult.visibility = View.VISIBLE
+            binding.ivResult.setImageBitmap(viewModel.getAnswer()?.answerMat.bitmapFrom())
+        }
+    }
 
     companion object {
         const val CURRENT_ROUND_POSITION = "currentRoundPosition"

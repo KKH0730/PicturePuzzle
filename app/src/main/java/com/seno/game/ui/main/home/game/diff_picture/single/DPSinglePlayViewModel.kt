@@ -102,6 +102,8 @@ class DPSinglePlayViewModel @Inject constructor(
             return list
         }
 
+    fun getAnswer() = gameInfo.answer
+
     private fun onClickRightAnswer(
         currentStagePosition: Int,
         currentRoundPosition: Int,

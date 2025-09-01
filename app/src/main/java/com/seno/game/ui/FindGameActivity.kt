@@ -19,7 +19,9 @@ import java.util.*
 
 @AndroidEntryPoint
 class FindGameActivity : BaseActivity<ActivityFindGameBinding>(
-    layoutResId = R.layout.activity_find_game
+    layoutResId = R.layout.activity_find_game,
+    isLightStatusBar = true,
+    isLightNavigationBar = false
 ) {
     private val homeViewModel by viewModels<HomeViewModel>()
 

@@ -11,9 +11,10 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
-import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -26,7 +27,12 @@ import com.google.android.gms.ads.AdRequest
 import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
-import com.seno.game.extensions.*
+import com.seno.game.extensions.bitmapFrom
+import com.seno.game.extensions.dpToPx
+import com.seno.game.extensions.drawLottieAnswerCircle
+import com.seno.game.extensions.saveCompleteDPGameRound
+import com.seno.game.extensions.screenWidth
+import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
@@ -36,12 +42,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.math.abs
 
 @AndroidEntryPoint
 class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
-    layoutResId = R.layout.activity_diff_picture_single_play
+    layoutResId = R.layout.activity_diff_picture_single_play,
+    isLightStatusBar = true,
+    isLightNavigationBar = false
 ) {
     private val viewModel by viewModels<DPSinglePlayViewModel>()
     private val admobRewardedAdUtil: AdmobRewardedAdUtil by lazy { AdmobRewardedAdUtil(this@DPSinglePlayActivity) }
@@ -127,11 +134,9 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
                 launch {
                     viewModel.onShowCompleteGameDialog.collectLatest {
-                        animatorSet
-                            ?.takeIf { it.isRunning }
-                            .let { AnimationUtils.stopAnimation(it) }
-                        binding.cvTimerView.stopTimer()
+                        if(animatorSet?.isRunning == true) AnimationUtils.stopAnimation(animatorSet)
 
+                        binding.cvTimerView.stopTimer()
                         delay(1000)
                         binding.cvGameCompleteDialog.show()
                     }
@@ -187,8 +192,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
                 launch {
                     viewModel.drawWrongAnswerMark.collectLatest {
-                        var lottieAnimationView: LottieAnimationView? = null
-                        lottieAnimationView = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
+                        (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = it.first,
                             y = it.second,
                             imageContainerX = binding.clPictureContainer.x.toInt(),
@@ -198,7 +202,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             maxProgress = 0.85f,
                             radius = 60,
                             isWrongAnswer = true,
-                            onAnimationEnd = { binding.clAnswerMark.removeView(lottieAnimationView) }
+                            onAnimationEnd = { animator, view ->  binding.clAnswerMark.removeView(view) }
                         ).also { view ->
                             view.playAnimation()
                             binding.clAnswerMark.addView(view)
@@ -213,8 +217,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         val answerCenterX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
-                        var lottieAnimationView1: LottieAnimationView? = null
-                        lottieAnimationView1 = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
+                        (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerX = binding.clPictureContainer.x.toInt(),
@@ -224,16 +227,13 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
                             isWrongAnswer = false,
-                            onAnimationEnd = {
-                                binding.clAnswerMark.removeView(lottieAnimationView1)
-                            }
+                            onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
                         }
 
-                        var lottieAnimationView2: LottieAnimationView? = null
-                        lottieAnimationView2 = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
+                        (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
@@ -242,9 +242,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
                             isWrongAnswer = false,
-                            onAnimationEnd = {
-                                binding.clAnswerMark.removeView(lottieAnimationView2)
-                            }
+                            onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
@@ -284,6 +282,15 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         val minute = String.format("%02d", binding.cvTimerView.maxTime / 60)
         val second = String.format("%02d", binding.cvTimerView.maxTime % 60)
         binding.tvRemainingTime.text = "$minute:$second"
+
+        setupWindowInsets(targetView = binding.clRoot) { systemBarInsets ->
+            binding.clToolbar.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                setMargins(0, systemBarInsets.top, 0, 0)
+            }
+            binding.clInfoContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                setMargins(0, 0, 0, systemBarInsets.bottom)
+            }
+        }
     }
 
     @SuppressLint("DefaultLocale")

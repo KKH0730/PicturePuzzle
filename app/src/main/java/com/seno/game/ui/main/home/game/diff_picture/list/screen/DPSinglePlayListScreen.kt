@@ -36,6 +36,8 @@ fun DPSinglePlayListScreen(
 ) {
     val pagerPage by rememberUpdatedState(newValue = stage)
     val snackbarHostState = remember { SnackbarHostState() }
+    val insets = WindowInsets.systemBars.asPaddingValues()
+
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)}) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -46,7 +48,9 @@ fun DPSinglePlayListScreen(
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
             ) {
                 Spacer(modifier = Modifier.height(height = 30.dp))
                 GameListHeader(snackbarHostState = snackbarHostState, onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)

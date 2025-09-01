@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -230,9 +229,9 @@ class DPSinglePlayViewModel @Inject constructor(
                         }
                     }
                     isRightAnswer
-                }
+                } ?: false
 
-                if (isFindAnswer != null && !isFindAnswer) {
+                if (!isFindAnswer) {
                     _drawWrongAnswerMark.emit(currentX + viewX to currentY + viewY)
                 }
             }

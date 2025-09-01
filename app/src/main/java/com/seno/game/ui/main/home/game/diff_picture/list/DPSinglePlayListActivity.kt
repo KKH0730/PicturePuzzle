@@ -1,39 +1,32 @@
 package com.seno.game.ui.main.home.game.diff_picture.list
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.snackbar.Snackbar
 import com.seno.game.R
-import com.seno.game.extensions.*
-import com.seno.game.manager.AccountManager
-import com.seno.game.prefs.PrefsManager
-import com.seno.game.theme.AppTheme
-import com.seno.game.ui.main.home.game.diff_picture.list.component.TOTAL_HEART_COUNT
+import com.seno.game.base.BaseComposeActivity
+import com.seno.game.extensions.saveDiskCacheData
+import com.seno.game.extensions.startActivity
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
-import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class DPSinglePlayListActivity : ComponentActivity() {
+class DPSinglePlayListActivity : BaseComposeActivity(
+    isLightStatusBar = true,
+    isLightNavigationBar = false
+) {
     private val viewModel by viewModels<DiffPictureSingleGameViewModel>()
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -61,27 +54,21 @@ class DPSinglePlayListActivity : ComponentActivity() {
             }
         }
 
-    @SuppressLint("StateFlowValueCalledInComposition")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    @Composable
+    override fun ComposeContent() {
         startObserve()
 
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    DPSinglePlayListScreen(
-                        stageInfos = viewModel.gameList.collectAsState().value,
-                        stage = viewModel.currentStage.collectAsState().value,
-                        enablePlayButton = viewModel.enablePlayButton.collectAsState().value,
-                        onChangedStage = viewModel::onChangedPage,
-                        onClickBack = { finish() },
-                        onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
-                        onClickPlayButton = { viewModel.startGame() },
-                        onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
-                    )
-                }
-            }
+        Surface(Modifier.fillMaxSize()) {
+            DPSinglePlayListScreen(
+                stageInfos = viewModel.gameList.collectAsState().value,
+                stage = viewModel.currentStage.collectAsState().value,
+                enablePlayButton = viewModel.enablePlayButton.collectAsState().value,
+                onChangedStage = viewModel::onChangedPage,
+                onClickBack = { finish() },
+                onClickGameItem = { dPSingleGame -> viewModel.syncGameItem(selectedItem = dPSingleGame) },
+                onClickPlayButton = { viewModel.startGame() },
+                onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
+            )
         }
     }
 

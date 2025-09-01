@@ -22,12 +22,13 @@ import com.seno.game.ui.main.home.HomeViewModel
 import com.seno.game.ui.main.home.game.diff_picture.multi.DiffPictureGameActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
-    layoutResId = R.layout.activity_create_game
+    layoutResId = R.layout.activity_create_game,
+    isLightStatusBar = true,
+    isLightNavigationBar = false
 ), OnCreateGameEventListener {
     private val homeViewModel by viewModels<HomeViewModel>()
     private var snapshotListener: ListenerRegistration? = null

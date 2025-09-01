@@ -79,14 +79,13 @@ fun HomeUI(
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profileUri by remember { mutableStateOf("") }
 
-    var isEnableSoloPlay by remember { mutableStateOf(true) }
+    val insets = WindowInsets.systemBars.asPaddingValues()
 
     context.LifecycleEventListener {
         when (it) {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
-                isEnableSoloPlay = true
                 nickname = PrefsManager.nickname
                 profileUri = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
@@ -111,7 +110,11 @@ fun HomeUI(
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
+        ) {
             Spacer(modifier = Modifier.height(14.dp))
             Row {
                 HomeProfileContainer(
@@ -145,8 +148,6 @@ fun HomeUI(
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = {
-                    isEnableSoloPlay = false
-
                     DPSinglePlayListActivity.start(context = context)
                     context.overridePendingTransition(
                         R.anim.slide_right_enter,

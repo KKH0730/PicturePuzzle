@@ -18,15 +18,15 @@ fun Context.drawLottieAnswerCircle(
     radius: Int,
     isWrongAnswer: Boolean,
     onAnimationStart: (animator: Animator?) -> Unit = {},
-    onAnimationEnd: (animator: Animator?) -> Unit = {},
+    onAnimationEnd: (animator: Animator?, view: LottieAnimationView) -> Unit = { _, _ -> },
     onAnimationRepeat: (animator: Animator?) -> Unit = {},
     onAnimationCancel: (animator: Animator?) -> Unit = {},
 ): LottieAnimationView {
     return LottieAnimationView(this).apply {
         this.x = if (isWrongAnswer) {
-            x - (radius / 2)
+            x - (radius / 2) + imageContainerX
         } else {
-            x
+            x + imageContainerX
         }
         this.y = if (isWrongAnswer) {
             y - (radius / 2) + imageContainerY
@@ -54,7 +54,7 @@ fun Context.drawLottieAnswerCircle(
             }
 
             override fun onAnimationEnd(animator: Animator) {
-                onAnimationEnd.invoke(animator)
+                onAnimationEnd.invoke(animator,this@apply)
             }
         })
     }

@@ -13,7 +13,9 @@ import com.seno.game.util.GameColor
 import org.opencv.core.Mat
 
 class AreaGameActivity : BaseActivity<ActivityAreaGameBinding>(
-    layoutResId = R.layout.activity_area_game
+    layoutResId = R.layout.activity_area_game,
+    isLightStatusBar = true,
+    isLightNavigationBar = false
 ) {
     private lateinit var opencvUtil: AreaOpencvUtil
 

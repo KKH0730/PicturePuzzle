@@ -1,34 +1,35 @@
 package com.seno.game.ui.main
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
+import com.seno.game.base.BaseComposeActivity
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.theme.AppTheme
 import com.seno.game.ui.common.RestartDialog
 import com.seno.game.ui.main.home.HomeLoadingScreen
-import com.seno.game.ui.splash.SplashActivity
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -37,73 +38,56 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseComposeActivity(
+    isLightStatusBar = true,
+    isLightNavigationBar = false
+) {
     private val mainViewModel by viewModels<MainViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        printHashKey()
+    @Composable
+    override fun ComposeContent() {
+        Surface(Modifier.fillMaxSize()) {
+            var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
+            var isNetworkError by remember { mutableStateOf(false) }
 
-        createRandomNickname()
+            startObserve(
+                onCallbackSavedGameInfo = { savedGameInfo = it },
+                onCallbackNetworkError = { isNetworkError = it }
+            )
 
-        setContent {
-            AppTheme {
-                Surface(Modifier.fillMaxSize()) {
-                    var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
-                    var isNetworkError by remember { mutableStateOf(false) }
-
-                    startObserve(
-                        onCallbackSavedGameInfo = { savedGameInfo = it },
-                        onCallbackNetworkError = { isNetworkError = it }
-                    )
-
-                    if (AccountManager.isUser) {
-                        reqSavedGameInfo(
-                            savedGameInfo = savedGameInfo,
-                            isTaskSuccess = { isTaskSuccess ->
-                                if (!isTaskSuccess) {
-                                    isNetworkError = true
-                                }
-                            }
-                        )
-                    }
-//                    setOrReqAuthentication(callback = { isAuthenticated ->
-//                        if (isAuthenticated) {
-//                            reqSavedGameInfo(
-//                                savedGameInfo = savedGameInfo,
-//                                isTaskSuccess = { isTaskSuccess ->
-//                                    if (!isTaskSuccess) {
-//                                        isNetworkError = true
-//                                    }
-//                                }
-//                            )
-//                        }
-//                    })
-
-                    if (isNetworkError) {
-                        RestartDialog(
-                            title = getString(R.string.network_error_title),
-                            content = getString(R.string.network_error),
-                            confirmText = getString(R.string.alert_dialog_restart),
-                            onClickConfirm = { this@MainActivity.restartApp() }
-                        )
-                    } else {
-                        if (AccountManager.isUser) {
-                            if (savedGameInfo != null) {
-                                // 저장된 게임 데이터 Load
-                                savedGameInfo.savedGameInfoToLocalDB()
-
-                                // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                                HomeLoadingScreen()
-                                MainScreen()
-                            } else {
-                                HomeLoadingScreen()
-                            }
-                        } else {
-                            HomeLoadingScreen()
-                            MainScreen()
+            if (AccountManager.isUser) {
+                reqSavedGameInfo(
+                    savedGameInfo = savedGameInfo,
+                    isTaskSuccess = { isTaskSuccess ->
+                        if (!isTaskSuccess) {
+                            isNetworkError = true
                         }
                     }
+                )
+            }
+
+            if (isNetworkError) {
+                RestartDialog(
+                    title = getString(R.string.network_error_title),
+                    content = getString(R.string.network_error),
+                    confirmText = getString(R.string.alert_dialog_restart),
+                    onClickConfirm = { this@MainActivity.restartApp() }
+                )
+            } else {
+                if (AccountManager.isUser) {
+                    if (savedGameInfo != null) {
+                        // 저장된 게임 데이터 Load
+                        savedGameInfo.savedGameInfoToLocalDB()
+
+                        // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
+                        HomeLoadingScreen()
+                        MainScreen()
+                    } else {
+                        HomeLoadingScreen()
+                    }
+                } else {
+                    HomeLoadingScreen()
+                    MainScreen()
                 }
             }
         }

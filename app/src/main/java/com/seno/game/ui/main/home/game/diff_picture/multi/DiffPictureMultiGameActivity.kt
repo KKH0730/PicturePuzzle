@@ -40,7 +40,9 @@ const val ANSWER_CORRECTION = 20
 
 @AndroidEntryPoint
 class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
-    layoutResId = R.layout.activity_diff_picture_multi_game
+    layoutResId = R.layout.activity_diff_picture_multi_game,
+    isLightStatusBar = true,
+    isLightNavigationBar = false
 ) {
     private val viewModel by viewModels<DiffPictureGameViewModel>()
     private var rewardedAd: RewardedAd? = null
@@ -204,7 +206,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding
                             maxProgress = 0.85f,
                             radius = 60,
                             isWrongAnswer = true,
-                            onAnimationEnd = { binding.clAnswerMark.removeView(lottieAnimationView) }
+                            onAnimationEnd = { _, view -> binding.clAnswerMark.removeView(lottieAnimationView) }
                         ).also { view ->
                             view.playAnimation()
                             binding.clAnswerMark.addView(view)
@@ -226,9 +228,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
                             isWrongAnswer = false,
-                            onAnimationEnd = {
-                                binding.clAnswerMark.removeView(lottieAnimationView1)
-                            }
+                            onAnimationEnd = { _, view -> binding.clAnswerMark.removeView(lottieAnimationView1) }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
@@ -243,9 +243,7 @@ class DiffPictureGameActivity : BaseActivity<ActivityDiffPictureMultiGameBinding
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
                             isWrongAnswer = false,
-                            onAnimationEnd = {
-                                binding.clAnswerMark.removeView(lottieAnimationView2)
-                            }
+                            onAnimationEnd = { _, view -> binding.clAnswerMark.removeView(lottieAnimationView2) }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)

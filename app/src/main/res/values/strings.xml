@@ -94,7 +94,7 @@
     <string name="hummin_submit">제출</string>
     <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
 
-    <!-- single gmale -->
+    <!-- single game -->
     <string name="diff_title">틀린그림을 찾아보세요</string>
     <string name="diff_total_answer_count">점수 : %s</string>
 
@@ -108,6 +108,7 @@
     <string name="diff_fail_dialog_sub_content">광고를 보면 이어서 할 수 있어요</string>
     <string name="diff_fail_dialog_give_up">포기할래</string>
     <string name="diff_fail_dialog_show_ad">이어서 할래</string>
+    <string name="diff_new_month_update_alert_dialog">새로운 월간 스테이지가 열렸습니다 🎉\n지금 바로 새 도전에 나서보세요!</string>
 
     <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
     <string name="diff_game_no_heart">하트가 부족해요… 잠시 후에 다시 시도해 주세요!</string>

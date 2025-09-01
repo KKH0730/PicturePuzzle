@@ -1,6 +1,7 @@
 package com.seno.game.prefs
 
 import com.pixplicity.easyprefs.library.Prefs
+import com.seno.game.extensions.getTodayDate
 
 object PrefsManager {
     var nickname: String
@@ -85,13 +86,30 @@ object PrefsManager {
         }
 
     var roundOriginImageUrl: String
-        get() = Prefs.getString("roundImageUrl", "")
+        get() = Prefs.getString("roundOriginImageUrl", "")
         set(value) {
-            Prefs.putString("roundImageUrl", value)
+            Prefs.putString("roundOriginImageUrl", value)
         }
     var roundOtherImageUrl: String
         get() = Prefs.getString("roundOtherImageUrl", "")
         set(value) {
             Prefs.putString("roundOtherImageUrl", value)
         }
+
+    var recentSinglePlayDate: String // yyyyMMdd
+        get() {
+            return Prefs.getString("recentSinglePlayDate", getTodayDate())
+        }
+        set(value) {
+            Prefs.putString("recentSinglePlayDate", value)
+        }
+
+    fun clearSinglePlayData(currentTimeMillis: Long) {
+        Prefs.putString("diffPictureCompleteGameRound", "")
+        Prefs.putInt("diffPictureStage", 0)
+        Prefs.putLong("diffPictureHeartChargedTime", 5)
+        Prefs.putLong("diffPictureHeartChargedTime", currentTimeMillis)
+        Prefs.putString("roundOriginImageUrl", "")
+        Prefs.putString("roundOtherImageUrl", "")
+    }
 }

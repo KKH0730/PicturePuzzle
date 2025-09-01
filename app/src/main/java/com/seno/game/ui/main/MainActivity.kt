@@ -3,25 +3,24 @@ package com.seno.game.ui.main
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
-import com.seno.game.base.BaseComposeActivity
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
@@ -38,56 +37,62 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 @AndroidEntryPoint
-class MainActivity : BaseComposeActivity(
-    isLightStatusBar = true,
-    isLightNavigationBar = false
-) {
+class MainActivity : ComponentActivity() {
     private val mainViewModel by viewModels<MainViewModel>()
 
-    @Composable
-    override fun ComposeContent() {
-        Surface(Modifier.fillMaxSize()) {
-            var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
-            var isNetworkError by remember { mutableStateOf(false) }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-            startObserve(
-                onCallbackSavedGameInfo = { savedGameInfo = it },
-                onCallbackNetworkError = { isNetworkError = it }
-            )
+        enableEdgeToEdge()
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            isAppearanceLightNavigationBars = false
+        }
 
-            if (AccountManager.isUser) {
-                reqSavedGameInfo(
-                    savedGameInfo = savedGameInfo,
-                    isTaskSuccess = { isTaskSuccess ->
-                        if (!isTaskSuccess) {
-                            isNetworkError = true
-                        }
-                    }
+        setContent {
+            Surface(Modifier.fillMaxSize()) {
+                var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
+                var isNetworkError by remember { mutableStateOf(false) }
+
+                startObserve(
+                    onCallbackSavedGameInfo = { savedGameInfo = it },
+                    onCallbackNetworkError = { isNetworkError = it }
                 )
-            }
 
-            if (isNetworkError) {
-                RestartDialog(
-                    title = getString(R.string.network_error_title),
-                    content = getString(R.string.network_error),
-                    confirmText = getString(R.string.alert_dialog_restart),
-                    onClickConfirm = { this@MainActivity.restartApp() }
-                )
-            } else {
                 if (AccountManager.isUser) {
-                    if (savedGameInfo != null) {
-                        // 저장된 게임 데이터 Load
-                        savedGameInfo.savedGameInfoToLocalDB()
+                    reqSavedGameInfo(
+                        savedGameInfo = savedGameInfo,
+                        isTaskSuccess = { isTaskSuccess ->
+                            if (!isTaskSuccess) {
+                                isNetworkError = true
+                            }
+                        }
+                    )
+                }
 
-                        // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                        HomeLoadingScreen()
-                        MainScreen()
+                if (isNetworkError) {
+                    RestartDialog(
+                        title = getString(R.string.network_error_title),
+                        content = getString(R.string.network_error),
+                        confirmText = getString(R.string.alert_dialog_restart),
+                        onClickConfirm = { this@MainActivity.restartApp() }
+                    )
+                } else {
+                    if (AccountManager.isUser) {
+                        if (savedGameInfo != null) {
+                            // 저장된 게임 데이터 Load
+                            savedGameInfo.savedGameInfoToLocalDB()
+
+                            // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
+                            HomeLoadingScreen()
+                            MainScreen()
+                        } else {
+                            HomeLoadingScreen()
+                        }
                     } else {
                         HomeLoadingScreen()
+                        MainScreen()
                     }
-                } else {
-                    HomeLoadingScreen()
-                    MainScreen()
                 }
             }
         }
@@ -194,23 +199,6 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             }
             diffPictureHeartCount = it.diffPictureHeartCount
             diffPictureHeartChargedTime = it.diffPictureHeartChargedTime
-        }
-    }
-}
-
-@Composable
-fun ComponentActivity.LifecycleEventListener(event: (Lifecycle.Event) -> Unit) {
-    val eventHandler by rememberUpdatedState(newValue = event)
-    val lifecycle = this@LifecycleEventListener.lifecycle
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event ->
-            eventHandler(event)
-        }
-
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycle.removeObserver(observer)
         }
     }
 }

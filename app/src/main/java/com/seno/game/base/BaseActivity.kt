@@ -1,5 +1,7 @@
 package com.seno.game.base
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +12,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.parseImageDate
+import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.view.NewMonthAlertDialog
 
 
 abstract class BaseActivity<T: ViewDataBinding>(
@@ -42,5 +48,27 @@ abstract class BaseActivity<T: ViewDataBinding>(
             }
             insets ?: WindowInsetsCompat.CONSUMED
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+            NewMonthAlertDialog (
+                context = this@BaseActivity,
+                onConfirm = {
+                    PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                    restartApp(this@BaseActivity)
+            }).show()
+        }
+    }
+
+    protected fun restartApp(activity: Activity) {
+        val intent = activity.packageManager.getLaunchIntentForPackage(activity.packageName)?.apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        activity.startActivity(intent)
+        activity.finish()
+        Runtime.getRuntime().exit(0)
     }
 }

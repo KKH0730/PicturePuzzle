@@ -8,6 +8,7 @@ import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -15,7 +16,7 @@ import kotlin.coroutines.suspendCoroutine
 class ConfigImpl @Inject constructor(
     private val db: FirebaseFirestore,
     private val configMapper: ConfigMapper,
-    private val diffPictureSavedGameInfoMapper: DiffPictureSavedGameInfoMapper,
+    private val diffPictureSavedGameInfoMapper: DiffPictureSavedGameInfoMapper
 ): ConfigRepository {
     override suspend fun getSavedGameInfo(uid: String): Flow<Result<SavedGameInfo>> =
         flow {
@@ -50,6 +51,54 @@ class ConfigImpl @Inject constructor(
                 param2 = configMapper.fromRemote(model = userInfoTask.result)
             ).run {
                 emit(Result.Success(this))
+            }
+        }
+
+    override suspend fun resetAndGetSavedGameInfo(uid: String, currentTimeMillis: Long): Flow<Result<SavedGameInfo>> =
+        flow {
+            try {
+                val userInfoSnapshot = db.collection(ApiConstants.Collection.PROFILE)
+                    .document(uid)
+                    .get()
+                    .await()
+
+                if (!userInfoSnapshot.exists()) {
+                    emit(Result.Success(SavedGameInfo())) // 기본값 반환
+                    return@flow
+                }
+
+                val diffPictureDocRef = db.collection(ApiConstants.Collection.PROFILE)
+                    .document(uid)
+                    .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+                    .document(ApiConstants.Document.DIFF_PICTURE)
+
+                db.runTransaction { transaction ->
+                    val diffSnapshot = transaction.get(diffPictureDocRef)
+
+                    val defaultSavedGameInfoMap = mapOf(
+                        ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to 0,
+                        ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to "",
+                        ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to 5,
+                        ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to currentTimeMillis
+                    )
+
+                    if (diffSnapshot.exists()) {
+                        transaction.update(diffPictureDocRef, defaultSavedGameInfoMap)
+                    } else {
+                        transaction.set(diffPictureDocRef, defaultSavedGameInfoMap)
+                    }
+
+                    diffSnapshot
+                }.await()
+
+                val latestSnapshot = diffPictureDocRef.get().await()
+                val userInfo = ConfigMapper().fromRemote(userInfoSnapshot)
+                val savedGameInfo = diffPictureSavedGameInfoMapper.fromRemote(latestSnapshot, userInfo)
+
+                emit(Result.Success(savedGameInfo))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Result.Error(e))
             }
         }
 

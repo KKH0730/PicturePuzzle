@@ -89,16 +89,16 @@ class DiffPictureSingleGameViewModel @Inject constructor(
             return stageInfos
         }
 
-    suspend fun reqRoundDiffPictures(round: String): Pair<String, String>? {
+    suspend fun reqRoundDiffPictures(stage: String, round: String): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
             val imageDate = getImageDate()
-            if (round.getOriginImageUrl().contains(imageDate) && round.getOtherImageUrl().contains(imageDate)) {
+            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
                 round.getOriginImageUrl() to round.getOtherImageUrl()
             } else {
-                val urlPair = diffPictureUseCase.reqRoundDiffPicture(round = round).successData()
+                val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
                 if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
-                    urlPair.first.saveOriginImageUrl(round = round)
-                    urlPair.second.saveRoundImageUrl(round = round)
+                    urlPair.first.saveOriginImageUrl(stage = stage, round = round)
+                    urlPair.second.saveRoundImageUrl(stage = stage, round = round)
                 }
                 urlPair
             }
@@ -178,7 +178,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                             currentStagePosition = _currentStage.value,
                             currentRoundPosition = selectedGameIndex,
                             finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
-                            images = reqRoundDiffPictures((selectedGameIndex + 1).toString())
+                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (selectedGameIndex + 1).toString())
                         )
                     )
                 }
@@ -201,7 +201,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                             currentStagePosition = _currentStage.value,
                             currentRoundPosition = currentRoundPosition + 1,
                             finalRoundPosition = finalRoundPosition,
-                            images = reqRoundDiffPictures((currentRoundPosition + 1).toString())
+                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 1).toString())
                         )
                     )
                 }

@@ -73,7 +73,7 @@ class FindGameActivity : BaseActivity<ActivityFindGameBinding>(
                     result.contents.let { roomUid ->
                         val date = Date(Calendar.getInstance().timeInMillis)
                         homeViewModel.reqEnterRoom(
-                            date = date.getTodayDate(),
+                            date = getTodayDate(),
                             uid = uid,
                             roomUid = roomUid,
                             nickName = "Find${Calendar.getInstance().timeInMillis}"

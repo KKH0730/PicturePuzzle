@@ -13,8 +13,12 @@ class GameConfigUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    suspend fun reqGetSavedGameInfo(params: String): Flow<Result<SavedGameInfo>> {
-        return configRepository.getSavedGameInfo(uid = params).catchError(dispatcher = ioDispatcher)
+    suspend fun reqGetSavedGameInfo(uid: String): Flow<Result<SavedGameInfo>> {
+        return configRepository.getSavedGameInfo(uid = uid).catchError(dispatcher = ioDispatcher)
+    }
+
+    suspend fun reqResetAndGetSavedGameInfo(uid: String, currentTimeMillis: Long): Flow<Result<SavedGameInfo>> {
+        return configRepository.resetAndGetSavedGameInfo(uid = uid, currentTimeMillis = currentTimeMillis).catchError(dispatcher = ioDispatcher)
     }
 
     suspend fun reqUpdateBackgroundVolume(uid: String, volume: String): Flow<Result<Float>> {

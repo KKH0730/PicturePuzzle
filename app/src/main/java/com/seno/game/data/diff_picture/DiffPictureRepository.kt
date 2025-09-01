@@ -14,7 +14,7 @@ interface DiffPictureRepository {
         heartChargedTime: Long
     ): Flow<Result<Unit>>
 
-    suspend fun getRoundDiffPicture(round: String): Result<Pair<String, String>>
+    suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>>
 
     suspend fun getAllDiffPictures(): Result<List<Pair<Uri, Uri>>>
 

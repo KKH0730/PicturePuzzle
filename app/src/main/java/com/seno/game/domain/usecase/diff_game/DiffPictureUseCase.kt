@@ -31,8 +31,8 @@ class DiffPictureUseCase @Inject constructor(
         ).catchError(dispatcher = ioDispatcher)
 
 
-    suspend fun reqRoundDiffPicture(round: String): Result<Pair<String, String>> {
-        return diffPictureRepository.getRoundDiffPicture(round = round)
+    suspend fun reqRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>> {
+        return diffPictureRepository.getRoundDiffPicture(stage = stage, round = round)
     }
 
     suspend fun reqAllDiffPictures(): Result<List<Pair<Uri, Uri>>>  {

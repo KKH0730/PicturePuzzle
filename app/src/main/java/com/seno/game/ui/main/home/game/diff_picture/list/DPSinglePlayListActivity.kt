@@ -14,12 +14,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
 import com.seno.game.base.BaseComposeActivity
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.getTodayDate
+import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.extensions.startActivity
+import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -77,6 +82,13 @@ class DPSinglePlayListActivity : BaseComposeActivity(
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.currentGameRound.collect {
                     it.images.saveDiskCacheData()
+
+                    if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                        onResume()
+                        return@collect
+                    } else {
+                        PrefsManager.recentSinglePlayDate = getTodayDate()
+                    }
 
                     DPSinglePlayActivity.start(
                         context = this@DPSinglePlayListActivity,

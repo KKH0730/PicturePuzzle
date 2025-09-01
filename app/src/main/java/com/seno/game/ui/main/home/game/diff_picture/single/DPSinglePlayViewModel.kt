@@ -43,6 +43,7 @@ class DPSinglePlayViewModel @Inject constructor(
     @DiffOpenCv private val opencvUtil: DiffPictureOpencvUtil,
 ) : ViewModel() {
 
+    var currentStage: Int = savedStateHandle[DPSinglePlayActivity.STAGE_POSITION] ?: 0
     var roundPosition: Int = savedStateHandle[DPSinglePlayActivity.CURRENT_ROUND_POSITION] ?: 0
     var image1: String = savedStateHandle[DPSinglePlayActivity.IMAGE1] ?: ""
     var image2: String = savedStateHandle[DPSinglePlayActivity.IMAGE2] ?: ""
@@ -95,7 +96,6 @@ class DPSinglePlayViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-
             if (image1.isNotEmpty() && image2.isNotEmpty()) {
                 val bitmap1 = image1.getBitmapFromUrl()
                 val bitmap2 = image2.getBitmapFromUrl()
@@ -152,13 +152,14 @@ class DPSinglePlayViewModel @Inject constructor(
     suspend fun getDiffPictures(): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
             val imageDate = getImageDate()
-            if ((roundPosition + 1).toString().getOriginImageUrl().contains(imageDate) && (roundPosition + 1).toString().getOtherImageUrl().contains(imageDate)) {
+
+            if ("${currentStage + 1}-${(roundPosition + 1)}".getOriginImageUrl().contains(imageDate) && "${currentStage + 1}-${(roundPosition + 1)}".getOtherImageUrl().contains(imageDate)) {
                 (roundPosition + 1).toString().getOriginImageUrl() to (roundPosition + 1).toString().getOtherImageUrl()
             } else {
-                val imagePair = diffPictureUseCase.reqRoundDiffPicture(round = (roundPosition + 1).toString()).successData()
+                val imagePair = diffPictureUseCase.reqRoundDiffPicture(stage = (roundPosition + 1).toString(), round = (roundPosition + 1).toString()).successData()
                 if (imagePair?.first.isNotNullAndNotEmpty() && imagePair.second.isNotNullAndNotEmpty()) {
-                    imagePair.first.saveOriginImageUrl(round = (roundPosition + 1).toString())
-                    imagePair.second.saveRoundImageUrl(round = (roundPosition + 1).toString())
+                    imagePair.first.saveOriginImageUrl(stage = (currentStage + 1).toString(), round = (roundPosition + 1).toString())
+                    imagePair.second.saveRoundImageUrl(stage = (currentStage + 1).toString(), round = (roundPosition + 1).toString())
                 }
                 imagePair
             }

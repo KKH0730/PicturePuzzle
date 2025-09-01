@@ -15,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seno.game.R
+import com.seno.game.extensions.LifecycleEventListener
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
@@ -25,7 +26,6 @@ import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.common.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
-import com.seno.game.ui.main.LifecycleEventListener
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.component.*
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity

@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface ConfigRepository {
     suspend fun getSavedGameInfo(uid: String): Flow<Result<SavedGameInfo>>
 
+    suspend fun resetAndGetSavedGameInfo(uid: String, currentTimeMillis: Long): Flow<Result<SavedGameInfo>>
+
     suspend fun updateBackgroundVolume(uid: String, volume: String) : Flow<Result<Float>>
 
     suspend fun updateEffectVolume(uid: String, volume: String) : Flow<Result<Float>>

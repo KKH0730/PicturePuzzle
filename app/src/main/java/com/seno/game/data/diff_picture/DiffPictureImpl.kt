@@ -69,18 +69,17 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRoundDiffPicture(round: String): Result<Pair<String, String>> {
+    override suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>> {
         val today = LocalDate.now()
         val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
 
         return withContext(Dispatchers.IO) {
             try {
-                val originImage = ref.child(formattedDate).child("${formattedDate}_${round}_1.png").downloadUrl.await()
-                val otherImage = ref.child(formattedDate).child("${formattedDate}_${round}_2.png").downloadUrl.await()
-                Timber.e("originImage : $originImage")
-                Timber.e("otherImage : $otherImage")
+                val originImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_1.png").downloadUrl.await()
+                val otherImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_2.png").downloadUrl.await()
                 Result.Success(originImage.toString() to otherImage.toString())
             } catch (e: Exception) {
+                e.printStackTrace()
                 Result.Error(exception = e)
             }
         }

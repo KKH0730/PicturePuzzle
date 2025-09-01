@@ -1,22 +1,22 @@
 package com.seno.game.ui.main.home.game.diff_picture.single
 
 import android.graphics.Bitmap
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
-import com.seno.game.App
-import com.seno.game.R
 import com.seno.game.di.DiffOpenCv
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
-import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getBitmapFromUrl
-import com.seno.game.extensions.getDrawable
-import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.getOriginImageUrl
+import com.seno.game.extensions.getOtherImageUrl
+import com.seno.game.extensions.isNotNullAndNotEmpty
+import com.seno.game.extensions.saveOriginImageUrl
+import com.seno.game.extensions.saveRoundImageUrl
 import com.seno.game.model.successData
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
+import com.seno.game.ui.main.home.game.diff_picture.model.Answer
 import com.seno.game.ui.main.home.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.main.home.game.diff_picture.model.Point
 import com.seno.game.ui.main.home.game.diff_picture.multi.ANSWER_CORRECTION
@@ -25,10 +25,13 @@ import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -74,6 +77,8 @@ class DPSinglePlayViewModel @Inject constructor(
 
     private var gameInfo: DiffGameInfo? = null
 
+    val answer: Answer? get() = gameInfo?.answer
+
     private val modifiedAnswerMarkList: List<AnswerMark>
         get() {
             val list = _answerMarkList.value.toMutableList()
@@ -115,13 +120,10 @@ class DPSinglePlayViewModel @Inject constructor(
 
     suspend fun loadDiffPicture() {
         repeat(5) { times ->
-            val data = diffPictureUseCase
-                .reqRoundDiffPicture((roundPosition + 1).toString())
-                .successData()
-
-            if (data != null) {
-                val bitmap1 = data.first.getBitmapFromUrl()
-                val bitmap2 = data.second.getBitmapFromUrl()
+            val urlPair = getDiffPictures()
+            if (urlPair != null) {
+                val bitmap1 = urlPair.first.getBitmapFromUrl()
+                val bitmap2 = urlPair.second.getBitmapFromUrl()
                 if (bitmap1 == null || bitmap2 == null) return@repeat
 
                 gameInfo = DiffGameInfo(
@@ -135,7 +137,7 @@ class DPSinglePlayViewModel @Inject constructor(
                 }
 
                 _diffImagePair.update { bitmap1 to bitmap2 }
-                return   // 함수 전체 종료
+                return
             }
 
             if (times == 4) {
@@ -145,7 +147,21 @@ class DPSinglePlayViewModel @Inject constructor(
         }
     }
 
-    fun getAnswer() = gameInfo?.answer
+    suspend fun getDiffPictures(): Pair<String, String>? {
+        return withContext(Dispatchers.IO) {
+            val imageDate = getImageDate()
+            if ((roundPosition + 1).toString().getOriginImageUrl().contains(imageDate) && (roundPosition + 1).toString().getOtherImageUrl().contains(imageDate)) {
+                (roundPosition + 1).toString().getOriginImageUrl() to (roundPosition + 1).toString().getOtherImageUrl()
+            } else {
+                val imagePair = diffPictureUseCase.reqRoundDiffPicture(round = (roundPosition + 1).toString()).successData()
+                if (imagePair?.first.isNotNullAndNotEmpty() && imagePair.second.isNotNullAndNotEmpty()) {
+                    imagePair.first.saveOriginImageUrl(round = (roundPosition + 1).toString())
+                    imagePair.second.saveRoundImageUrl(round = (roundPosition + 1).toString())
+                }
+                imagePair
+            }
+        }
+    }
 
     private fun onClickRightAnswer(
         currentStagePosition: Int,

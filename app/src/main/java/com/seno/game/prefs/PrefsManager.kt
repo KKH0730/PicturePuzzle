@@ -83,4 +83,15 @@ object PrefsManager {
         set(value) {
             Prefs.putLong("diffPictureHeartChargedTime", value)
         }
+
+    var roundOriginImageUrl: String
+        get() = Prefs.getString("roundImageUrl", "")
+        set(value) {
+            Prefs.putString("roundImageUrl", value)
+        }
+    var roundOtherImageUrl: String
+        get() = Prefs.getString("roundOtherImageUrl", "")
+        set(value) {
+            Prefs.putString("roundOtherImageUrl", value)
+        }
 }

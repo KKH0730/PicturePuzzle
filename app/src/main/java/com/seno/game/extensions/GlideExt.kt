@@ -81,7 +81,7 @@ suspend fun String.getBitmapFromUrl(): Bitmap? {
         try {
             Glide.with(App.getInstance().applicationContext)
                 .asBitmap()
-                .load(this)
+                .load(this@getBitmapFromUrl)
                 .submit()
                 .get()
         } catch (e: Exception) {

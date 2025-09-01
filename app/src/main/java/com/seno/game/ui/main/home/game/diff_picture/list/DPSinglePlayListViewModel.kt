@@ -6,19 +6,28 @@ import com.seno.game.R
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
 import com.seno.game.extensions.getDrawableResourceId
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.getOriginImageUrl
+import com.seno.game.extensions.getOtherImageUrl
 import com.seno.game.extensions.getString
+import com.seno.game.extensions.isNotNullAndNotEmpty
+import com.seno.game.extensions.saveOriginImageUrl
+import com.seno.game.extensions.saveRoundImageUrl
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.successData
-import com.seno.game.model.successOr
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 const val TOTAL_STAGE = 5
@@ -82,7 +91,17 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     suspend fun reqRoundDiffPictures(round: String): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
-            diffPictureUseCase.reqRoundDiffPicture(round = round).successData()
+            val imageDate = getImageDate()
+            if (round.getOriginImageUrl().contains(imageDate) && round.getOtherImageUrl().contains(imageDate)) {
+                round.getOriginImageUrl() to round.getOtherImageUrl()
+            } else {
+                val urlPair = diffPictureUseCase.reqRoundDiffPicture(round = round).successData()
+                if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
+                    urlPair.first.saveOriginImageUrl(round = round)
+                    urlPair.second.saveRoundImageUrl(round = round)
+                }
+                urlPair
+            }
         }
     }
 
@@ -153,7 +172,6 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 val gameList = _gameList.value[_currentStage.value]
                 val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
                 if (selectedGameIndex != -1) {
-                    Timber.e("selectedGameIndex : ${selectedGameIndex + 1}")
                     _currentGameRound.emit(
                         StartGameModel(
                             currentGameModel = gameList[selectedGameIndex],

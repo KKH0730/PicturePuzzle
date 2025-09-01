@@ -270,7 +270,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         super.onDestroy()
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "DefaultLocale")
     private fun initSetting() {
         binding.apply {
             activity = this@DPSinglePlayActivity
@@ -282,6 +282,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         binding.tvRemainingTime.text = "$minute:$second"
     }
 
+    @SuppressLint("DefaultLocale")
     private fun setPrepareView() {
         binding.cvPrepareView.apply {
             setStage("ROUND ${String.format("%02d", currentRoundPosition + 1)}")
@@ -336,7 +337,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 finish()
             }
             onClickShowAD = onClickShowAD@{
-                if (binding.clLoadingView.visibility == View.VISIBLE) {
+                if (binding.clLoadingView.isVisible) {
                     return@onClickShowAD
                 }
                 binding.clLoadingView.visibility = View.VISIBLE
@@ -386,7 +387,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "DefaultLocale")
     private fun setTimerView() {
         binding.cvTimerView.post {
             binding.cvTimerView.apply {
@@ -561,7 +562,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             binding.clAnswerMark.visibility = View.INVISIBLE
             binding.ivCopy.visibility = View.INVISIBLE
             binding.ivResult.visibility = View.VISIBLE
-            binding.ivResult.setImageBitmap(viewModel.getAnswer()?.answerMat.bitmapFrom())
+            binding.ivResult.setImageBitmap(viewModel.answer?.answerMat.bitmapFrom())
         }
     }
 

@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -95,15 +96,17 @@ class DPSinglePlayViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+
             if (image1.isNotEmpty() && image2.isNotEmpty()) {
                 val bitmap1 = image1.getBitmapFromUrl()
                 val bitmap2 = image2.getBitmapFromUrl()
+
                 if (bitmap1 == null || bitmap2 == null) return@launch
 
                 gameInfo = DiffGameInfo(
                     answer = opencvUtil.getDiffAnswer(
-                        srcBitmap = _diffImagePair.value?.first,
-                        copyBitmap = _diffImagePair.value?.second
+                        srcBitmap = bitmap1,
+                        copyBitmap = bitmap2
                     )
                 ).also {
                     val size = it.answer?.answerPointList?.size ?: 0
@@ -128,8 +131,8 @@ class DPSinglePlayViewModel @Inject constructor(
 
                 gameInfo = DiffGameInfo(
                     answer = opencvUtil.getDiffAnswer(
-                        srcBitmap = _diffImagePair.value?.first,
-                        copyBitmap = _diffImagePair.value?.second
+                        srcBitmap = bitmap1,
+                        copyBitmap = bitmap2
                     )
                 ).also {
                     val size = it.answer?.answerPointList?.size ?: 0
@@ -191,6 +194,7 @@ class DPSinglePlayViewModel @Inject constructor(
     fun drawAnswerCircle(
         currentX: Float,
         currentY: Float,
+        viewX: Float,
         viewY: Float,
         imageViewWidth: Float,
         resizedLength: Float,
@@ -229,7 +233,7 @@ class DPSinglePlayViewModel @Inject constructor(
                 }
 
                 if (isFindAnswer != null && !isFindAnswer) {
-                    _drawWrongAnswerMark.emit(currentX to currentY + viewY)
+                    _drawWrongAnswerMark.emit(currentX + viewX to currentY + viewY)
                 }
             }
         }

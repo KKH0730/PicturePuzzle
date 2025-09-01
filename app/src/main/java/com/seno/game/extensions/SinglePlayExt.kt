@@ -18,10 +18,10 @@ fun String?.saveRoundImageUrl(round: String) {
 
 fun String.getOriginImageUrl(): String {
     val jsonObject = PrefsManager.roundOriginImageUrl.getJSONObject()
-    return jsonObject.getString(this)
+    return jsonObject.getStringOrDefault(this)
 }
 
 fun String.getOtherImageUrl(): String {
     val jsonObject = PrefsManager.roundOtherImageUrl.getJSONObject()
-    return jsonObject.getString(this)
+    return jsonObject.getStringOrDefault(this)
 }

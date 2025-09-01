@@ -145,6 +145,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
+                            imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
@@ -159,6 +160,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
+                            imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
@@ -189,6 +191,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         lottieAnimationView = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = it.first,
                             y = it.second,
+                            imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.wrong_answer_mark,
                             speed = 5f,
@@ -214,6 +217,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                         lottieAnimationView1 = (this@DPSinglePlayActivity).drawLottieAnswerCircle(
                             x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
                             y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
+                            imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
@@ -462,6 +466,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 viewModel.drawAnswerCircle(
                     currentX = event.x,
                     currentY = event.y,
+                    viewX = v.x,
                     viewY = v.y,
                     imageViewWidth = binding.ivOrigin.width.toFloat(),
                     resizedLength = resizedLength,
@@ -482,6 +487,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                 viewModel.drawAnswerCircle(
                     currentX = event.x,
                     currentY = event.y,
+                    viewX = v.x,
                     viewY = v.y,
                     imageViewWidth = binding.ivOrigin.width.toFloat(),
                     resizedLength = resizedLength,

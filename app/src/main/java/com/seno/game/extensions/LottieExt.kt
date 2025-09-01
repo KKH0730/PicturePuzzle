@@ -10,6 +10,7 @@ import com.airbnb.lottie.LottieAnimationView
 fun Context.drawLottieAnswerCircle(
     x: Float,
     y: Float,
+    imageContainerX: Int = 0,
     imageContainerY: Int = 0,
     @RawRes rawRes: Int,
     speed: Float,

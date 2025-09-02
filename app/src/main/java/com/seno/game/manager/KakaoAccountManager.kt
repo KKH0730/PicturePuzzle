@@ -6,12 +6,12 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.rx
+import com.seno.game.extensions.isNotNullAndNotEmpty
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import java.lang.Exception
 
 class KakaoAccountManager(private val context: Context) {
     var disposables = CompositeDisposable()
@@ -93,7 +93,8 @@ class KakaoAccountManager(private val context: Context) {
                 if (kakaoAccount == null) {
                     Single.just(null)
                 } else {
-                    val email = kakaoAccount.email
+
+                    val email = if (kakaoAccount.email.isNullOrEmpty()) "" else "kakao_${kakaoAccount.email}"
                     val nickname = user.kakaoAccount?.profile?.nickname
                     val kakaoUid = user.id
                     val profileUri = kakaoAccount.profile?.thumbnailImageUrl
@@ -109,12 +110,12 @@ class KakaoAccountManager(private val context: Context) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it != null) {
-                    if (it.email != null && it.kakaoUid != null) {
-                        val email = it.email
-                        val kakaoUid = it.kakaoUid
-                        val nickname = it.nickname ?: ""
-                        val profileUri = it.profileUri ?: ""
+                    val email = it.email
+                    val kakaoUid = it.kakaoUid
+                    val nickname = it.nickname ?: ""
+                    val profileUri = it.profileUri ?: ""
 
+                    if (it.email.isNotNullAndNotEmpty() && it.kakaoUid.isNotNullAndNotEmpty()) {
                         AccountManager.createUserWithEmailAndPassword(
                             email = email,
                             password = kakaoUid,

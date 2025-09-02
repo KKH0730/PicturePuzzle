@@ -1,15 +1,12 @@
 package com.seno.game.manager
 
 import android.content.Context
-import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import timber.log.Timber
-import java.lang.Exception
+import com.seno.game.extensions.isNotNullAndNotEmpty
 
 class NaverAccountManager {
 
@@ -24,12 +21,12 @@ class NaverAccountManager {
                 NidOAuthLogin().callProfileApi(object : NidProfileCallback<NidProfileResponse> {
                     override fun onSuccess(result: NidProfileResponse) {
                         // 네이버 유저 정보 가져오기
-                        val email = result.profile?.email
+                        val email = if (result.profile?.email.isNullOrEmpty()) "" else  "naver_${result.profile?.email}"
                         val id = result.profile?.id
                         val name = result.profile?.name
                         val profileImage = result.profile?.profileImage
 
-                        if (email != null && id != null) {
+                        if (email.isNotNullAndNotEmpty() && id.isNotNullAndNotEmpty()) {
                             AccountManager.createUserWithEmailAndPassword(
                                 email = email,
                                 password = id,

@@ -9,7 +9,6 @@ import com.seno.game.R
 import com.seno.game.data.network.ApiConstants
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
-import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +24,7 @@ private const val LOGIN_TYPE_GOOGLE = "google.com"
 private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
 private const val LOGIN_TYPE_NAVER = "naver.com"
 private const val LOGIN_TYPE_KAKAO = "kakao.com"
+private const val LOGIN_TYPE_UNKNOWN = "unknown"
 
 enum class PlatForm(val value: String) {
     KAKAO(value = "kakao"),
@@ -69,10 +69,15 @@ object AccountManager {
                     "facebook.com" -> LOGIN_TYPE_FACEBOOK
                     "google.com" -> LOGIN_TYPE_GOOGLE
                     "password" -> {
-                        if (currentUser?.email?.contains("naver.com") == true) {
-                            LOGIN_TYPE_NAVER
+                        val list = currentUser?.email?.split("_") ?: listOf()
+                        if (list.isNotEmpty()) {
+                            when(list[0]) {
+                                "naver" -> LOGIN_TYPE_NAVER
+                                "kakao" -> LOGIN_TYPE_KAKAO
+                                else -> LOGIN_TYPE_UNKNOWN
+                            }
                         } else {
-                            LOGIN_TYPE_KAKAO
+                            LOGIN_TYPE_UNKNOWN
                         }
                     }
                     else -> ""

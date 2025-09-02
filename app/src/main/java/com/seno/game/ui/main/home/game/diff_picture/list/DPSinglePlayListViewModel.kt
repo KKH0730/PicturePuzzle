@@ -14,7 +14,6 @@ import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveOriginImageUrl
 import com.seno.game.extensions.saveRoundImageUrl
 import com.seno.game.manager.AccountManager
-import com.seno.game.manager.UNKNOWN_UID
 import com.seno.game.model.Result
 import com.seno.game.model.successData
 import com.seno.game.prefs.PrefsManager
@@ -22,13 +21,11 @@ import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -215,7 +212,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                                 currentStagePosition = _currentStage.value,
                                 currentRoundPosition = currentRoundPosition + 1,
                                 finalRoundPosition = finalRoundPosition,
-                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 1).toString())
+                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 2).toString())
                             )
                         )
                     }

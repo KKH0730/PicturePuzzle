@@ -5,6 +5,7 @@ import com.seno.game.ui.main.home.game.diff_picture.model.Answer
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import timber.log.Timber
 import kotlin.math.sqrt
 
 //const val RADIUS_CORRECTION = 50
@@ -237,20 +238,6 @@ class DiffPictureOpencvUtil {
             val copy = Mat()
             Utils.bitmapToMat(copyBitmap, copy)
 
-            // ⭐ 크기 맞추기
-            if (src.size() != copy.size()) {
-                Imgproc.resize(copy, copy, src.size())
-            }
-
-            // ⭐ 채널 맞추기 (src가 3채널이라면 copy도 3채널로)
-            if (src.channels() != copy.channels()) {
-                if (src.channels() == 3 && copy.channels() == 1) {
-                    Imgproc.cvtColor(copy, copy, Imgproc.COLOR_GRAY2BGR)
-                } else if (src.channels() == 1 && copy.channels() == 3) {
-                    Imgproc.cvtColor(copy, copy, Imgproc.COLOR_BGR2GRAY)
-                }
-            }
-
             val diffMat = Mat()
             Core.absdiff(src, copy, diffMat)
 
@@ -336,6 +323,7 @@ class DiffPictureOpencvUtil {
             return Answer(answerMat = src, answerPointList = pointList as ArrayList<com.seno.game.ui.main.home.game.diff_picture.model.Point>)
         } catch (e: Exception) {
             e.printStackTrace()
+            Timber.e(e)
             return null
         }
     }

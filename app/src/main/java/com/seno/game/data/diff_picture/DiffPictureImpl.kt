@@ -69,6 +69,8 @@ class DiffPictureImpl @Inject constructor(
                 Result.Error(updateSavedGameInfoTask.exception)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
+            Timber.e(e)
             Result.Error(e)
         }
     }
@@ -84,6 +86,7 @@ class DiffPictureImpl @Inject constructor(
                 Result.Success(originImage.toString() to otherImage.toString())
             } catch (e: Exception) {
                 e.printStackTrace()
+                Timber.e(e)
                 Result.Error(exception = e)
             }
         }
@@ -166,6 +169,8 @@ class DiffPictureImpl @Inject constructor(
             }.await()
             result
         } catch (e: Exception) {
+            e.printStackTrace()
+            Timber.e(e)
             Result.Error(exception = e)
         }
     }
@@ -204,6 +209,7 @@ class DiffPictureImpl @Inject constructor(
             result
         } catch (e: Exception) {
             e.printStackTrace()
+            Timber.e(e)
             Result.Error(exception = e)
         }
     }
@@ -235,6 +241,7 @@ class DiffPictureImpl @Inject constructor(
             result
         } catch (e: Exception) {
             e.printStackTrace()
+            Timber.e(e)
             Result.Error(exception = e)
         }
     }
@@ -272,6 +279,7 @@ class DiffPictureImpl @Inject constructor(
             result
         } catch (e: Exception) {
             e.printStackTrace()
+            Timber.e(e)
             Result.Error(exception = e)
         }
     }

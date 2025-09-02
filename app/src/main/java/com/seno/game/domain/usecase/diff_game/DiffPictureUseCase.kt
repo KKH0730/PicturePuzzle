@@ -21,14 +21,14 @@ class DiffPictureUseCase @Inject constructor(
         completeGameRound: String,
         heartCount: Int,
         heartChargedTime: Long
-    ): Flow<Result<Unit>> =
+    ): Result<Unit> =
         diffPictureRepository.updateSavedGameInfo(
             uid = uid,
             stage = stage,
             completeGameRound = completeGameRound,
             heartCount = heartCount,
             heartChargedTime = heartChargedTime
-        ).catchError(dispatcher = ioDispatcher)
+        )
 
 
     suspend fun reqRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>> {

@@ -12,7 +12,7 @@ interface DiffPictureRepository {
         completeGameRound: String,
         heartCount: Int,
         heartChargedTime: Long
-    ): Flow<Result<Unit>>
+    ): Result<Unit>
 
     suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>>
 

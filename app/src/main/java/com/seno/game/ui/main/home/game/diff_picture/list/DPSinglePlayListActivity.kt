@@ -24,7 +24,6 @@ import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayList
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -37,23 +36,25 @@ class DPSinglePlayListActivity : BaseComposeActivity(
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 result.data?.let { intent ->
-                    viewModel.reqUpdateSavedGameInfo()
+                    lifecycleScope.launch {
+                        viewModel.reqUpdateSavedGameInfo()
 
-                    val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
-                    val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
-                    val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
+                        val isStartNextGame = intent.getBooleanExtra("isStartNextGame", false)
+                        val currentRoundPosition = intent.getIntExtra(DPSinglePlayActivity.CURRENT_ROUND_POSITION, -1)
+                        val finalRoundPosition = intent.getIntExtra(DPSinglePlayActivity.FINAL_ROUND_POSITION, -1)
 
-                    if (currentRoundPosition != -1 && finalRoundPosition != -1) {
-                        if (currentRoundPosition == finalRoundPosition) {
-                            viewModel.setNextStage()
+                        if (currentRoundPosition != -1 && finalRoundPosition != -1) {
+                            if (currentRoundPosition == finalRoundPosition) {
+                                viewModel.setNextStage()
+                            }
+                            if (isStartNextGame) {
+                                viewModel.startNextGame(
+                                    currentRoundPosition = currentRoundPosition,
+                                    finalRoundPosition = finalRoundPosition
+                                )
+                            }
+                            viewModel.refreshGameList()
                         }
-                        if (isStartNextGame) {
-                            viewModel.startNextGame(
-                                currentRoundPosition = currentRoundPosition,
-                                finalRoundPosition = finalRoundPosition
-                            )
-                        }
-                        viewModel.refreshGameList()
                     }
                 }
             }

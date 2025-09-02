@@ -81,7 +81,7 @@ private fun getHeartTime(heartCount: Int, currentTime: Long, prevChargeHeartTime
 fun GameListHeader(
     snackbarHostState: SnackbarHostState,
     onClickBack: () -> Unit,
-    onChangedHeartTime: (Long) -> Unit
+    onChangedHeartTime: suspend (Long) -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -109,7 +109,7 @@ fun GameListHeader(
 
                 if (prevHeartCount != it) {
                     PrefsManager.diffPictureHeartChargedTime = if (prevChargeHeartTime == 0L) 0L else currentTime - (currentTime % prevChargeHeartTime)
-                    onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
+                    scope.launch { onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime) }
                 }
             }
 
@@ -180,7 +180,7 @@ fun GameListHeader(
                                     onRewarded = {
                                         PrefsManager.diffPictureHeartCount = prevHeartCount + 1
                                         PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
-                                        onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
+                                        scope.launch { onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime) }
 
                                         heartCount = prevHeartCount + 1
                                     }

@@ -39,33 +39,37 @@ class DiffPictureImpl @Inject constructor(
         completeGameRound: String,
         heartCount: Int,
         heartChargedTime: Long,
-    ): Flow<Result<Unit>> = flow {
-        val updateSavedGameInfoTask = suspendCoroutine { continuation ->
-            val map = mutableMapOf<String, Any>(
-                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
-                ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
-                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
-                ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to heartChargedTime
-            )
-            kotlin.runCatching {
-                db.collection(ApiConstants.Collection.PROFILE)
-                    .document(uid)
-                    .collection(ApiConstants.Collection.SAVE_GAME_INFO)
-                    .document(ApiConstants.Document.DIFF_PICTURE)
-                    .update(map)
-                    .addOnCompleteListener { task -> continuation.resume(task) }
-                    .addOnSuccessListener {
-                        Timber.e("updateSavedGameInfo addOnSuccessListener")
-                    }
-                    .addOnFailureListener {
-                        Timber.e("updateSavedGameInfo addOnFailureListener : ${it.message}")
-                    }
+    ): Result<Unit> {
+        return  try {
+            val updateSavedGameInfoTask = suspendCoroutine { continuation ->
+                val map = mutableMapOf<String, Any>(
+                    ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
+                    ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
+                    ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
+                    ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to heartChargedTime
+                )
+                kotlin.runCatching {
+                    db.collection(ApiConstants.Collection.PROFILE)
+                        .document(uid)
+                        .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+                        .document(ApiConstants.Document.DIFF_PICTURE)
+                        .update(map)
+                        .addOnCompleteListener { task -> continuation.resume(task) }
+                        .addOnSuccessListener {
+                            Timber.e("updateSavedGameInfo addOnSuccessListener")
+                        }
+                        .addOnFailureListener {
+                            Timber.e("updateSavedGameInfo addOnFailureListener : ${it.message}")
+                        }
+                }
             }
-        }
-        if (updateSavedGameInfoTask.isSuccessful) {
-            emit(Result.Success(Unit))
-        } else {
-            emit(Result.Error(updateSavedGameInfoTask.exception))
+            if (updateSavedGameInfoTask.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                Result.Error(updateSavedGameInfoTask.exception)
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 

@@ -32,7 +32,7 @@ fun DPSinglePlayListScreen(
     onClickBack: () -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
     onClickPlayButton: () -> Unit,
-    onChangedHeartTime: (Long) -> Unit
+    onChangedHeartTime: suspend (Long) -> Unit
 ) {
     val pagerPage by rememberUpdatedState(newValue = stage)
     val snackbarHostState = remember { SnackbarHostState() }

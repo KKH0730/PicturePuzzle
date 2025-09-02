@@ -14,12 +14,14 @@ import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveOriginImageUrl
 import com.seno.game.extensions.saveRoundImageUrl
 import com.seno.game.manager.AccountManager
+import com.seno.game.model.Result
 import com.seno.game.model.successData
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
 import com.seno.game.ui.main.home.game.diff_picture.single.model.StartGameModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -141,46 +143,47 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
-    fun reqUpdateSavedGameInfo(heartCount: Int = PrefsManager.diffPictureHeartCount) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                AccountManager.firebaseUid?.let { uid ->
-                    diffPictureUseCase.reqUpdateSavedGameInfo(
-                        uid = uid,
-                        stage = PrefsManager.diffPictureStage,
-                        completeGameRound = PrefsManager.diffPictureCompleteGameRound,
-                        heartCount = heartCount,
-                        heartChargedTime = PrefsManager.diffPictureHeartChargedTime
-                    ).collect()
-                }
-            }
+    suspend fun reqUpdateSavedGameInfo(heartCount: Int = PrefsManager.diffPictureHeartCount): Boolean {
+        return withContext(Dispatchers.IO) {
+            AccountManager.firebaseUid?.let { uid ->
+                val result = diffPictureUseCase.reqUpdateSavedGameInfo(
+                    uid = uid,
+                    stage = PrefsManager.diffPictureStage,
+                    completeGameRound = PrefsManager.diffPictureCompleteGameRound,
+                    heartCount = heartCount,
+                    heartChargedTime = PrefsManager.diffPictureHeartChargedTime
+                )
+
+                result is Result.Success
+            } ?: false
         }
     }
 
     fun startGame() {
         viewModelScope.launch {
             if (PrefsManager.diffPictureHeartCount > 0) {
-                updateEnableUpdateButton(enable = false)
-
-                PrefsManager.diffPictureHeartCount -= 1
-
-                if (PrefsManager.diffPictureHeartCount + 1 == 5) {
-                    PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
-                    reqUpdateSavedGameInfo()
-                }
-
                 val gameList = _gameList.value[_currentStage.value]
                 val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
                 if (selectedGameIndex != -1) {
-                    _currentGameRound.emit(
-                        StartGameModel(
-                            currentGameModel = gameList[selectedGameIndex],
-                            currentStagePosition = _currentStage.value,
-                            currentRoundPosition = selectedGameIndex,
-                            finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
-                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (selectedGameIndex + 1).toString())
+                    val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
+                    val isSuccess = reqUpdateSavedGameInfo(tempHeartCount)
+                    if (isSuccess) {
+                        updateEnableUpdateButton(enable = false)
+
+                        PrefsManager.diffPictureHeartCount = tempHeartCount
+
+                        _currentGameRound.emit(
+                            StartGameModel(
+                                currentGameModel = gameList[selectedGameIndex],
+                                currentStagePosition = _currentStage.value,
+                                currentRoundPosition = selectedGameIndex,
+                                finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
+                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (selectedGameIndex + 1).toString())
+                            )
                         )
-                    )
+                    } else {
+                        _message.emit(getString(R.string.network_request_error))
+                    }
                 }
             } else {
                 _message.emit(getString(R.string.diff_game_no_heart))
@@ -191,20 +194,26 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     fun startNextGame(currentRoundPosition: Int, finalRoundPosition: Int) {
         viewModelScope.launch {
             if (PrefsManager.diffPictureHeartCount > 0) {
-                PrefsManager.diffPictureHeartCount -= 1
-                reqUpdateSavedGameInfo()
+                val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
+                val isSuccess = reqUpdateSavedGameInfo(tempHeartCount)
+                if (isSuccess) {
+                    PrefsManager.diffPictureHeartCount = tempHeartCount
 
-                if (currentRoundPosition <= finalRoundPosition - 1) {
-                    _currentGameRound.emit(
-                        StartGameModel(
-                            currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
-                            currentStagePosition = _currentStage.value,
-                            currentRoundPosition = currentRoundPosition + 1,
-                            finalRoundPosition = finalRoundPosition,
-                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 1).toString())
+                    if (currentRoundPosition <= finalRoundPosition - 1) {
+                        _currentGameRound.emit(
+                            StartGameModel(
+                                currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
+                                currentStagePosition = _currentStage.value,
+                                currentRoundPosition = currentRoundPosition + 1,
+                                finalRoundPosition = finalRoundPosition,
+                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 1).toString())
+                            )
                         )
-                    )
+                    }
+                } else {
+                    _message.emit(getString(R.string.network_request_error))
                 }
+
             } else {
                 _message.emit(getString(R.string.diff_game_no_heart))
             }

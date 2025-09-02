@@ -111,5 +111,5 @@
     <string name="diff_new_month_update_alert_dialog">새로운 월간 스테이지가 열렸습니다 🎉\n지금 바로 새 도전에 나서보세요!</string>
 
     <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
-    <string name="diff_game_no_heart">하트가 부족해요… 잠시 후에 다시 시도해 주세요!</string>
+    <string name="diff_game_no_heart">하트가 모자라요. 잠시 후 재도전!</string>
 </resources>

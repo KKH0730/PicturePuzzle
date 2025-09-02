@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowInsetsControllerCompat
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.prefs.PrefsManager
@@ -73,6 +74,7 @@ abstract class BaseComposeActivity(
                 context = this@BaseComposeActivity,
                 onConfirm = {
                     PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                    clearMemoryCache()
                     restartApp(this@BaseComposeActivity)
                 }).show()
         }

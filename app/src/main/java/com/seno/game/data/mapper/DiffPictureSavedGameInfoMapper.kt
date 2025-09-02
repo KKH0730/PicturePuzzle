@@ -6,6 +6,7 @@ import com.seno.game.data.network.ApiConstants
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.model.response.UserInfoResponse
 import com.seno.game.prefs.PrefsManager
+import timber.log.Timber
 import javax.inject.Inject
 
 class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<DocumentSnapshot, UserInfoResponse, SavedGameInfo> {
@@ -24,12 +25,8 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
                 ?: PrefsManager.diffPictureStage,
             completeGameRound = param1.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND)
                 ?: PrefsManager.diffPictureCompleteGameRound,
-            diffPictureHeartCount = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
-                param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt()
-                    ?: PrefsManager.diffPictureHeartCount
-            } else {
-                PrefsManager.diffPictureHeartCount
-            },
+            diffPictureHeartCount = param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt()
+                ?: PrefsManager.diffPictureHeartCount,
             diffPictureHeartChargedTime = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
                 param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME)
                     ?: PrefsManager.diffPictureHeartChargedTime

@@ -93,7 +93,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         return withContext(Dispatchers.IO) {
             val imageDate = getImageDate()
             if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
-                round.getOriginImageUrl() to round.getOtherImageUrl()
+                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
             } else {
                 val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
                 if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {

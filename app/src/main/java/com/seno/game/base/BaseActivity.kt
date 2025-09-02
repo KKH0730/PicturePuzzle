@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.prefs.PrefsManager
@@ -58,6 +59,7 @@ abstract class BaseActivity<T: ViewDataBinding>(
                 context = this@BaseActivity,
                 onConfirm = {
                     PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                    clearMemoryCache()
                     restartApp(this@BaseActivity)
             }).show()
         }

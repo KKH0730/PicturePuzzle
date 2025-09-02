@@ -1,7 +1,6 @@
 package com.seno.game.ui.main.home.game.diff_picture.list
 
 import android.content.Context
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +17,7 @@ import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveDiskCacheData
+import com.seno.game.extensions.snackbar
 import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
@@ -79,35 +79,38 @@ class DPSinglePlayListActivity : BaseComposeActivity(
 
     private fun startObserve() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentGameRound.collect {
-                    it.images.saveDiskCacheData()
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                launch {
+                    viewModel.currentGameRound.collect {
+                        it.images.saveDiskCacheData()
 
-                    if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
-                        onResume()
-                        return@collect
-                    } else {
-                        PrefsManager.recentSinglePlayDate = getTodayDate()
+                        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                            onResume()
+                            return@collect
+                        } else {
+                            PrefsManager.recentSinglePlayDate = getTodayDate()
+                        }
+
+                        DPSinglePlayActivity.start(
+                            context = this@DPSinglePlayListActivity,
+                            stagePosition = it.currentStagePosition,
+                            currentRoundPosition = it.currentRoundPosition,
+                            finalRoundPosition = it.finalRoundPosition,
+                            image1 = it.images?.first ?: "",
+                            image2 = it.images?.second ?: "",
+                            launcher = launcher
+                        )
+                        overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
+
+                        viewModel.updateEnableUpdateButton(enable = true)
                     }
-
-                    DPSinglePlayActivity.start(
-                        context = this@DPSinglePlayListActivity,
-                        stagePosition = it.currentStagePosition,
-                        currentRoundPosition = it.currentRoundPosition,
-                        finalRoundPosition = it.finalRoundPosition,
-                        image1 = it.images?.first ?: "",
-                        image2 = it.images?.second ?: "",
-                        launcher = launcher
-                    )
-                    overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
-
-                    viewModel.updateEnableUpdateButton(enable = true)
                 }
-            }
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.message.collect {
-                    viewModel.updateEnableUpdateButton(enable = true)
-                    Toast.makeText(this@DPSinglePlayListActivity, it, Toast.LENGTH_SHORT).show()
+
+                launch {
+                    viewModel.message.collect {
+                        viewModel.updateEnableUpdateButton(enable = true)
+                        snackbar(it)
+                    }
                 }
             }
         }

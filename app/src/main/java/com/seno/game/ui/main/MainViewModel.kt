@@ -2,6 +2,7 @@ package com.seno.game.ui.main
 
 import androidx.lifecycle.viewModelScope
 import com.seno.game.domain.usecase.user.GameConfigUseCase
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.parseImageDate
@@ -42,7 +43,11 @@ class MainViewModel @Inject constructor(
                             if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
                                 PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
                                 PrefsManager.recentSinglePlayDate = getTodayDate()
+                                withContext(Dispatchers.Main) {
+                                    clearMemoryCache()
+                                }
                             }
+
                             _savedGameInfoToLocalDB.emit(result.data)
                         }
                         is Result.Error -> { _showNetworkErrorEvent.value = true }

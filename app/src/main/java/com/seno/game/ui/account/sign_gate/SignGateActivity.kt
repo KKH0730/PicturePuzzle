@@ -40,6 +40,7 @@ class SignGateActivity : AppCompatActivity() {
                         onSignInSucceed = {
                             runOnUiThread {
                                 toast("로그인 성공")
+                                setResult(RESULT_OK)
                                 finish()
                             }
                         },

@@ -1,6 +1,9 @@
 package com.seno.game.ui.main.home
 
+import android.app.Activity.RESULT_OK
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -76,10 +79,19 @@ fun HomeUI(
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var isUser by remember { mutableStateOf(AccountManager.isUser) }
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profileUri by remember { mutableStateOf("") }
 
     val insets = WindowInsets.systemBars.asPaddingValues()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+       if (result.resultCode == RESULT_OK) {
+           isUser = true
+       }
+    }
 
     context.LifecycleEventListener {
         when (it) {
@@ -192,6 +204,7 @@ fun HomeUI(
                     isCompleteLogout = {
                         isLoading = false
                         isShowLogoutDialog = false
+                        isUser = false
 
                         PrefsManager.apply {
                             this.nickname = context.resources.createRandomNickname()
@@ -217,11 +230,12 @@ fun HomeUI(
             onChangedBackgroundVolume = onChangedBackgroundVolume,
             onChangedFinishedBackgroundVolume = onChangeFinishedBackgroundVolume,
             effectVolume = savedGameInfo.effectVolume,
+            isUser = isUser,
             onChangedEffectVolume = onChangedEffectVolume,
             onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
             onChangedVibration = onChangedVibration,
             onChangedPush = onChangedPush,
-            onClickLogin = { context.startActivity(SignGateActivity::class.java) },
+            onClickLogin = { context.startActivity(SignGateActivity::class.java, launcher = launcher) },
             onClickLogout = {
                 isShowSettingDialog = false
                 isShowLogoutDialog = true

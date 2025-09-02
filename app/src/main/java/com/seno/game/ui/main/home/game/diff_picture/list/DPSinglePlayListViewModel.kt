@@ -14,6 +14,7 @@ import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveOriginImageUrl
 import com.seno.game.extensions.saveRoundImageUrl
 import com.seno.game.manager.AccountManager
+import com.seno.game.manager.UNKNOWN_UID
 import com.seno.game.model.Result
 import com.seno.game.model.successData
 import com.seno.game.prefs.PrefsManager
@@ -148,17 +149,18 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         heartChargedTime: Long = PrefsManager.diffPictureHeartChargedTime
     ): Boolean {
         return withContext(Dispatchers.IO) {
-            AccountManager.firebaseUid?.let { uid ->
+            if (AccountManager.isUser) {
                 val result = diffPictureUseCase.reqUpdateSavedGameInfo(
-                    uid = uid,
+                    uid = AccountManager.firebaseUid,
                     stage = PrefsManager.diffPictureStage,
                     completeGameRound = PrefsManager.diffPictureCompleteGameRound,
                     heartCount = heartCount,
                     heartChargedTime = heartChargedTime
                 )
-
                 result is Result.Success
-            } ?: false
+            } else {
+                true
+            }
         }
     }
 

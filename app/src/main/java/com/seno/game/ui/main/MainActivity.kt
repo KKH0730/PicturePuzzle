@@ -25,6 +25,7 @@ import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
+import com.seno.game.manager.UNKNOWN_UID
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.common.RestartDialog
@@ -43,6 +44,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        createRandomNickname()
+
         enableEdgeToEdge()
         WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightStatusBars = true
@@ -54,20 +57,19 @@ class MainActivity : ComponentActivity() {
                 var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
                 var isNetworkError by remember { mutableStateOf(false) }
 
+                if (!AccountManager.isUser) {
+                    HomeLoadingScreen()
+                    MainScreen()
+                    return@Surface
+                }
+
                 startObserve(
                     onCallbackSavedGameInfo = { savedGameInfo = it },
                     onCallbackNetworkError = { isNetworkError = it }
                 )
 
-                if (AccountManager.isUser) {
-                    reqSavedGameInfo(
-                        savedGameInfo = savedGameInfo,
-                        isTaskSuccess = { isTaskSuccess ->
-                            if (!isTaskSuccess) {
-                                isNetworkError = true
-                            }
-                        }
-                    )
+                if (AccountManager.isUser && savedGameInfo == null) {
+                    mainViewModel.getSavedGameInfo(uid = AccountManager.firebaseUid)
                 }
 
                 if (isNetworkError) {
@@ -78,20 +80,15 @@ class MainActivity : ComponentActivity() {
                         onClickConfirm = { this@MainActivity.restartApp() }
                     )
                 } else {
-                    if (AccountManager.isUser) {
-                        if (savedGameInfo != null) {
-                            // 저장된 게임 데이터 Load
-                            savedGameInfo.savedGameInfoToLocalDB()
+                    if (savedGameInfo != null) {
+                        // 저장된 게임 데이터 Load
+                        savedGameInfo.savedGameInfoToLocalDB()
 
-                            // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
-                            HomeLoadingScreen()
-                            MainScreen()
-                        } else {
-                            HomeLoadingScreen()
-                        }
-                    } else {
+                        // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
                         HomeLoadingScreen()
                         MainScreen()
+                    } else {
+                        HomeLoadingScreen()
                     }
                 }
             }
@@ -100,29 +97,7 @@ class MainActivity : ComponentActivity() {
 
     private fun createRandomNickname() {
         if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {
-            resources.createRandomNickname()
-        }
-    }
-
-    private fun setOrReqAuthentication(callback: (Boolean) -> Unit) {
-        if (AccountManager.isUser) {
-            callback.invoke(true)
-        } else {
-            reqAuthentication { callback.invoke(it) }
-        }
-    }
-
-    private fun reqSavedGameInfo(
-        savedGameInfo: SavedGameInfo?,
-        isTaskSuccess: (Boolean) -> Unit
-    ) {
-        if (savedGameInfo == null) {
-            AccountManager.firebaseUid?.let {
-                mainViewModel.getSavedGameInfo(uid = it)
-                isTaskSuccess.invoke(true)
-            } ?: run {
-                isTaskSuccess.invoke(false)
-            }
+            PrefsManager.nickname = resources.createRandomNickname()
         }
     }
 

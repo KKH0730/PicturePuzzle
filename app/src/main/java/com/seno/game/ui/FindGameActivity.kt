@@ -43,16 +43,7 @@ class FindGameActivity : BaseActivity<ActivityFindGameBinding>(
                 homeViewModel.enterRoomFlow.collect {
                     it?.roomUid?.let { roomUid ->
                         it.date?.let { date ->
-                            AccountManager.firebaseUid?.let { uid ->
-                                startActivity(CreateGameActivity::class.java) {
-                                    putExtra("date", date)
-                                    putExtra("uid", uid)
-                                    putExtra("roomUid", roomUid)
-                                    putExtra("isChief", false)
-                                }
 
-                                finish()
-                            }
                         }
                     }
                 }
@@ -69,17 +60,7 @@ class FindGameActivity : BaseActivity<ActivityFindGameBinding>(
             if (result.contents == null) {
                 finish()
             } else {
-                AccountManager.firebaseUid?.let { uid ->
-                    result.contents.let { roomUid ->
-                        val date = Date(Calendar.getInstance().timeInMillis)
-                        homeViewModel.reqEnterRoom(
-                            date = getTodayDate(),
-                            uid = uid,
-                            roomUid = roomUid,
-                            nickName = "Find${Calendar.getInstance().timeInMillis}"
-                        )
-                    }
-                }
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

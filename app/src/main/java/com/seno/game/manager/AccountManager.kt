@@ -25,6 +25,7 @@ private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
 private const val LOGIN_TYPE_NAVER = "naver.com"
 private const val LOGIN_TYPE_KAKAO = "kakao.com"
 private const val LOGIN_TYPE_UNKNOWN = "unknown"
+const val UNKNOWN_UID = "unknownUid"
 
 enum class PlatForm(val value: String) {
     KAKAO(value = "kakao"),
@@ -38,8 +39,8 @@ object AccountManager {
     private val currentUser: FirebaseUser?
         get() = firebaseRequest.currentUser
 
-    val firebaseUid: String?
-        get() = firebaseRequest.currentUser?.uid
+    val firebaseUid: String
+        get() = firebaseRequest.currentUser?.uid ?: UNKNOWN_UID
 
     val isSignedIn: Boolean
         get() = currentUser != null
@@ -48,7 +49,7 @@ object AccountManager {
         get() = currentUser?.isAnonymous == true
 
     val isUser: Boolean
-        get() = currentUser != null
+        get() = firebaseUid.isNotEmpty() && firebaseUid != UNKNOWN_UID
 
     val profileColRef = FirebaseFirestore.getInstance().collection("profile")
 
@@ -422,8 +423,13 @@ object AccountManager {
         onFail: () -> Unit
     ) {
         val uid = firebaseUid
-        if (uid.isNullOrEmpty()) {
+        if (uid.isEmpty()) {
             withContext(Dispatchers.Main) { onFail.invoke() }
+            return
+        }
+
+        if (uid == UNKNOWN_UID) {
+            withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
             return
         }
 

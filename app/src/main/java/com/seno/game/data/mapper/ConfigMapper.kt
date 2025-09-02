@@ -12,7 +12,7 @@ class ConfigMapper @Inject constructor(): Mapper<DocumentSnapshot, UserInfoRespo
     override fun fromRemote(model: DocumentSnapshot): UserInfoResponse {
         return with(model) {
             UserInfoResponse(
-                getString(ApiConstants.UserInfo.UID) ?: AccountManager.firebaseUid ?: "",
+                getString(ApiConstants.UserInfo.UID) ?: AccountManager.firebaseUid,
                 getString(ApiConstants.UserInfo.NICKNAME) ?: PrefsManager.nickname,
                 getString(ApiConstants.UserInfo.PLATFORM) ?: PrefsManager.platform,
                 getString(ApiConstants.UserInfo.PROFILE_URI) ?: PrefsManager.profileUri,

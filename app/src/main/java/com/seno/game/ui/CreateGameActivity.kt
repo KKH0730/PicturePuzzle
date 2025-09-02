@@ -167,14 +167,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
 
     private fun reqCreateRoom() {
         // QR 코드 생성
-        AccountManager.firebaseUid?.let { uid ->
-            homeViewModel.reqCreateRoom(
-                date = todayDate,
-                uid = uid,
-                roomUid = roomUid,
-                nickName = "nick"
-            )
-        }
+
     }
 
     private fun setQRCode() {
@@ -182,20 +175,7 @@ class CreateGameActivity : BaseActivity<ActivityCreateGameBinding>(
     }
 
     private fun setReadyButton(index: Int, playerInfoMap: HashMap<String, Any>) {
-        AccountManager.firebaseUid?.let { uid ->
-            // 방장이 변경되었음
-            if (playerInfoMap["uid"] as String == uid) {
-                if (index == 0) {
-                    binding.tvReady.text = getString(R.string.game_start)
-                } else {
-                    if (playerInfoMap["ready"] as Boolean) {
-                        binding.tvReady.text = getString(R.string.game_prepare_complete)
-                    } else {
-                        binding.tvReady.text = getString(R.string.game_prepare)
-                    }
-                }
-            }
-        }
+
     }
 
     override fun onClickReady() {

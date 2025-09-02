@@ -29,6 +29,7 @@ import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
+import com.seno.game.manager.UNKNOWN_UID
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.account.AccountViewModel
@@ -186,7 +187,7 @@ fun MyProfileScreen(
         )
     }
 
-    if (profileState.isShowEditNicknameDialog.value) {
+    if (profileState.isShowEditNicknameDialog.value && AccountManager.isUser) {
         NicknameEditDialog(
             initialNickname = profileState.nickname.value,
             onConfirm = {

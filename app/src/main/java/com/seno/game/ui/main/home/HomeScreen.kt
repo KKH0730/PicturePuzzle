@@ -42,20 +42,32 @@ fun HomeScreen() {
         savedGameInfo = homeViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle().value,
         onChangedBackgroundVolume = homeViewModel::updateBackgroundVolume,
         onChangeFinishedBackgroundVolume = {
-            homeViewModel.reqUpdateBackgroundVolume(
-                uid = AccountManager.firebaseUid,
-                volume = it.toString()
-            )
+            if (AccountManager.isUser) {
+                homeViewModel.reqUpdateBackgroundVolume(
+                    uid = AccountManager.firebaseUid,
+                    volume = it.toString()
+                )
+            }
         },
         onChangedEffectVolume = homeViewModel::updateEffectVolume,
         onChangeFinishedEffectVolume = {
-            homeViewModel.reqUpdateEffectVolume(
-                uid = AccountManager.firebaseUid,
-                volume = it.toString()
-            )
+            if (AccountManager.isUser) {
+                homeViewModel.reqUpdateEffectVolume(
+                    uid = AccountManager.firebaseUid,
+                    volume = it.toString()
+                )
+            }
         },
-        onChangedVibration = { homeViewModel.reqUpdateVibrationOnOff(AccountManager.firebaseUid, isVibrationOn = it) },
-        onChangedPush = { homeViewModel.reqUpdatePushOnOff(AccountManager.firebaseUid, isPushOn = it) },
+        onChangedVibration = {
+            if (AccountManager.isUser) {
+                homeViewModel.reqUpdateVibrationOnOff(AccountManager.firebaseUid, isVibrationOn = it)
+            }
+        },
+        onChangedPush = {
+            if (AccountManager.isUser) {
+                homeViewModel.reqUpdatePushOnOff(AccountManager.firebaseUid, isPushOn = it)
+            }
+        },
     )
 }
 
@@ -88,9 +100,9 @@ fun HomeUI(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-       if (result.resultCode == RESULT_OK) {
-           isUser = true
-       }
+        if (result.resultCode == RESULT_OK) {
+            isUser = true
+        }
     }
 
     context.LifecycleEventListener {
@@ -102,14 +114,18 @@ fun HomeUI(
                 profileUri = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
             }
+
             Lifecycle.Event.ON_PAUSE -> {
             }
+
             Lifecycle.Event.ON_STOP -> {
                 MusicPlayUtil.pause(isBackgroundSound = true)
             }
+
             Lifecycle.Event.ON_DESTROY -> {
                 MusicPlayUtil.release(isBackgroundSound = true)
             }
+
             else -> return@LifecycleEventListener
         }
     }

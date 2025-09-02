@@ -25,8 +25,12 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
                 ?: PrefsManager.diffPictureStage,
             completeGameRound = param1.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND)
                 ?: PrefsManager.diffPictureCompleteGameRound,
-            diffPictureHeartCount = param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt()
-                ?: PrefsManager.diffPictureHeartCount,
+            diffPictureHeartCount = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
+                param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt()
+                    ?: PrefsManager.diffPictureHeartCount
+            } else {
+                PrefsManager.diffPictureHeartCount
+            },
             diffPictureHeartChargedTime = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
                 param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME)
                     ?: PrefsManager.diffPictureHeartChargedTime

@@ -173,6 +173,7 @@ dependencies {
 
     // Etc
     implementation(libs.easy.prefs)
-    implementation(libs.zxing)
+    implementation(libs.zxing.android.embedded)
+    implementation(libs.barcodescanner.zxing)
     implementation(libs.recyclerview.divider)
 }

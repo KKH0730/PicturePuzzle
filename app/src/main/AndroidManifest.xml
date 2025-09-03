@@ -44,6 +44,19 @@
             android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.main.home.game.diff_picture.multi.qr.QRScanActivity"
+            android:exported="false"
+            android:theme="@style/PopupTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
+        <activity
+            android:name=".ui.main.home.game.diff_picture.multi.multi_game.DPMultiPlayActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.main.home.game.diff_picture.single.DPSinglePlayActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
@@ -54,13 +67,6 @@
             android:name=".ui.splash.SplashActivity"
             android:exported="false"
             android:theme="@style/Theme.Splash" />
-        <activity
-            android:name=".ui.FindGameActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.CreateGameActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.account.sign_gate.SignGateActivity"
             android:exported="false"

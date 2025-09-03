@@ -1,7 +1,5 @@
 package com.seno.game.data.diff_picture
 
-import android.net.Uri
-import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,13 +10,14 @@ import com.seno.game.di.network.DiffDocRef
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Player
 import com.seno.game.model.Result
+import com.seno.game.ui.main.home.game.diff_picture.multi.model.MultiGameProfileInfo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -40,7 +39,7 @@ class DiffPictureImpl @Inject constructor(
         heartCount: Int,
         heartChargedTime: Long,
     ): Result<Unit> {
-        return  try {
+        return try {
             val updateSavedGameInfoTask = suspendCoroutine { continuation ->
                 val map = mutableMapOf<String, Any>(
                     ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
@@ -92,47 +91,90 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllDiffPictures(): Result<List<Pair<Uri, Uri>>> {
-        val today = LocalDate.now()
-        val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
+    override suspend fun createMultiGame(
+        path: String,
+        hostUid: String,
+        hostNickName: String,
+        hostProfileUri: String,
+        guestUid: String,
+        guestNickName: String,
+        guestProfileUri: String
+    ): Result<Boolean> {
+        val data = mapOf(
+            "hostUid" to hostUid,
+            "hostNickName" to hostNickName,
+            "hostProfileUri" to hostProfileUri,
+            "guestUid" to guestUid,
+            "guestNickName" to guestNickName,
+            "guestProfileUri" to guestProfileUri,
+            "ready" to false
+        )
 
-        return withContext(Dispatchers.IO) {
-            try {
-                val uriPairList = arrayListOf<Pair<Uri, Uri>>()
-                val result = ref.child(formattedDate).listAll().await()
-                val allFiles = mutableListOf<StorageReference>()
-                allFiles.addAll(result.items)
-
-                val allUrls = allFiles.map { it.downloadUrl.await() } // 모든 URL 가져오기
-
-
-//                ref.child(halloween).list(100)
-//                    .addOnSuccessListener { listResult ->
-//                        listResult.items.map { storageReference ->  }
-//                        // 이미지 두개 들어있는 폴더들
-//                        listResult.items.forEach { pictureFolderRef ->
-//                            var firstUri: Uri? = null
-//                            pictureFolderRef.listAll().addOnSuccessListener { pictureListResult ->
-//                                pictureListResult.items.forEach { pictureRef ->
-//                                    pictureRef.downloadUrl.addOnSuccessListener { uri ->
-//                                        if (!pictureRef.name.contains("copy")) {
-//                                            firstUri = uri
-//                                        } else {
-//                                            firstUri?.let {
-//                                                uriPairList.add(it to uri)
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }.await()
-                Result.Success(uriPairList)
-            } catch (e: Exception) {
-                Result.Error(exception = e)
-            }
+        return try {
+            diffGameDocRef
+                .collection("multi")
+                .document(path)
+                .set(data)
+                .await()
+            Result.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(exception = e)
         }
     }
+
+    override suspend fun updateMultiGame(path: String): Result<Boolean> {
+        return try {
+            diffGameDocRef
+                .collection("multi")
+                .document(path)
+                .update("ready", true)
+                .await()
+
+            Result.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(exception = e)
+        }
+    }
+
+    override suspend fun observeMultiGameSnapshot(path: String): Flow<Result<Pair<Boolean ,MultiGameProfileInfo>>> =
+        callbackFlow {
+            val registration = diffGameDocRef
+                .collection("multi")
+                .document(path)
+                .addSnapshotListener { snapshot, error ->
+                    try {
+                        if (error != null) {
+                            trySend(Result.Error(error))
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            val data = MultiGameProfileInfo(
+                                path = path,
+                                hostUid = snapshot.getString("hostUid") ?: "",
+                                hostNickName = snapshot.getString("hostNickName") ?: "",
+                                hostProfileUri = snapshot.getString("hostProfileUri") ?: "",
+                                guestUid = snapshot.getString("guestUid") ?: "",
+                                guestNickName = snapshot.getString("guestNickName") ?: "",
+                                guestProfileUri = snapshot.getString("guestProfileUri") ?: "",
+                            )
+
+                            if (data.isNotEmpty()) {
+                                val ready = snapshot.getBoolean("ready") ?: false
+                                trySend(Result.Success(ready to data))
+                            } else {
+                                trySend(Result.Error(error))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        trySend(Result.Error(error))
+                    }
+                }
+            awaitClose { registration.remove() }
+        }
 
     override suspend fun createRoom(
         date: String, //20220730
@@ -144,7 +186,7 @@ class DiffPictureImpl @Inject constructor(
             val player = Player(
                 uid = uid,
                 nickName = nickName,
-                isReady = true
+                profileUri = ""
             )
 
             val map = HashMap<String, Any>()
@@ -161,7 +203,9 @@ class DiffPictureImpl @Inject constructor(
                     DiffPictureGame(
                         date = date,
                         roomUid = roomUid,
-                        playerList = arrayListOf(Player(uid = uid, nickName = nickName, isReady = true))
+                        playerList = arrayListOf(
+                            Player(uid = uid, nickName = nickName, profileUri = "")
+                        )
                     )
                 )
             }.addOnFailureListener {
@@ -187,7 +231,7 @@ class DiffPictureImpl @Inject constructor(
                     Player(
                         uid = uid,
                         nickName = nickName,
-                        isReady = false
+                        profileUri = ""
                     )
                 )
 
@@ -227,9 +271,7 @@ class DiffPictureImpl @Inject constructor(
 
                 val playerList = playerListMapper(playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>))
                 playerList.forEach {
-                    if (uid == it.uid) {
-                        it.isReady = !it.isReady
-                    }
+
                 }
 
                 transaction.update(roomDocRef, "playerList", playerList)
@@ -298,7 +340,7 @@ private fun playerListMapper(playerList: ArrayList<HashMap<String, Any>>): List<
         Player(
             uid = (it["uid"] as String),
             nickName = (it["nickName"] as String),
-            isReady = (it["ready"] as Boolean)
+            profileUri = "",
         )
     }
 }
@@ -314,7 +356,7 @@ private fun playerListMapper(uid: String, playerList: ArrayList<HashMap<String, 
             Player(
                 uid = (hashMap["uid"] as String),
                 nickName = (hashMap["nickName"] as String),
-                isReady = (hashMap["ready"] as Boolean)
+                profileUri = "",
             )
         )
     }

@@ -16,15 +16,23 @@ import com.seno.game.util.MusicPlayUtil
 
 @Composable
 fun HomeQuickMenuContainer(
-    onToggledSound: () -> Unit,
     onClickSetting: () -> Unit,
+    onToggledSound: () -> Unit,
+    onClickQRScan: () -> Unit,
 ) {
     Column {
-        SoundOnOffButton(
-            onToggledSound = onToggledSound
-        )
-        SettingButton(
-            onClickSetting = onClickSetting
+        SettingButton(onClickSetting = onClickSetting)
+        SoundOnOffButton(onToggledSound = onToggledSound)
+        ScanQRCode(onClickQRScan = onClickQRScan)
+    }
+}
+
+@Composable
+fun ScanQRCode(onClickQRScan: () -> Unit) {
+    IconButton(onClick = onClickQRScan) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_qr_scan),
+            contentDescription = null
         )
     }
 }

@@ -1,11 +1,10 @@
 package com.seno.game.domain.usecase.diff_game
 
-import android.net.Uri
 import com.seno.game.data.diff_picture.DiffPictureRepository
 import com.seno.game.di.coroutine.IoDispatcher
-import com.seno.game.extensions.catchError
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Result
+import com.seno.game.ui.main.home.game.diff_picture.multi.model.MultiGameProfileInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -35,8 +34,31 @@ class DiffPictureUseCase @Inject constructor(
         return diffPictureRepository.getRoundDiffPicture(stage = stage, round = round)
     }
 
-    suspend fun reqAllDiffPictures(): Result<List<Pair<Uri, Uri>>>  {
-        return diffPictureRepository.getAllDiffPictures()
+    suspend fun createMultiGame(
+        path: String,
+        hostUid: String,
+        hostNickName: String,
+        hostProfileUri: String,
+        guestUid: String,
+        guestNickName: String,
+        guestProfileUri: String
+    ): Result<Boolean> {
+        return diffPictureRepository.createMultiGame(
+            path = path, hostUid = hostUid,
+            hostNickName = hostNickName,
+            hostProfileUri = hostProfileUri,
+            guestUid = guestUid,
+            guestNickName = guestNickName,
+            guestProfileUri = guestProfileUri
+        )
+    }
+
+    suspend fun updateMultiGame(path: String): Result<Boolean> {
+        return diffPictureRepository.updateMultiGame(path = path)
+    }
+
+    suspend fun observeMultiGameSnapshot(path: String): Flow<Result<Pair<Boolean, MultiGameProfileInfo>>>{
+        return diffPictureRepository.observeMultiGameSnapshot(path = path)
     }
 
     suspend fun createRoom(

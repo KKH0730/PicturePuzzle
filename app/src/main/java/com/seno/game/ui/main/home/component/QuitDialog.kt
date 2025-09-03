@@ -49,8 +49,8 @@ fun QuitDialog(
                 Spacer(modifier = Modifier.height(height = 28.dp))
                 Row() {
                     Spacer(modifier = Modifier.width(width = 10.dp))
-                    QuitDialogNoButton(onClick = onClickNo)
-                    QuitDialogYesButton(onClick = onClickYes)
+                    QuitDialogNoButton(text = stringResource(id = R.string.home_quit_n), onClick = onClickNo)
+                    QuitDialogYesButton(text = stringResource(id = R.string.home_quit_y), onClick = onClickYes)
                     Spacer(modifier = Modifier.width(width = 10.dp))
                 }
                 Spacer(modifier = Modifier.height(height = 25.dp))
@@ -60,7 +60,7 @@ fun QuitDialog(
 }
 
 @Composable
-fun QuitDialogYesButton(onClick: () -> Unit) {
+fun QuitDialogYesButton(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .width(width = 130.dp)
@@ -72,7 +72,7 @@ fun QuitDialogYesButton(onClick: () -> Unit) {
             modifier = Modifier.align(alignment = Alignment.Center)
         )
         Text(
-            text = stringResource(id = R.string.home_quit_y),
+            text = text,
             color = Color.White,
             fontSize = 16.textDp,
             modifier = Modifier.align(alignment = Alignment.Center)
@@ -81,7 +81,7 @@ fun QuitDialogYesButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun QuitDialogNoButton(onClick: () -> Unit) {
+fun QuitDialogNoButton(text: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .width(width = 130.dp)
@@ -93,7 +93,7 @@ fun QuitDialogNoButton(onClick: () -> Unit) {
             modifier = Modifier.align(alignment = Alignment.Center)
         )
         Text(
-            text = stringResource(id = R.string.home_quit_n),
+            text = text,
             color = colorResource(id = R.color.color_bbd0ff),
             fontSize = 16.textDp,
             modifier = Modifier.align(alignment = Alignment.Center)

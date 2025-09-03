@@ -1,12 +1,15 @@
-package com.seno.game.ui.main.home.game.diff_picture.single
+package com.seno.game.ui.main.home.game.diff_picture.multi.multi_game
 
 import android.graphics.Bitmap
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.seno.game.R
 import com.seno.game.di.DiffOpenCv
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getBitmapFromUrl
+import com.seno.game.extensions.getDrawable
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getOriginImageUrl
 import com.seno.game.extensions.getOtherImageUrl
@@ -19,7 +22,7 @@ import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.model.Answer
 import com.seno.game.ui.main.home.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.main.home.game.diff_picture.model.Point
-import com.seno.game.ui.main.home.game.diff_picture.multi.multi_game.ANSWER_CORRECTION
+import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
 import com.seno.game.ui.main.home.game.diff_picture.single.model.AnswerMark
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +40,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 @HiltViewModel
-class DPSinglePlayViewModel @Inject constructor(
+class DPMultiPlayViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diffPictureUseCase: DiffPictureUseCase,
     @DiffOpenCv private val opencvUtil: DiffPictureOpencvUtil,

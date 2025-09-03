@@ -61,7 +61,8 @@ kakao-sdk-all = { module = "com.kakao.sdk:v2-all-rx", version = "2.11.2" }
 gms-auth = { module = "com.google.android.gms:play-services-auth", version = "21.4.0" }
 gms-ads = { module = "com.google.android.gms:play-services-ads", version = "24.5.0" }
 easy-prefs = { module = "com.pixplicity.easyprefs:EasyPrefs", version = "1.10.0" }
-zxing = { module = "com.journeyapps:zxing-android-embedded", version = "4.3.0" }
+zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version = "4.3.0" }
+barcodescanner-zxing = { module = "me.dm7.barcodescanner:zxing", version = "1.9.8" }
 recyclerview-divider = { module = "com.github.fondesa:recycler-view-divider", version = "3.0.0" }
 
 

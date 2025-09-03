@@ -1,8 +1,8 @@
 package com.seno.game.data.diff_picture
 
-import android.net.Uri
 import com.seno.game.model.DiffPictureGame
 import com.seno.game.model.Result
+import com.seno.game.ui.main.home.game.diff_picture.multi.model.MultiGameProfileInfo
 import kotlinx.coroutines.flow.Flow
 
 interface DiffPictureRepository {
@@ -16,7 +16,19 @@ interface DiffPictureRepository {
 
     suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>>
 
-    suspend fun getAllDiffPictures(): Result<List<Pair<Uri, Uri>>>
+    suspend fun createMultiGame(
+        path: String,
+        hostUid: String,
+        hostNickName: String,
+        hostProfileUri: String,
+        guestUid: String,
+        guestNickName: String,
+        guestProfileUri: String
+    ): Result<Boolean>
+
+    suspend fun updateMultiGame(path: String): Result<Boolean>
+
+    suspend fun observeMultiGameSnapshot(path: String): Flow<Result<Pair<Boolean, MultiGameProfileInfo>>>
 
     suspend fun createRoom(
         date: String,

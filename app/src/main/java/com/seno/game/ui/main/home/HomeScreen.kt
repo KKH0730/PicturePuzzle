@@ -5,8 +5,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -22,7 +40,11 @@ import com.seno.game.extensions.LifecycleEventListener
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
-import com.seno.game.manager.*
+import com.seno.game.manager.AccountManager
+import com.seno.game.manager.FacebookAccountManager
+import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.manager.KakaoAccountManager
+import com.seno.game.manager.NaverAccountManager
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
@@ -30,9 +52,16 @@ import com.seno.game.ui.account.sign_gate.SignGateActivity
 import com.seno.game.ui.common.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.MainActivity
-import com.seno.game.ui.main.home.component.*
+import com.seno.game.ui.main.home.component.GamePlayContainer
+import com.seno.game.ui.main.home.component.HomeProfileContainer
+import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
+import com.seno.game.ui.main.home.component.QuitDialog
+import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.qr.QRScanActivity
 import com.seno.game.util.MusicPlayUtil
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun HomeScreen() {
@@ -95,6 +124,9 @@ fun HomeUI(
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profileUri by remember { mutableStateOf("") }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     val insets = WindowInsets.systemBars.asPaddingValues()
 
     val launcher = rememberLauncherForActivityResult(
@@ -152,6 +184,7 @@ fun HomeUI(
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(
+                    onClickSetting = { isShowSettingDialog = true },
                     onToggledSound = {
                         val isPlaying = MusicPlayUtil.isPlaying
                         if (isPlaying == null || !isPlaying) {
@@ -160,7 +193,13 @@ fun HomeUI(
                             MusicPlayUtil.pause(isBackgroundSound = true)
                         }
                     },
-                    onClickSetting = { isShowSettingDialog = true }
+                    onClickQRScan = {
+                        QRScanActivity.start(
+                            context = context,
+                            isScanMode = true,
+                            currentTimeMillis = System.currentTimeMillis().toString()
+                        )
+                    }
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
@@ -182,11 +221,27 @@ fun HomeUI(
                         R.anim.slide_right_exit
                     )
                 },
-                onClickMultiPlay = {},
+                onClickMultiPlay = {
+                    if (AccountManager.isUser) {
+                        QRScanActivity.start(
+                            context = context,
+                            isScanMode = false,
+                            currentTimeMillis = System.currentTimeMillis().toString()
+                        )
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "로그인이 필요한 서비스입니다.",
+                                actionLabel = "확인",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                },
                 onClickQuit = { isShowQuitDialog = true },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(height = 56.dp))
+            Spacer(modifier = Modifier.height(height = 70.dp))
         }
 
         if (isLoading) {

@@ -24,6 +24,7 @@
     <string name="kakao">카카오</string>
     <string name="google">구글</string>
     <string name="naver">네이버</string>
+    <string name="please_retry">다시 시도해 주세요.</string>
 
     <!-- MyProfile -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
@@ -56,7 +57,7 @@
     <string name="blank"></string>
     <string name="network_error_title">네트워크 오류</string>
     <string name="network_error">네트워크 연결 상태를 확인해 주세요.</string>
-    <string name="network_request_error">"네트워크 요청을 실패했습니다. 다시 시도해주세요."</string>
+    <string name="network_request_error">"네트워크 요청을 실패했습니다. 다시 시도해 주세요."</string>
     <string name="alert_dialog_restart">재시작</string>
     <string name="alert_dialog_confirm">확인</string>
     <string name="alert_dialog_dismiss">취소</string>
@@ -112,4 +113,9 @@
 
     <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
     <string name="diff_game_no_heart">하트가 모자라요. 잠시 후 재도전!</string>
+
+    <!--qr-->
+    <string name="qr_network_error">네트워크 요청을 실패했습니다. QR 코드를 다시 스캔해 주세요.</string>
+    <string name="qr_guide_message">QR코드를 스캔하면\n바로 게임이 시작됩니다!</string>
+    <string name="qr_dialog_message">지금 종료하면 게임이 시작되지 않을 수 있습니다.\n그래도 종료하시겠습니까?</string>
 </resources>

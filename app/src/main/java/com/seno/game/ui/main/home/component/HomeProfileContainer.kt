@@ -33,8 +33,8 @@ fun HomeProfileContainer(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.noRippleClickable { onClick.invoke() }
     ) {
+        Spacer(modifier = Modifier.width(width = 16.dp))
         if (profileUri.isEmpty()) {
-            Spacer(modifier = Modifier.width(width = 16.dp))
             Image(
                 painter = painterResource(id = R.drawable.ic_profile_not_login),
                 contentDescription = null,

@@ -33,7 +33,7 @@ class ProvideSinModule {
     @Singleton
     @Provides
     fun provideDiffDocRef(): DocumentReference {
-        return  FirebaseFirestore.getInstance().collection("game").document("diff_picture_room")
+        return  FirebaseFirestore.getInstance().collection("game").document("diff_picture")
     }
 
     @DiffOpenCv

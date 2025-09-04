@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
 import com.seno.game.base.BaseComposeActivity
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.parseImageDate
@@ -22,6 +23,7 @@ import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
+import com.seno.game.ui.view.NewMonthAlertDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -114,6 +116,20 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                     }
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+            NewMonthAlertDialog (
+                context = this@DPSinglePlayListActivity,
+                onConfirm = {
+                    PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                    clearMemoryCache()
+                    restartApp(this@DPSinglePlayListActivity)
+                }).show()
         }
     }
 

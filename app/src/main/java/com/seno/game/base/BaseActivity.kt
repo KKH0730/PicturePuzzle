@@ -51,20 +51,6 @@ abstract class BaseActivity<T: ViewDataBinding>(
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
-            NewMonthAlertDialog (
-                context = this@BaseActivity,
-                onConfirm = {
-                    PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
-                    clearMemoryCache()
-                    restartApp(this@BaseActivity)
-            }).show()
-        }
-    }
-
     protected fun restartApp(activity: Activity) {
         val intent = activity.packageManager.getLaunchIntentForPackage(activity.packageName)?.apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)

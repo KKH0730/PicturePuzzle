@@ -1,15 +1,19 @@
 package com.seno.game.ui.account.sign_gate
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.seno.game.R
+import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.snackbar
+import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
@@ -40,7 +44,10 @@ class SignGateActivity : AppCompatActivity() {
                         onSignInSucceed = {
                             runOnUiThread {
                                 toast("로그인 성공")
-                                setResult(RESULT_OK)
+                                val resultIntent = Intent().apply {
+                                    putExtra(PATH, intent.getStringExtra(PATH) ?: "")
+                                }
+                                setResult(intent.getIntExtra(RESULT_CODE, ResultConstants.RESULT_LOGIN), resultIntent)
                                 finish()
                             }
                         },
@@ -71,5 +78,22 @@ class SignGateActivity : AppCompatActivity() {
             facebookAccountManager.onActivityResult(requestCode, resultCode, data)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    companion object {
+        const val PATH = "path"
+        const val RESULT_CODE = "resultCode"
+
+        fun start(context: Context, path: String = "") {
+            context.startActivity(SignGateActivity::class.java) {
+                putExtra(PATH, path)
+            }
+        }
+        fun start(context: Context, path: String = "", resultCode: Int, launcher: ActivityResultLauncher<Intent>) {
+            context.startActivity(SignGateActivity::class.java, launcher) {
+                putExtra(PATH, path)
+                putExtra(RESULT_CODE, resultCode)
+            }
+        }
     }
 }

@@ -25,7 +25,7 @@ fun <T> Context.startActivity(
 
 fun <T> Context.startActivity(
     activityClass: Class<T>,
-    launcher: ActivityResultLauncher<Intent?>,
+    launcher: ActivityResultLauncher<Intent>,
     builder: (Intent.() -> Unit)
 ) {
     launcher.launch(Intent(this, activityClass).apply(builder))

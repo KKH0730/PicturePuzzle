@@ -12,9 +12,6 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +19,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -78,76 +74,6 @@ class HomeViewModel @Inject constructor(
 //                // 로그 아웃 후 익명으로 강제 로그인 시키기 때문에 onSignedOut { } 블럭은 사용 하지 않음
 //            }
 //        )
-    }
-    fun reqCreateRoom(date: String, uid: String, roomUid: String, nickName: String) {
-        viewModelScope.launch {
-            _loadingFlow.value = true
-            val result = diffPictureUseCase.createRoom(
-                date = date,
-                uid = uid,
-                roomUid = roomUid,
-                nickName = nickName,
-            )
-
-            if (result is Result.Success) {
-                _createRoomFlow.value = result.data
-            } else {
-                _message.emit(getString(R.string.network_request_error))
-            }
-
-            _loadingFlow.value = false
-        }
-    }
-
-    fun reqEnterRoom(date: String, uid: String, roomUid: String, nickName: String) {
-        viewModelScope.launch {
-            val result = diffPictureUseCase.enterRoom(
-                date = date,
-                uid = uid,
-                roomUid = roomUid,
-                nickName = nickName,
-            )
-            if (result is Result.Success) {
-                withContext(Dispatchers.Main) {
-                    _enterRoomFlow.value = result.data
-                }
-            } else {
-                _message.emit(getString(R.string.network_request_error))
-            }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun reqExitRoom(date: String, uid: String, roomUid: String) {
-        GlobalScope.launch {
-            val result = diffPictureUseCase.exitRoom(
-                date = date,
-                uid = uid,
-                roomUid = roomUid,
-            )
-            if (result is Result.Success) {
-                _exitRoomFlow.value = result.data
-            } else {
-                _exitRoomFlow.value = null
-            }
-        }
-    }
-
-    fun reqGameReady(date: String, uid: String, roomUid: String) {
-        viewModelScope.launch {
-            val result = diffPictureUseCase.readyGamePlay(
-                date = date,
-                uid = uid,
-                roomUid = roomUid
-            )
-
-            if (result is Result.Success) {
-                _gameReadySharedFlow.emit(Unit)
-            } else {
-                _gameReadySharedFlow.emit(Unit)
-                _message.emit(getString(R.string.network_request_error))
-            }
-        }
     }
 
     fun updateBackgroundVolume(volume: Float) {

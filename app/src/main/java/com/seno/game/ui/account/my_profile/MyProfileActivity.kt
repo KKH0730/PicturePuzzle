@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.seno.game.extensions.startActivity
 import com.seno.game.extensions.toast
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.account.AccountViewModel
@@ -31,7 +30,7 @@ class MyProfileActivity : ComponentActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     MyProfileScreen(
                         onClickClose = { finish() },
-                        onClickLogin = { startActivity(SignGateActivity::class.java) }
+                        onClickLogin = { SignGateActivity.start(this@MyProfileActivity) }
                     )
                 }
             }

@@ -32,6 +32,7 @@ class DiffPictureImpl @Inject constructor(
     @DiffDocRef
     @Inject
     lateinit var diffGameDocRef: DocumentReference
+
     override suspend fun updateSavedGameInfo(
         uid: String,
         stage: Int,
@@ -91,23 +92,42 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
+    override suspend fun checkWaitingRoom(path: String, hostUid: String): Result<Boolean> {
+        return try {
+            val multiDocRef = diffGameDocRef.collection("multi").document(path).get().await()
+
+            if (multiDocRef.exists()) {
+                val uid = multiDocRef.get("hostUid") as? String? ?: ""
+                if (uid == hostUid) return Result.Success(true)
+            }
+
+            Result.Success(false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     override suspend fun createMultiGame(
         path: String,
         hostUid: String,
-        hostNickName: String,
-        hostProfileUri: String,
-        guestUid: String,
-        guestNickName: String,
-        guestProfileUri: String
+        hostNickname: String,
+        hostProfileUri: String
     ): Result<Boolean> {
+        val players = listOf(
+            mapOf(
+                "uid" to hostUid,
+                "nickname" to hostNickname,
+                "profileUri" to hostProfileUri
+            )
+        )
+
         val data = mapOf(
             "hostUid" to hostUid,
-            "hostNickName" to hostNickName,
+            "hostNickname" to hostNickname,
             "hostProfileUri" to hostProfileUri,
-            "guestUid" to guestUid,
-            "guestNickName" to guestNickName,
-            "guestProfileUri" to guestProfileUri,
-            "ready" to false
+            "players" to players,
+            "start" to false
         )
 
         return try {
@@ -123,13 +143,58 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateMultiGame(path: String): Result<Boolean> {
+    override suspend fun updateMultiGamePlayer(path: String, uid: String, nickname: String, profileUri: String, isAdd: Boolean): Result<Boolean> {
         return try {
-            diffGameDocRef
-                .collection("multi")
-                .document(path)
-                .update("ready", true)
-                .await()
+            val multiDocRef = diffGameDocRef.collection("multi").document(path)
+
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(multiDocRef)
+                val playersFromSnapshot = (snapshot.get("players") as? List<*>)
+                    ?.mapNotNull { it as? Map<*, *> }
+                    ?.map { hashMap ->
+                        Player(
+                            uid = hashMap["uid"] as? String ?: "",
+                            nickname = hashMap["nickname"] as? String ?: "",
+                            profileUri = hashMap["profileUri"] as? String ?: ""
+                        )
+                    } ?: emptyList()
+
+                val updateList = playersFromSnapshot.toMutableList()
+
+                val existingIndex = updateList.indexOfFirst { it.uid == uid }
+                if (isAdd) {
+                    if (existingIndex != -1) {
+                        updateList[existingIndex] = Player(uid, nickname, profileUri)
+                    } else {
+                        updateList.add(Player(uid, nickname, profileUri))
+                    }
+                } else {
+                    if (existingIndex != -1) {
+                        updateList.removeAt(existingIndex)
+                    }
+                }
+
+                val players = updateList.map { player ->
+                    mapOf(
+                        "uid" to player.uid,
+                        "nickname" to player.nickname,
+                        "profileUri" to player.profileUri
+                    )
+                }
+
+                transaction.update(multiDocRef, "players", players)
+                snapshot
+            }.await()
+            Result.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(exception = e)
+        }
+    }
+
+    override suspend fun updateMultiGameStart(path: String): Result<Boolean> {
+        return try {
+            diffGameDocRef.collection("multi").document(path).update("start", true).await()
 
             Result.Success(true)
         } catch (e: Exception) {
@@ -138,7 +203,7 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override suspend fun observeMultiGameSnapshot(path: String): Flow<Result<Pair<Boolean ,MultiGameProfileInfo>>> =
+    override fun observeMultiGameSnapshot(path: String): Flow<Pair<Boolean, List<Player>>> =
         callbackFlow {
             val registration = diffGameDocRef
                 .collection("multi")
@@ -146,219 +211,29 @@ class DiffPictureImpl @Inject constructor(
                 .addSnapshotListener { snapshot, error ->
                     try {
                         if (error != null) {
-                            trySend(Result.Error(error))
                             return@addSnapshotListener
                         }
 
                         if (snapshot != null && snapshot.exists()) {
-                            val data = MultiGameProfileInfo(
-                                path = path,
-                                hostUid = snapshot.getString("hostUid") ?: "",
-                                hostNickName = snapshot.getString("hostNickName") ?: "",
-                                hostProfileUri = snapshot.getString("hostProfileUri") ?: "",
-                                guestUid = snapshot.getString("guestUid") ?: "",
-                                guestNickName = snapshot.getString("guestNickName") ?: "",
-                                guestProfileUri = snapshot.getString("guestProfileUri") ?: "",
-                            )
+                            val players = (snapshot.get("players") as? List<*>)
+                                ?.mapNotNull { it as? Map<*, *> }
+                                ?.map { hashMap ->
+                                    Player(
+                                        uid = hashMap["uid"] as? String ?: "",
+                                        nickname = hashMap["nickname"] as? String ?: "",
+                                        profileUri = hashMap["profileUri"] as? String ?: ""
+                                    )
+                                } ?: emptyList()
 
-                            if (data.isNotEmpty()) {
-                                val ready = snapshot.getBoolean("ready") ?: false
-                                trySend(Result.Success(ready to data))
-                            } else {
-                                trySend(Result.Error(error))
+                            if (players.isNotEmpty()) {
+                                val start = snapshot.getBoolean("start") ?: false
+                                trySend(start to players)
                             }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        trySend(Result.Error(error))
                     }
                 }
             awaitClose { registration.remove() }
         }
-
-    override suspend fun createRoom(
-        date: String, //20220730
-        uid: String,
-        roomUid: String,
-        nickName: String,
-    ): Result<DiffPictureGame>? {
-        return try {
-            val player = Player(
-                uid = uid,
-                nickName = nickName,
-                profileUri = ""
-            )
-
-            val map = HashMap<String, Any>()
-            map["date"] = date
-            map["roomUid"] = roomUid
-            map["playerList"] = arrayListOf(player)
-
-            var result: Result<DiffPictureGame>? = null
-            val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
-            db.runBatch { batch ->
-                batch.set(roomDocRef, map)
-            }.addOnSuccessListener {
-                result = Result.Success(
-                    DiffPictureGame(
-                        date = date,
-                        roomUid = roomUid,
-                        playerList = arrayListOf(
-                            Player(uid = uid, nickName = nickName, profileUri = "")
-                        )
-                    )
-                )
-            }.addOnFailureListener {
-                result = Result.Error(exception = it)
-            }.await()
-            result
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.e(e)
-            Result.Error(exception = e)
-        }
-    }
-
-    override suspend fun enterRoom(date: String, uid: String, roomUid: String, nickName: String): Result<DiffPictureGame>? {
-        return try {
-            var result: Result<DiffPictureGame>? = null
-            var tempDiffPictureGame: DiffPictureGame? = null
-            val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
-            db.runTransaction { transaction ->
-                val snapshot = transaction.get(roomDocRef)
-                val playerList = playerListMapper(playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>)).toMutableList()
-                playerList.add(
-                    Player(
-                        uid = uid,
-                        nickName = nickName,
-                        profileUri = ""
-                    )
-                )
-
-                val diffPictureGame = diffPictureGameMapper(documentSnapshot = snapshot).apply {
-                    this.playerList = playerList as ArrayList<Player>
-                }
-                tempDiffPictureGame = diffPictureGame
-
-                transaction.update(roomDocRef, "playerList", playerList)
-            }.addOnSuccessListener {
-                tempDiffPictureGame?.let {
-                    result = Result.Success(data = it)
-                } ?: run {
-                    result = Result.Error(exception = NullPointerException())
-                }
-            }.addOnFailureListener {
-                result = Result.Error(exception = it)
-            }.await()
-            result
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.e(e)
-            Result.Error(exception = e)
-        }
-    }
-
-    override suspend fun readyGamePlay(
-        date: String,
-        uid: String,
-        roomUid: String,
-    ): Result<Unit>? {
-        return try {
-            var result: Result<Unit>? = null
-            val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
-            db.runTransaction { transaction ->
-                val snapshot = transaction.get(roomDocRef)
-
-                val playerList = playerListMapper(playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>))
-                playerList.forEach {
-
-                }
-
-                transaction.update(roomDocRef, "playerList", playerList)
-            }.addOnSuccessListener {
-                result = Result.Success(data = Unit)
-            }.addOnFailureListener {
-                result = Result.Error(exception = it)
-            }.await()
-            result
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.e(e)
-            Result.Error(exception = e)
-        }
-    }
-
-    override suspend fun exitRoom(
-        date: String,
-        uid: String,
-        roomUid: String,
-    ): Result<DiffPictureGame>? {
-        return try {
-            var result: Result<DiffPictureGame>? = null
-            var tempDiffPictureGame: DiffPictureGame? = null
-            val roomDocRef = diffGameDocRef.collection(date).document(roomUid)
-            db.runTransaction { transaction ->
-                val snapshot = transaction.get(roomDocRef)
-
-                val playerList =
-                    playerListMapper(uid = uid, playerList = (snapshot.get("playerList") as ArrayList<HashMap<String, Any>>)).toMutableList()
-                val diffPictureGame = diffPictureGameMapper(documentSnapshot = snapshot).apply {
-                    this.playerList = playerList as ArrayList<Player>
-                }
-                tempDiffPictureGame = diffPictureGame
-
-                transaction.update(roomDocRef, "playerList", playerList)
-            }.addOnSuccessListener {
-                tempDiffPictureGame?.let {
-                    result = Result.Success(data = it)
-                } ?: run {
-                    result = Result.Error(exception = NullPointerException())
-                }
-            }.addOnFailureListener {
-                result = Result.Error(exception = it)
-            }.await()
-
-            result
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.e(e)
-            Result.Error(exception = e)
-        }
-    }
-}
-
-private fun diffPictureGameMapper(documentSnapshot: DocumentSnapshot): DiffPictureGame {
-    return DiffPictureGame(
-        date = documentSnapshot.getString("date"),
-        roomUid = documentSnapshot.getString("roomUid"),
-        playerList = (playerListMapper(playerList = documentSnapshot.get("playerList") as ArrayList<HashMap<String, Any>>)) as ArrayList<Player>
-    )
-}
-
-private fun playerListMapper(playerList: ArrayList<HashMap<String, Any>>): List<Player> {
-    return playerList.map {
-        Player(
-            uid = (it["uid"] as String),
-            nickName = (it["nickName"] as String),
-            profileUri = "",
-        )
-    }
-}
-
-private fun playerListMapper(uid: String, playerList: ArrayList<HashMap<String, Any>>): List<Player> {
-    val list = ArrayList<Player>()
-    playerList.forEach { hashMap ->
-        if (hashMap["uid"] == uid) {
-            return@forEach
-        }
-
-        list.add(
-            Player(
-                uid = (hashMap["uid"] as String),
-                nickName = (hashMap["nickName"] as String),
-                profileUri = "",
-            )
-        )
-    }
-    return list
 }

@@ -28,14 +28,18 @@ import com.seno.game.R
 import com.seno.game.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
 import com.seno.game.extensions.bitmapFrom
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.dpToPx
 import com.seno.game.extensions.drawLottieAnswerCircle
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveCompleteDPGameRound
 import com.seno.game.extensions.screenWidth
 import com.seno.game.extensions.startActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
+import com.seno.game.ui.view.NewMonthAlertDialog
 import com.seno.game.util.AnimationUtils
 import com.seno.game.util.ad.AdmobRewardedAdUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -579,6 +583,20 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+            NewMonthAlertDialog (
+                context = this@DPSinglePlayActivity,
+                onConfirm = {
+                    PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                    clearMemoryCache()
+                    restartApp(this@DPSinglePlayActivity)
+                }).show()
+        }
+    }
+
     companion object {
         const val CURRENT_ROUND_POSITION = "currentRoundPosition"
         const val FINAL_ROUND_POSITION = "finalRoundPosition"
@@ -593,7 +611,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             finalRoundPosition: Int,
             image1: String,
             image2: String,
-            launcher: ActivityResultLauncher<Intent?>
+            launcher: ActivityResultLauncher<Intent>
         ) {
             context.startActivity(DPSinglePlayActivity::class.java, launcher) {
                 putExtra(STAGE_POSITION, stagePosition)

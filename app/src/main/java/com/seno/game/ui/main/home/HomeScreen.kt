@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seno.game.R
+import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.LifecycleEventListener
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.startActivity
@@ -58,9 +56,9 @@ import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
 import com.seno.game.ui.main.home.component.QuitDialog
 import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
-import com.seno.game.ui.main.home.game.diff_picture.multi.qr.QRScanActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.qr_scan.QRScanActivity
+import com.seno.game.ui.main.home.game.diff_picture.waiting_room.WaitingRoomActivity
 import com.seno.game.util.MusicPlayUtil
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -124,16 +122,32 @@ fun HomeUI(
     var nickname by remember { mutableStateOf(PrefsManager.nickname) }
     var profileUri by remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
     val insets = WindowInsets.systemBars.asPaddingValues()
 
-    val launcher = rememberLauncherForActivityResult(
+    val loginLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        when (result.resultCode) {
+            ResultConstants.RESULT_LOGIN -> isUser = true
+            ResultConstants.RESULT_QR, ResultConstants.RESULT_MOVE_ROOM -> {
+                val path = result.data?.getStringExtra("path") ?: ""
+                if (path.isNotEmpty()) {
+                    WaitingRoomActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
+                }
+            }
+        }
+    }
+
+    val qrScanLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
-            isUser = true
+            val path = result.data?.getStringExtra("path") ?: ""
+            if (path.isNotEmpty() && AccountManager.isUser) {
+                WaitingRoomActivity.start(context = context, path = path)
+            } else {
+                SignGateActivity.start(context = context, path = path, resultCode = ResultConstants.RESULT_QR, launcher = loginLauncher)
+            }
         }
     }
 
@@ -193,13 +207,7 @@ fun HomeUI(
                             MusicPlayUtil.pause(isBackgroundSound = true)
                         }
                     },
-                    onClickQRScan = {
-                        QRScanActivity.start(
-                            context = context,
-                            isScanMode = true,
-                            currentTimeMillis = System.currentTimeMillis().toString()
-                        )
-                    }
+                    onClickQRScan = { QRScanActivity.start(context = context, launcher = qrScanLauncher) }
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
@@ -223,19 +231,13 @@ fun HomeUI(
                 },
                 onClickMultiPlay = {
                     if (AccountManager.isUser) {
-                        QRScanActivity.start(
-                            context = context,
-                            isScanMode = false,
-                            currentTimeMillis = System.currentTimeMillis().toString()
-                        )
+                        WaitingRoomActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
                     } else {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "로그인이 필요한 서비스입니다.",
-                                actionLabel = "확인",
-                                duration = SnackbarDuration.Short
-                            )
-                        }
+                        SignGateActivity.start(
+                            context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
+                            resultCode = ResultConstants.RESULT_MOVE_ROOM,
+                            launcher = loginLauncher
+                        )
                     }
                 },
                 onClickQuit = { isShowQuitDialog = true },
@@ -306,7 +308,7 @@ fun HomeUI(
             onChangedFinishedEffectVolume = onChangeFinishedEffectVolume,
             onChangedVibration = onChangedVibration,
             onChangedPush = onChangedPush,
-            onClickLogin = { context.startActivity(SignGateActivity::class.java, launcher = launcher) },
+            onClickLogin = { SignGateActivity.start(context = context, resultCode = ResultConstants.RESULT_LOGIN, launcher = loginLauncher) },
             onClickLogout = {
                 isShowSettingDialog = false
                 isShowLogoutDialog = true

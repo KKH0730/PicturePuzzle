@@ -114,8 +114,9 @@
     <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
     <string name="diff_game_no_heart">하트가 모자라요. 잠시 후 재도전!</string>
 
-    <!--qr-->
+    <!--room-->
     <string name="qr_network_error">네트워크 요청을 실패했습니다. QR 코드를 다시 스캔해 주세요.</string>
-    <string name="qr_guide_message">QR코드를 스캔하면\n바로 게임이 시작됩니다!</string>
+    <string name="qr_guide_message">QR코드를 스캔하면\n대기방에 초대됩니다!</string>
     <string name="qr_dialog_message">지금 종료하면 게임이 시작되지 않을 수 있습니다.\n그래도 종료하시겠습니까?</string>
+    <string name="multi_room_player_count_s">플레이어 %s명</string>
 </resources>

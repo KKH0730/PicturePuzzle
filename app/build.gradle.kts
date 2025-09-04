@@ -176,4 +176,6 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.barcodescanner.zxing)
     implementation(libs.recyclerview.divider)
+
+    implementation("com.github.monibu1548:supalink-android-sdk:1.0.1")
 }

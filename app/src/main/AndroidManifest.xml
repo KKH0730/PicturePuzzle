@@ -41,10 +41,19 @@
             android:value="${enableCrashReporting}" />
 
         <activity
+            android:name=".ui.main.home.game.diff_picture.waiting_room.WaitingRoomActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.home.game.diff_picture.multi.qr.QRScanActivity"
+            android:name=".ui.main.home.game.diff_picture.multi.qr_scan.QRScanActivity"
+            android:exported="false"
+            android:theme="@style/PopupTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.home.game.diff_picture.multi.qr.QRActivity"
             android:exported="false"
             android:theme="@style/PopupTheme"
             android:screenOrientation="portrait" />

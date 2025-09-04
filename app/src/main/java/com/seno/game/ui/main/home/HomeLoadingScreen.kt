@@ -22,7 +22,7 @@ fun HomeLoadingScreen() {
     ) {
         Spacer(modifier = Modifier.height(height = 210.dp))
         Image(
-            painter = painterResource(id = R.drawable.img_bottom_second_logo),
+            painter = painterResource(id = R.drawable.ic_splash),
             contentDescription = null,
             modifier = Modifier.width(width = 216.dp)
         )

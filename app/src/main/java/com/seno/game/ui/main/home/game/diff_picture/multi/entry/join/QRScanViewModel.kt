@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.qr_scan
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.join
 
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.model.successData

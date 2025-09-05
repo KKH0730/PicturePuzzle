@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby
 
 import android.content.Context
 import androidx.activity.OnBackPressedCallback
@@ -10,19 +10,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.extensions.createQRCode
-import com.seno.game.extensions.startActivity
-import com.seno.game.ui.main.home.game.diff_picture.multi.qr.QRActivity
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.screen.WaitingRoomScreen
+import com.seno.game.extensions.safeStartActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.screen.LobbyRoomScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class WaitingRoomActivity : BaseComposeActivity(
+class LobbyActivity : BaseComposeActivity(
     isLightStatusBar = true,
     isLightNavigationBar = false
 ) {
-    private val viewModel by viewModels<WaitingRoomViewModel>()
+    private val viewModel by viewModels<LobbyViewModel>()
     private val path: String by lazy { intent.getStringExtra(PATH) ?: "" }
 
     @Composable
@@ -37,14 +36,13 @@ class WaitingRoomActivity : BaseComposeActivity(
 
         if (qrBitmap == null || ownerUid.isEmpty()) return
 
-        WaitingRoomScreen(
+        LobbyRoomScreen(
             ownerUid = ownerUid,
             qrBitmap = qrBitmap,
             players = viewModel.players.collectAsStateWithLifecycle().value?.players ?: listOf(),
             isShowQuitDialog = viewModel.isShowQuitDialog.collectAsStateWithLifecycle().value,
-            onClickQRCode = { QRActivity.start(context = this@WaitingRoomActivity, path = path) },
             onClickQuit = { finish() },
-            onDismissQuitDialog = {  },
+            onDismissQuitDialog = {},
             onClickBack = {
                 viewModel.updateMultiGamePlayer(isAdd = false)
                 finish()
@@ -64,7 +62,7 @@ class WaitingRoomActivity : BaseComposeActivity(
     }
 
     private fun setOnBackPressedEvent() {
-        onBackPressedDispatcher.addCallback(this@WaitingRoomActivity, object : OnBackPressedCallback(true) {
+        onBackPressedDispatcher.addCallback(this@LobbyActivity, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {}
         })
     }
@@ -73,7 +71,7 @@ class WaitingRoomActivity : BaseComposeActivity(
         const val PATH = "path"
 
         fun start(context: Context, path: String) {
-            context.startActivity(WaitingRoomActivity::class.java) {
+            context.safeStartActivity(LobbyActivity::class.java) {
                 putExtra(PATH, path)
             }
         }

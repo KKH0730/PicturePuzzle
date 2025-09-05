@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room.screen
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.screen
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -17,6 +17,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,24 +35,26 @@ import androidx.compose.ui.window.Dialog
 import com.seno.game.R
 import com.seno.game.extensions.textDp
 import com.seno.game.model.Player
-import com.seno.game.ui.common.BannerADView
+import com.seno.game.ui.component.BannerADView
 import com.seno.game.ui.main.home.component.QuitDialogYesButton
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingPlayerList
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingRoomGameSettingPanel
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingRoomHeader
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component.LobbyQROverlayView
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component.LobbyPlayerList
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component.LobbyRoomGameSettingPanel
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component.LobbyHeader
 
 @Composable
-fun WaitingRoomScreen(
+fun LobbyRoomScreen(
     ownerUid: String,
     qrBitmap: Bitmap,
     players: List<Player>,
     isShowQuitDialog: Boolean,
-    onClickQRCode: () -> Unit,
     onClickQuit: () -> Unit,
     onDismissQuitDialog: () -> Unit,
     onClickBack: () -> Unit
 ) {
     val insets = WindowInsets.systemBars.asPaddingValues()
+    var isShowQROverlay by remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.ic_home_background),
@@ -66,19 +72,27 @@ fun WaitingRoomScreen(
                     end = 16.dp
                 )
         ) {
-            WaitingRoomHeader(onClickBack = onClickBack)
+            LobbyHeader(onClickBack = onClickBack)
             Spacer(modifier = Modifier.height(height = 10.dp))
-            WaitingRoomGameSettingPanel(qrBitmap = qrBitmap, onClickQRCode = onClickQRCode)
+            LobbyRoomGameSettingPanel(qrBitmap = qrBitmap, onClickQRCode = { isShowQROverlay = true })
             Spacer(modifier = Modifier.height(height = 20.dp))
-            WaitingPlayerList(ownerUid = ownerUid, players = players, modifier = Modifier.weight(1f))
+            LobbyPlayerList(ownerUid = ownerUid, players = players, modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(height = 20.dp))
             BannerADView()
             Spacer(modifier = Modifier.height(height = 16.dp))
         }
+
         if (isShowQuitDialog) {
             QuitDialog(
                 onClickQuit = onClickQuit,
                 onDismissed = onDismissQuitDialog
+            )
+        }
+
+        if (isShowQROverlay) {
+            LobbyQROverlayView(
+                qrBitmap = qrBitmap,
+                onClick = { isShowQROverlay = false }
             )
         }
     }

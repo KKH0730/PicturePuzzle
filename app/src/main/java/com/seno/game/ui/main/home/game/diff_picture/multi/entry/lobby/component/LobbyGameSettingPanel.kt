@@ -1,11 +1,10 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -35,7 +34,7 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 
 @Composable
-fun WaitingRoomGameSettingPanel(qrBitmap: Bitmap, onClickQRCode: () -> Unit) {
+fun LobbyRoomGameSettingPanel(qrBitmap: Bitmap, onClickQRCode: () -> Unit) {
     Card(
         shape = RoundedCornerShape(size = 16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -68,15 +67,15 @@ fun WaitingRoomGameSettingPanel(qrBitmap: Bitmap, onClickQRCode: () -> Unit) {
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
         ) {
-            WaitingRoomQRCode(qrBitmap = qrBitmap, modifier = Modifier, onClickQRCode = onClickQRCode)
-            WaitingGameSetting(modifier = Modifier.weight(1f))
+            LobbyQRCode(qrBitmap = qrBitmap, modifier = Modifier, onClickQRCode = onClickQRCode)
+            LobbySetting(modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.width(width = 8.dp))
         }
     }
 }
 
 @Composable
-fun WaitingRoomQRCode(qrBitmap: Bitmap, modifier: Modifier = Modifier, onClickQRCode: () -> Unit) {
+fun LobbyQRCode(qrBitmap: Bitmap, modifier: Modifier = Modifier, onClickQRCode: () -> Unit) {
     Box(
         modifier = Modifier
             .background(color = colorResource(id = R.color.transparent))
@@ -101,7 +100,7 @@ fun WaitingRoomQRCode(qrBitmap: Bitmap, modifier: Modifier = Modifier, onClickQR
 }
 
 @Composable
-fun WaitingGameSetting(modifier: Modifier = Modifier) {
+fun LobbySetting(modifier: Modifier = Modifier) {
     Card(
         shape = RoundedCornerShape(size = 16.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_FFD6FF)),

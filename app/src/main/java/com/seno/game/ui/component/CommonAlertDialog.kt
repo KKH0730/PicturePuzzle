@@ -1,4 +1,4 @@
-package com.seno.game.ui.common
+package com.seno.game.ui.component
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.seno.game.extensions.textDp
 
 @Composable
-fun RestartDialog(
+fun CommonAlertDialog(
     title: String,
     content: String,
     confirmText: String = "",
@@ -75,7 +75,7 @@ fun RestartDialog(
 @Preview
 @Composable
 fun PreviewCommonAlertDialog() {
-    RestartDialog(
+    CommonAlertDialog(
         title = "title",
         content = "content",
         confirmText = "confirm",

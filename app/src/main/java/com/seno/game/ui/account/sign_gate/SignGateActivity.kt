@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.seno.game.R
 import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.snackbar
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.*
 import com.seno.game.theme.AppTheme
@@ -85,12 +85,12 @@ class SignGateActivity : AppCompatActivity() {
         const val RESULT_CODE = "resultCode"
 
         fun start(context: Context, path: String = "") {
-            context.startActivity(SignGateActivity::class.java) {
+            context.safeStartActivity(SignGateActivity::class.java) {
                 putExtra(PATH, path)
             }
         }
         fun start(context: Context, path: String = "", resultCode: Int, launcher: ActivityResultLauncher<Intent>) {
-            context.startActivity(SignGateActivity::class.java, launcher) {
+            context.safeStartActivity(SignGateActivity::class.java, launcher) {
                 putExtra(PATH, path)
                 putExtra(RESULT_CODE, resultCode)
             }

@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class WaitingRoomViewModel @Inject constructor(
+class LobbyViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diffPictureUseCase: DiffPictureUseCase,
 ) : BaseViewModel() {
-    var path: String = savedStateHandle[WaitingRoomActivity.PATH] ?: ""
+    var path: String = savedStateHandle[LobbyActivity.PATH] ?: ""
     val isHost: Boolean
         get() {
         val hostUid = try {

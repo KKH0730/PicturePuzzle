@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
@@ -38,7 +38,6 @@ class SplashActivity : AppCompatActivity() {
                     ) {
                         SplashScreen {
                             MainActivity.start(context = this@SplashActivity)
-                            overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
                             finish()
                         }
                     }
@@ -55,7 +54,7 @@ class SplashActivity : AppCompatActivity() {
 
     companion object {
         fun start(context: Context) {
-            context.startActivity(SplashActivity::class.java)
+            context.safeStartActivity(SplashActivity::class.java)
         }
     }
 }

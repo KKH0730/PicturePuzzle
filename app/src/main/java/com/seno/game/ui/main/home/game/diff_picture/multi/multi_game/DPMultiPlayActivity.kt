@@ -31,7 +31,7 @@ import com.seno.game.extensions.dpToPx
 import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.saveCompleteDPGameRound
 import com.seno.game.extensions.screenWidth
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
@@ -588,7 +588,7 @@ class DPMultiPlayActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
         const val IMAGE2 = "image2"
 
         fun start(context: Context) {
-            context.startActivity(DPMultiPlayActivity::class.java)
+            context.safeStartActivity(DPMultiPlayActivity::class.java)
         }
     }
 }

@@ -23,11 +23,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.component.CommonAlertDialog
 import com.seno.game.ui.main.home.screen.HomeLoadingScreen
 import com.seno.game.ui.main.screen.MainScreen
 import com.seno.game.ui.main.screen.MainViewModel
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (isNetworkError) {
-                    RestartDialog(
+                    CommonAlertDialog(
                         title = getString(R.string.network_error_title),
                         content = getString(R.string.network_error),
                         confirmText = getString(R.string.alert_dialog_restart),
@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         fun start(context: Context) {
-            context.startActivity(MainActivity::class.java) {
+            context.safeStartActivity(MainActivity::class.java) {
                 putExtra("isSplashFinish", true)
             }
         }

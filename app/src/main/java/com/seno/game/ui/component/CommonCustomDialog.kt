@@ -1,4 +1,4 @@
-package com.seno.game.ui.common
+package com.seno.game.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

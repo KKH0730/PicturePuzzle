@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -36,14 +36,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
-import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.Player
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun WaitingPlayerList(
+fun LobbyPlayerList(
     ownerUid: String,
     players: List<Player>,
     modifier: Modifier = Modifier

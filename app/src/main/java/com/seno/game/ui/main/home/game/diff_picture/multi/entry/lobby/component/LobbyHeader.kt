@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,7 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 
 @Composable
-fun WaitingRoomHeader(onClickBack: () -> Unit) {
+fun LobbyHeader(onClickBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -38,7 +39,7 @@ fun WaitingRoomHeader(onClickBack: () -> Unit) {
                     .noRippleClickable { onClickBack.invoke() }
             )
             Text(
-                text = "대기방",
+                text = stringResource(R.string.multi_lobby_title),
                 style = TextStyle(
                     color = Color.White,
                     fontSize = 18.textDp,

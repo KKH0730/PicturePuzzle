@@ -1,6 +1,7 @@
 package com.seno.game.ui.main.home.game.diff_picture.list
 
 import android.content.Context
+import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +20,8 @@ import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.extensions.snackbar
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
+import com.seno.game.extensions.startActivityAnimation
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
@@ -62,10 +64,16 @@ class DPSinglePlayListActivity : BaseComposeActivity(
             }
         }
 
-    @Composable
-    override fun ComposeContent() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        this@DPSinglePlayListActivity.startActivityAnimation(isOpen = true, openEnterAnim = R.anim.slide_right_enter, openExitAnim = R.anim.slide_right_exit)
         startObserve()
 
+    }
+
+    @Composable
+    override fun ComposeContent() {
         Surface(Modifier.fillMaxSize()) {
             DPSinglePlayListScreen(
                 stageInfos = viewModel.gameList.collectAsState().value,
@@ -103,7 +111,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                             image2 = it.images?.second ?: "",
                             launcher = launcher
                         )
-                        overridePendingTransition(R.anim.slide_right_enter, R.anim.slide_right_exit)
+                        this@DPSinglePlayListActivity.startActivityAnimation(isOpen = true, openEnterAnim = R.anim.slide_right_enter, openExitAnim = R.anim.slide_right_exit)
 
                         viewModel.updateEnableUpdateButton(enable = true)
                     }
@@ -135,7 +143,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
 
     companion object {
         fun start(context: Context) {
-            context.startActivity(DPSinglePlayListActivity::class.java)
+            context.safeStartActivity(DPSinglePlayListActivity::class.java)
         }
     }
 }

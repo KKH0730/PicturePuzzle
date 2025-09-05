@@ -1,27 +1,43 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.qr_scan
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.join
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.zxing.Result
 import com.seno.game.R
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
+import com.seno.game.ui.base.BaseComposeActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.component.QRScanHeader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 @AndroidEntryPoint
-class QRScanActivity : ComponentActivity(), ZXingScannerView.ResultHandler {
+class QRScanActivity : BaseComposeActivity(
+    isLightStatusBar = true,
+    isLightNavigationBar = false
+), ZXingScannerView.ResultHandler {
     private val viewModel by viewModels<QRScanViewModel>()
     private val scannerView: ZXingScannerView by lazy { ZXingScannerView(this@QRScanActivity) }
 
@@ -34,8 +50,28 @@ class QRScanActivity : ComponentActivity(), ZXingScannerView.ResultHandler {
             isAppearanceLightNavigationBars = false
         }
 
-        setContentView(scannerView)
+        setBackPressedEvent()
         startObserve()
+    }
+
+    @Composable
+    override fun ComposeContent() {
+        val insets = WindowInsets.systemBars.asPaddingValues()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = colorResource(R.color.black))
+                .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
+        ) {
+            QRScanHeader(
+                onClickFlash = { scannerView.toggleFlash() },
+                onClickBack = { finish() }
+            )
+            AndroidView(
+                factory = { context -> scannerView },
+                update = { scannerView -> }
+            )
+        }
     }
 
     private fun startObserve() {
@@ -62,6 +98,14 @@ class QRScanActivity : ComponentActivity(), ZXingScannerView.ResultHandler {
         }
     }
 
+    private fun setBackPressedEvent() {
+        onBackPressedDispatcher.addCallback(this@QRScanActivity, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+    }
+
     override fun onResume() {
         super.onResume()
         scannerView.setResultHandler(this@QRScanActivity)
@@ -71,6 +115,12 @@ class QRScanActivity : ComponentActivity(), ZXingScannerView.ResultHandler {
     override fun onPause() {
         super.onPause()
         scannerView.stopCamera()
+    }
+
+    override fun onDestroy() {
+        scannerView.stopCamera()
+        scannerView.setResultHandler(null)
+        super.onDestroy()
     }
 
     override fun handleResult(result: Result?) {
@@ -85,7 +135,7 @@ class QRScanActivity : ComponentActivity(), ZXingScannerView.ResultHandler {
 
     companion object {
         fun start(context: Context, launcher: ActivityResultLauncher<Intent>) {
-            context.startActivity(QRScanActivity::class.java, launcher)
+            context.safeStartActivity(QRScanActivity::class.java, launcher)
         }
     }
 }

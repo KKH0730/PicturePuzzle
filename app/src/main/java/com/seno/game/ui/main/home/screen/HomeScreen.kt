@@ -1,8 +1,13 @@
 package com.seno.game.ui.main.home.screen
 
 import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -36,7 +41,7 @@ import com.seno.game.R
 import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.LifecycleEventListener
 import com.seno.game.extensions.createRandomNickname
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
 import com.seno.game.manager.FacebookAccountManager
@@ -47,8 +52,9 @@ import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
-import com.seno.game.ui.common.BannerADView
-import com.seno.game.ui.common.CommonCustomDialog
+import com.seno.game.ui.component.BannerADView
+import com.seno.game.ui.component.CommonAlertDialog
+import com.seno.game.ui.component.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.HomeViewModel
@@ -58,8 +64,9 @@ import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
 import com.seno.game.ui.main.home.component.QuitDialog
 import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
-import com.seno.game.ui.main.home.game.diff_picture.multi.qr_scan.QRScanActivity
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.WaitingRoomActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.EntryActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.QRScanActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.LobbyActivity
 import com.seno.game.util.MusicPlayUtil
 
 
@@ -116,6 +123,7 @@ fun HomeUI(
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
+    var isShowPermissionAlertDialog by remember { mutableStateOf(false) }
     var isShowQuitDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
@@ -126,19 +134,7 @@ fun HomeUI(
 
     val insets = WindowInsets.systemBars.asPaddingValues()
 
-    val loginLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        when (result.resultCode) {
-            ResultConstants.RESULT_LOGIN -> isUser = true
-            ResultConstants.RESULT_QR, ResultConstants.RESULT_MOVE_ROOM -> {
-                val path = result.data?.getStringExtra("path") ?: ""
-                if (path.isNotEmpty()) {
-                    WaitingRoomActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
-                }
-            }
-        }
-    }
+    var loginLauncher: ActivityResultLauncher<Intent>? = null
 
     val qrScanLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -146,11 +142,44 @@ fun HomeUI(
         if (result.resultCode == RESULT_OK) {
             val path = result.data?.getStringExtra("path") ?: ""
             if (path.isNotEmpty() && AccountManager.isUser) {
-                WaitingRoomActivity.start(context = context, path = path)
+                LobbyActivity.start(context = context, path = path)
             } else {
-                SignGateActivity.start(context = context, path = path, resultCode = ResultConstants.RESULT_QR, launcher = loginLauncher)
+                loginLauncher?.let { SignGateActivity.start(context = context, path = path, resultCode = ResultConstants.RESULT_CREATE_LOBBY, launcher = it) }
             }
         }
+    }
+
+    val entryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        when (result.resultCode) {
+            ResultConstants.RESULT_CREATE_LOBBY -> LobbyActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
+            ResultConstants.RESULT_JOIN_LOBBY -> QRScanActivity.start(context = context, launcher = qrScanLauncher)
+        }
+    }
+
+    loginLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == ResultConstants.RESULT_LOGIN ||
+            result.resultCode == ResultConstants.RESULT_ENTRY ||
+            result.resultCode == ResultConstants.RESULT_CREATE_LOBBY) {
+            isUser = true
+        }
+
+        when (result.resultCode) {
+            ResultConstants.RESULT_ENTRY -> EntryActivity.start(context = context, launcher = entryLauncher)
+            ResultConstants.RESULT_CREATE_LOBBY -> {
+                val path = result.data?.getStringExtra("path") ?: ""
+                if (path.isNotEmpty()) {
+                    LobbyActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        isShowQuitDialog = true
     }
 
     context.LifecycleEventListener {
@@ -196,7 +225,7 @@ fun HomeUI(
                 HomeProfileContainer(
                     nickname = nickname,
                     profileUri = profileUri,
-                    onClick = { context.startActivity(MyProfileActivity::class.java) }
+                    onClick = { context.safeStartActivity(MyProfileActivity::class.java) }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(
@@ -209,7 +238,6 @@ fun HomeUI(
                             MusicPlayUtil.pause(isBackgroundSound = true)
                         }
                     },
-                    onClickQRScan = { QRScanActivity.start(context = context, launcher = qrScanLauncher) }
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
@@ -224,20 +252,15 @@ fun HomeUI(
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
-                onClickSoloPlay = {
-                    DPSinglePlayListActivity.start(context = context)
-                    context.overridePendingTransition(
-                        R.anim.slide_right_enter,
-                        R.anim.slide_right_exit
-                    )
-                },
+                onClickSoloPlay = { DPSinglePlayListActivity.start(context = context) },
                 onClickMultiPlay = {
                     if (AccountManager.isUser) {
-                        WaitingRoomActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
+                        EntryActivity.start(context = context, launcher = entryLauncher)
                     } else {
                         SignGateActivity.start(
-                            context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
-                            resultCode = ResultConstants.RESULT_MOVE_ROOM,
+                            context = context,
+                            path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
+                            resultCode = ResultConstants.RESULT_ENTRY,
                             launcher = loginLauncher
                         )
                     }
@@ -319,6 +342,21 @@ fun HomeUI(
             },
             onClickManageProfile = {},
             onDismissed = { isShowSettingDialog = false }
+        )
+    }
+
+    if (isShowPermissionAlertDialog) {
+        CommonAlertDialog(
+            title = stringResource(id = R.string.camera_permission_title),
+            content = stringResource(id = R.string.camera_permission_content),
+            confirmText = stringResource(id = R.string.camera_permission_confirm),
+            dismissText = stringResource(id = R.string.camera_permission_dismiss),
+            onClickConfirm = {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                }
+                context.safeStartActivity(intent)
+            }
         )
     }
 }

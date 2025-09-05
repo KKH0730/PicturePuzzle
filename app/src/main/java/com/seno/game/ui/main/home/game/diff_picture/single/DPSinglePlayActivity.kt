@@ -35,7 +35,7 @@ import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveCompleteDPGameRound
 import com.seno.game.extensions.screenWidth
-import com.seno.game.extensions.startActivity
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.main.home.game.diff_picture.list.TOTAL_STAGE
 import com.seno.game.ui.main.home.game.diff_picture.single.adapter.AnswerMarkAdapter
@@ -613,7 +613,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             image2: String,
             launcher: ActivityResultLauncher<Intent>
         ) {
-            context.startActivity(DPSinglePlayActivity::class.java, launcher) {
+            context.safeStartActivity(DPSinglePlayActivity::class.java, launcher) {
                 putExtra(STAGE_POSITION, stagePosition)
                 putExtra(CURRENT_ROUND_POSITION, currentRoundPosition)
                 putExtra(FINAL_ROUND_POSITION, finalRoundPosition)

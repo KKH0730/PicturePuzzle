@@ -26,6 +26,12 @@
     <string name="naver">네이버</string>
     <string name="please_retry">다시 시도해 주세요.</string>
 
+    <!-- 권한 -->
+    <string name="camera_permission_title">카메라 권한 필요</string>
+    <string name="camera_permission_content">앱 사용을 위해 카메라 권한이 필요합니다</string>
+    <string name="camera_permission_confirm">설정 열기</string>
+    <string name="camera_permission_dismiss">취소</string>
+
     <!-- MyProfile -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
     <string name="account_google_login">Google 아이디로 로그인</string>
@@ -86,8 +92,6 @@
     <string name="home_setting_account_create_account">계정생성</string>
     <string name="home_setting_account_profile">프로필 관리</string>
 
-
-
     <!-- single game -->
     <string name="game_prepare_start">START!</string>
 
@@ -106,9 +110,12 @@
     <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
     <string name="diff_game_no_heart">하트가 모자라요. 잠시 후 재도전!</string>
 
-    <!--room-->
+    <!--entry-->
+    <string name="entry_crate_lobby">방 생성</string>
+    <string name="entry_search_lobby">방 찾기</string>
     <string name="qr_network_error">네트워크 요청을 실패했습니다. QR 코드를 다시 스캔해 주세요.</string>
     <string name="qr_guide_message">QR코드를 스캔하면\n대기방에 초대됩니다!</string>
     <string name="qr_dialog_message">지금 종료하면 게임이 시작되지 않을 수 있습니다.\n그래도 종료하시겠습니까?</string>
     <string name="multi_room_player_count_s">플레이어 %s명</string>
+    <string name="multi_lobby_title">대기방</string>
 </resources>

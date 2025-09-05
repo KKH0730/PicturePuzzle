@@ -176,4 +176,5 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.barcodescanner.zxing)
     implementation(libs.recyclerview.divider)
+    implementation(libs.tedpermission.coroutine)
 }

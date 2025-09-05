@@ -8,7 +8,7 @@ import com.seno.game.R
 import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.navigation.NavigationGraph
-import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.component.CommonAlertDialog
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.util.MusicPlayUtil
 
@@ -28,7 +28,7 @@ fun MainUI() {
             NavigationGraph(navController = navController)
         }
     } else {
-        RestartDialog(
+        CommonAlertDialog(
             title = context.getString(R.string.network_error_title),
             content = context.getString(R.string.network_error),
             confirmText = context.getString(R.string.alert_dialog_restart),

@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <queries>
@@ -41,30 +43,29 @@
             android:value="${enableCrashReporting}" />
 
         <activity
-            android:name=".ui.main.home.game.diff_picture.waiting_room.WaitingRoomActivity"
+            android:name=".ui.main.home.game.diff_picture.multi.multi_game.DPMultiPlayActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.main.home.game.diff_picture.multi.qr_scan.QRScanActivity"
-            android:exported="false"
-            android:theme="@style/PopupTheme"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.main.home.game.diff_picture.multi.qr.QRActivity"
-            android:exported="false"
-            android:theme="@style/PopupTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
         <activity
-            android:name=".ui.main.home.game.diff_picture.multi.multi_game.DPMultiPlayActivity"
+            android:name=".ui.main.home.game.diff_picture.multi.entry.join.QRScanActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.home.game.diff_picture.multi.entry.lobby.LobbyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.home.game.diff_picture.multi.entry.EntryActivity"
+            android:exported="false"
+            android:theme="@style/PopupTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.main.home.game.diff_picture.single.DPSinglePlayActivity"
             android:exported="false"
@@ -73,17 +74,13 @@
             android:name=".ui.account.my_profile.MyProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.splash.SplashActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Splash" />
-        <activity
             android:name=".ui.account.sign_gate.SignGateActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.main.home.game.areagame.AreaGameActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
+            android:theme="@style/Theme.Splash" />
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
@@ -94,6 +91,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.main.home.game.areagame.AreaGameActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

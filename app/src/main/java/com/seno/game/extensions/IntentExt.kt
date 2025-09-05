@@ -5,37 +5,68 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 
-fun Context.startActivity(action: String, builder: (Intent.() -> Unit)) {
-    startActivity(Intent(action).apply(builder))
+fun Context.safeStartActivity(intent: Intent) {
+    try {
+        startActivity(intent)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
-fun <T> Context.startActivity(
+fun Context.safeStartActivity(action: String, builder: (Intent.() -> Unit)) {
+    try {
+        startActivity(Intent(action).apply(builder))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun <T> Context.safeStartActivity(
     activityClass: Class<T>,
     builder: (Intent.() -> Unit)
 ) {
-    startActivity(Intent(this, activityClass).apply(builder))
+    try {
+        startActivity(Intent(this, activityClass).apply(builder))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
-fun <T> Context.startActivity(
+fun <T> Context.safeStartActivity(
     activityClass: Class<T>
 ) {
-    startActivity(Intent(this, activityClass))
+    try {
+        startActivity(Intent(this, activityClass))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
-fun <T> Context.startActivity(
+fun <T> Context.safeStartActivity(
     activityClass: Class<T>,
     launcher: ActivityResultLauncher<Intent>,
+    options: ActivityOptionsCompat? = null,
     builder: (Intent.() -> Unit)
 ) {
-    launcher.launch(Intent(this, activityClass).apply(builder))
+    try {
+        launcher.launch(Intent(this, activityClass).apply(builder), options)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
-fun <T> Context.startActivity(
+fun <T> Context.safeStartActivity(
     activityClass: Class<T>,
-    launcher: ActivityResultLauncher<Intent>
+    launcher: ActivityResultLauncher<Intent>,
+    options: ActivityOptionsCompat? = null
 ) {
-    launcher.launch(Intent(this, activityClass))
+    try {
+        launcher.launch(Intent(this, activityClass), options)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
 fun Activity.restartApp() {

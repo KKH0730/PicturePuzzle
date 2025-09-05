@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import com.seno.game.R
-import com.seno.game.base.BaseActivity
+import com.seno.game.ui.base.BaseActivity
 import com.seno.game.databinding.ActivityAreaGameBinding
 import com.seno.game.extensions.bitmapFrom
 import com.seno.game.util.AreaOpencvUtil

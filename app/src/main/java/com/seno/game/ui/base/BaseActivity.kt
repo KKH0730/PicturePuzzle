@@ -1,4 +1,4 @@
-package com.seno.game.base
+package com.seno.game.ui.base
 
 import android.app.Activity
 import android.content.Intent
@@ -7,16 +7,12 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.seno.game.extensions.clearMemoryCache
-import com.seno.game.extensions.getImageDate
-import com.seno.game.extensions.parseImageDate
-import com.seno.game.prefs.PrefsManager
-import com.seno.game.ui.view.NewMonthAlertDialog
 
 
 abstract class BaseActivity<T: ViewDataBinding>(
@@ -42,7 +38,7 @@ abstract class BaseActivity<T: ViewDataBinding>(
         }
     }
 
-    protected fun setupWindowInsets(targetView: View, onApplyWindowInsets: (androidx.core.graphics.Insets) -> Unit) {
+    protected fun setupWindowInsets(targetView: View, onApplyWindowInsets: (Insets) -> Unit) {
         ViewCompat.setOnApplyWindowInsetsListener(targetView) { v: View, insets: WindowInsetsCompat? ->
             insets?.getInsets(WindowInsetsCompat.Type.systemBars())?.let { systemBarInsets ->
                 onApplyWindowInsets.invoke(systemBarInsets)

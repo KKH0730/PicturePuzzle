@@ -1,4 +1,4 @@
-package com.seno.game.view
+package com.seno.game.ui.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,8 +12,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.seno.game.R
-import timber.log.Timber
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 

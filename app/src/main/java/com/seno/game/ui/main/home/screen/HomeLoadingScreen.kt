@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home
+package com.seno.game.ui.main.home.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

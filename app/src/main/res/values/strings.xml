@@ -87,17 +87,9 @@
     <string name="home_setting_account_profile">프로필 관리</string>
 
 
-    <string name="game_prepare_start">START!</string>
-
-    <string name="hummin_correct">정답!</string>
-    <string name="hummin_incorrect">일치하는 단어가 없어요…</string>
-    <string name="hummin_mismatch">초성 불일치</string>
-    <string name="hummin_submit">제출</string>
-    <string name="hummin_input_placeholder">초성과 일치하는 단어를 입력해보자!</string>
 
     <!-- single game -->
-    <string name="diff_title">틀린그림을 찾아보세요</string>
-    <string name="diff_total_answer_count">점수 : %s</string>
+    <string name="game_prepare_start">START!</string>
 
     <string name="diff_next_round_dialog_title">모든 정답을 맞추셨습니다!</string>
     <string name="diff_game_finish_dialog_title">네트워크 연결이 원활하지 않습니다.\n잠시 후 다시 시도해주세요.</string>

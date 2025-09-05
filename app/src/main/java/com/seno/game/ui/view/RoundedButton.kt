@@ -1,4 +1,4 @@
-package com.seno.game.view
+package com.seno.game.ui.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues

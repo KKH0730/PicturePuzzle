@@ -1,8 +1,8 @@
 package com.seno.game.domain.usecase.diff_game
 
 import com.seno.game.data.diff_picture.DiffPictureRepository
+import com.seno.game.data.network.model.MultiGameRoom
 import com.seno.game.di.coroutine.IoDispatcher
-import com.seno.game.model.Player
 import com.seno.game.model.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -69,7 +69,7 @@ class DiffPictureUseCase @Inject constructor(
         return diffPictureRepository.updateMultiGameStart(path = path)
     }
 
-    fun observeMultiGameSnapshot(path: String): Flow<Pair<Boolean, List<Player>>>{
+    fun observeMultiGameSnapshot(path: String): Flow<MultiGameRoom>{
         return diffPictureRepository.observeMultiGameSnapshot(path = path)
     }
 }

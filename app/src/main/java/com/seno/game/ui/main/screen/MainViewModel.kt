@@ -1,4 +1,4 @@
-package com.seno.game.ui.main
+package com.seno.game.ui.main.screen
 
 import androidx.lifecycle.viewModelScope
 import com.seno.game.domain.usecase.user.GameConfigUseCase

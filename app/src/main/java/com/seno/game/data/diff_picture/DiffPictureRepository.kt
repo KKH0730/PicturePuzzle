@@ -1,5 +1,6 @@
 package com.seno.game.data.diff_picture
 
+import com.seno.game.data.network.model.MultiGameRoom
 import com.seno.game.model.Player
 import com.seno.game.model.Result
 import kotlinx.coroutines.flow.Flow
@@ -35,5 +36,5 @@ interface DiffPictureRepository {
 
     suspend fun updateMultiGameStart(path: String): Result<Boolean>
 
-    fun observeMultiGameSnapshot(path: String): Flow<Pair<Boolean, List<Player>>>
+    fun observeMultiGameSnapshot(path: String): Flow<MultiGameRoom>
 }

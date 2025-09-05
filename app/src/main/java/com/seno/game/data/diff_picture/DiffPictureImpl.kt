@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.seno.game.data.network.ApiConstants
+import com.seno.game.data.network.model.MultiGameRoom
 import com.seno.game.di.DiffPictureStorageRef
 import com.seno.game.di.network.DiffDocRef
 import com.seno.game.model.DiffPictureGame
@@ -203,8 +204,10 @@ class DiffPictureImpl @Inject constructor(
         }
     }
 
-    override fun observeMultiGameSnapshot(path: String): Flow<Pair<Boolean, List<Player>>> =
+    override fun observeMultiGameSnapshot(path: String): Flow<MultiGameRoom> =
         callbackFlow {
+            val uniqueId = createUniqueRoomId(path = path)
+
             val registration = diffGameDocRef
                 .collection("multi")
                 .document(path)
@@ -226,8 +229,13 @@ class DiffPictureImpl @Inject constructor(
                                 } ?: emptyList()
 
                             if (players.isNotEmpty()) {
-                                val start = snapshot.getBoolean("start") ?: false
-                                trySend(start to players)
+                                trySend(
+                                    MultiGameRoom(
+                                        uniqueId = uniqueId,
+                                        start =  snapshot.getBoolean("start") ?: false,
+                                        players = players
+                                    )
+                                )
                             }
                         }
                     } catch (e: Exception) {
@@ -236,4 +244,30 @@ class DiffPictureImpl @Inject constructor(
                 }
             awaitClose { registration.remove() }
         }
+
+    suspend fun createUniqueRoomId(
+        path: String
+    ): String {
+        val colRef = diffGameDocRef.collection("unique_room_id")
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+        return db.runTransaction { transaction ->
+            var id: String
+            var exists: Boolean
+
+            do {
+                id = (1..6)
+                    .map { chars.random() }
+                    .joinToString("")
+
+                val docRef = colRef.document(id)
+                exists = transaction.get(docRef).exists()
+            } while (exists)
+
+            // 방 문서 생성
+            val docRef = colRef.document(id)
+            transaction.set(docRef, mapOf("path" to path))
+            id
+        }.await()
+    }
 }

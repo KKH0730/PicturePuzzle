@@ -25,7 +25,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fondesa.recyclerviewdivider.RecyclerViewDivider
 import com.google.android.gms.ads.AdRequest
 import com.seno.game.R
-import com.seno.game.base.BaseActivity
+import com.seno.game.ui.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
 import com.seno.game.extensions.bitmapFrom
 import com.seno.game.extensions.clearMemoryCache

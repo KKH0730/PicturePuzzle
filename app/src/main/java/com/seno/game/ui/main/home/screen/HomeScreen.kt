@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home
+package com.seno.game.ui.main.home.screen
 
 import android.app.Activity.RESULT_OK
 import androidx.activity.ComponentActivity
@@ -47,9 +47,11 @@ import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.account.my_profile.MyProfileActivity
 import com.seno.game.ui.account.sign_gate.SignGateActivity
+import com.seno.game.ui.common.BannerADView
 import com.seno.game.ui.common.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.MainActivity
+import com.seno.game.ui.main.home.HomeViewModel
 import com.seno.game.ui.main.home.component.GamePlayContainer
 import com.seno.game.ui.main.home.component.HomeProfileContainer
 import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
@@ -243,7 +245,9 @@ fun HomeUI(
                 onClickQuit = { isShowQuitDialog = true },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(height = 70.dp))
+            Spacer(modifier = Modifier.height(height = 50.dp))
+            BannerADView()
+            Spacer(modifier = Modifier.height(height = 16.dp))
         }
 
         if (isLoading) {

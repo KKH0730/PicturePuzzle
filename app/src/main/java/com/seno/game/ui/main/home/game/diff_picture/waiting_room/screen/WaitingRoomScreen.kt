@@ -31,9 +31,9 @@ import androidx.compose.ui.window.Dialog
 import com.seno.game.R
 import com.seno.game.extensions.textDp
 import com.seno.game.model.Player
+import com.seno.game.ui.common.BannerADView
 import com.seno.game.ui.main.home.component.QuitDialogYesButton
 import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingPlayerList
-import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingRoomFooter
 import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingRoomGameSettingPanel
 import com.seno.game.ui.main.home.game.diff_picture.waiting_room.component.WaitingRoomHeader
 
@@ -72,7 +72,7 @@ fun WaitingRoomScreen(
             Spacer(modifier = Modifier.height(height = 20.dp))
             WaitingPlayerList(ownerUid = ownerUid, players = players, modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(height = 20.dp))
-            WaitingRoomFooter()
+            BannerADView()
             Spacer(modifier = Modifier.height(height = 16.dp))
         }
         if (isShowQuitDialog) {

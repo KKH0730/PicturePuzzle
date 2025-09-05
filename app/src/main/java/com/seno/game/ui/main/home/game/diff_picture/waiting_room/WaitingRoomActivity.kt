@@ -1,8 +1,6 @@
 package com.seno.game.ui.main.home.game.diff_picture.waiting_room
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
@@ -10,13 +8,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.seno.game.base.BaseComposeActivity
+import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.extensions.createQRCode
 import com.seno.game.extensions.startActivity
 import com.seno.game.ui.main.home.game.diff_picture.multi.qr.QRActivity
 import com.seno.game.ui.main.home.game.diff_picture.waiting_room.screen.WaitingRoomScreen
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -43,7 +40,7 @@ class WaitingRoomActivity : BaseComposeActivity(
         WaitingRoomScreen(
             ownerUid = ownerUid,
             qrBitmap = qrBitmap,
-            players = viewModel.players.collectAsStateWithLifecycle().value.second,
+            players = viewModel.players.collectAsStateWithLifecycle().value?.players ?: listOf(),
             isShowQuitDialog = viewModel.isShowQuitDialog.collectAsStateWithLifecycle().value,
             onClickQRCode = { QRActivity.start(context = this@WaitingRoomActivity, path = path) },
             onClickQuit = { finish() },

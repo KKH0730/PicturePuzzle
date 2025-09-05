@@ -1,4 +1,4 @@
-package com.seno.game.ui.main
+package com.seno.game.ui.main.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -9,6 +9,7 @@ import com.seno.game.extensions.checkNetworkConnectivityForComposable
 import com.seno.game.extensions.restartApp
 import com.seno.game.navigation.NavigationGraph
 import com.seno.game.ui.common.RestartDialog
+import com.seno.game.ui.main.MainActivity
 import com.seno.game.util.MusicPlayUtil
 
 @Composable

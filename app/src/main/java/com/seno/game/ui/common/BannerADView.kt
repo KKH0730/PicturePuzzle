@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.waiting_room.component
+package com.seno.game.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +14,7 @@ import com.google.android.gms.ads.AdView
 import com.seno.game.R
 
 @Composable
-fun WaitingRoomFooter() {
+fun BannerADView() {
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -25,11 +25,12 @@ import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.startActivity
 import com.seno.game.manager.AccountManager
-import com.seno.game.manager.UNKNOWN_UID
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.common.RestartDialog
-import com.seno.game.ui.main.home.HomeLoadingScreen
+import com.seno.game.ui.main.home.screen.HomeLoadingScreen
+import com.seno.game.ui.main.screen.MainScreen
+import com.seno.game.ui.main.screen.MainViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

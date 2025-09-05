@@ -41,7 +41,7 @@ class WaitingRoomViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false to listOf()
+            initialValue = null
     )
 
     private val _isShowQuitDialog = MutableStateFlow(false)

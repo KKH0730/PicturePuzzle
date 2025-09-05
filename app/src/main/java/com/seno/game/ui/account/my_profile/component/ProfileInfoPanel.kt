@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.textDp
-import com.seno.game.view.RoundedButton
+import com.seno.game.ui.view.RoundedButton
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable

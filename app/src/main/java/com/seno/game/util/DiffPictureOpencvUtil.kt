@@ -223,7 +223,7 @@ import kotlin.math.sqrt
 //        return Rect(x, y, right - x, bottom - y)
 //    }
 //}
-
+const val RADIUS_CORRECTION = 5
 class DiffPictureOpencvUtil {
 
     fun getDiffAnswer(srcBitmap: Bitmap?, copyBitmap: Bitmap?) : Answer? {
@@ -242,20 +242,28 @@ class DiffPictureOpencvUtil {
             Core.absdiff(src, copy, diffMat)
 
             // 1️⃣ 그레이스케일 변환 + Threshold
-            val bin = Mat()
-            Imgproc.cvtColor(diffMat, bin, Imgproc.COLOR_BGR2GRAY)
-            Imgproc.threshold(bin, bin, 0.0, 255.0, Imgproc.THRESH_OTSU)
+            val gray = Mat()
+            Imgproc.cvtColor(diffMat, gray, Imgproc.COLOR_BGR2GRAY)
 
-            // 2️⃣ Morphological CLOSE 연산 (작은 구멍 제거, 인접 영역 병합)
-            val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(15.0, 15.0))
-            Imgproc.morphologyEx(bin, bin, Imgproc.MORPH_CLOSE, kernel)
+            // 2️⃣. 임계값(Threshold) 적용 -> 차이가 있는 부분만 흰색(255), 나머지는 검은색(0)
+            val thresh = Mat()
+            Imgproc.threshold(gray, thresh, 30.0, 255.0, Imgproc.THRESH_BINARY)
+//            Imgproc.threshold(bin, bin, 0.0, 255.0, Imgproc.THRESH_OTSU)
 
-            // 3️⃣ Contour 검출
+            // 3️⃣ Morphological CLOSE 연산 (작은 구멍 제거, 인접 영역 병합)
+            val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0))
+            Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_OPEN, kernel)
+            Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_DILATE, kernel)
+//            val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(15.0, 15.0))
+//            Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_CLOSE, kernel)
+
+            // 4️⃣ Contour 검출
             val contours = ArrayList<MatOfPoint>()
             val hierarchy = Mat()
-            Imgproc.findContours(bin, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE)
+            Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+//            Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE)
 
-            // 4️⃣ Contour → Circle 변환
+            // 5️⃣ Contour → Circle 변환
             val circles = contours
                 .filter {
                     val contourArea = Imgproc.contourArea(it)
@@ -270,10 +278,9 @@ class DiffPictureOpencvUtil {
                     Circle(center.x, center.y, radius[0].toDouble())
                 }
                 .toMutableList()
+                .let { mergeCircles(it) } // 원들 merge
 
-            val mergedCircles = mergeCircles(circles)
-
-            val pointList = mergedCircles.map { c ->
+            val pointList = circles.map { c ->
                 com.seno.game.ui.main.home.game.diff_picture.model.Point(
                     rectX = (c.cx - c.r).toFloat(),
                     rectY = (c.cy - c.r).toFloat(),
@@ -286,37 +293,29 @@ class DiffPictureOpencvUtil {
                     answerRadius = c.r.toFloat()
                 )
             }
-            for (c in mergedCircles) {
+            for (c in circles) {
                 Imgproc.circle(src, Point(c.cx, c.cy), limitRadius(c.r).toInt(), RED, 5)
             }
 
             val rects = contours
                 .filter {
                     val contourArea = Imgproc.contourArea(it)
-                    val minArea = (src.width() * src.height() * 0.00015)
+                    val minArea = maxOf(100.0, src.width() * src.height() * 0.0001)
                     contourArea >= minArea
                 }
                 .map {
-                    // 근사화
-                    val approxCurve = MatOfPoint2f()
-                    val contour2f = MatOfPoint2f(*it.toArray())
-                    val approxDistance = Imgproc.arcLength(contour2f, true) * 0.002
-                    Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true)
-
-                    val points = MatOfPoint(*approxCurve.toArray())
-
-                    Imgproc.boundingRect(points)
-                }.toMutableList()
+                    Imgproc.boundingRect(it) // 근사화 불필요
+                }
 
             for (rect in rects) {
-//                Imgproc.rectangle(
-//                    src,
-//                    Point(rect.x.toDouble(), rect.y.toDouble()),
-//                    Point((rect.x + rect.width).toDouble(), (rect.y + rect.height).toDouble()),
-//                    RED,
-//                    5,
-//                    1
-//                )
+                Imgproc.rectangle(
+                    src,
+                    Point(rect.x.toDouble(), rect.y.toDouble()),
+                    Point((rect.x + rect.width).toDouble(), (rect.y + rect.height).toDouble()),
+                    RED,
+                    3,                     // 두께 조절
+                    Imgproc.LINE_AA        // 안티에일리어싱 적용
+                )
             }
 
             Imgproc.cvtColor(src, src, Imgproc.COLOR_RGBA2BGR)
@@ -385,7 +384,7 @@ class DiffPictureOpencvUtil {
     }
 
     //    fun limitRadius(radius: Double): Double = radius * 2 / 3
-    fun limitRadius(radius: Double): Double = radius
+    fun limitRadius(radius: Double): Double = radius + RADIUS_CORRECTION
 }
 
 data class Circle(val cx: Double, val cy: Double, val r: Double)

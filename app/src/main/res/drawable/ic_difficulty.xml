@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 낮은 난이도 막대 (왼쪽) -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M5,14h3v6H5z" />
+
+    <!-- 중간 난이도 막대 (가운데) -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M11,10h3v10h-3z" />
+
+    <!-- 높은 난이도 막대 (오른쪽) -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M17,6h3v14h-3z" />
+
+</vector>

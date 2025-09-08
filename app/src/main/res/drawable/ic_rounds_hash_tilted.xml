@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 그룹 단위 회전 (-8도, 중심 12,12) -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="-8">
+
+        <!-- 수평 라인 (굵기 1.5, 간격 넓게) -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M5,8.75h14v1.5H5z M5,13h14v1.5H5z" />
+
+        <!-- 수직 라인 (굵기 1.5, 간격 넓게) -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M9.5,5v14h1.5V5z M13.5,5v14h1.5V5z" />
+
+    </group>
+</vector>

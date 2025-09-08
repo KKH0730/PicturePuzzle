@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi
 
 import android.content.Context
 import androidx.activity.OnBackPressedCallback
@@ -11,7 +11,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.extensions.createQRCode
 import com.seno.game.extensions.safeStartActivity
-import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.screen.LobbyRoomScreen
+import com.seno.game.ui.component.CommonNetworkErrorDialog
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.screen.LobbyRoomScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class LobbyActivity : BaseComposeActivity(
     isLightStatusBar = true,
     isLightNavigationBar = false
 ) {
-    private val viewModel by viewModels<LobbyViewModel>()
+    private val viewModel by viewModels<MultiGameViewModel>()
     private val path: String by lazy { intent.getStringExtra(PATH) ?: "" }
 
     @Composable
@@ -36,13 +37,23 @@ class LobbyActivity : BaseComposeActivity(
 
         if (qrBitmap == null || ownerUid.isEmpty()) return
 
+        if (viewModel.networkErrorDialog.collectAsStateWithLifecycle().value) {
+            CommonNetworkErrorDialog(
+                onClickQuit = { finish() },
+                onDismissed = {}
+            )
+        }
+
         LobbyRoomScreen(
             ownerUid = ownerUid,
             qrBitmap = qrBitmap,
+            gameTimeLimit = viewModel.gameTimeLimit.collectAsStateWithLifecycle().value,
+            gameRounds = viewModel.gameRounds.collectAsStateWithLifecycle().value,
+            selectedGameDifficulty = viewModel.gameDifficulty.collectAsStateWithLifecycle().value,
             players = viewModel.players.collectAsStateWithLifecycle().value?.players ?: listOf(),
-            isShowQuitDialog = viewModel.isShowQuitDialog.collectAsStateWithLifecycle().value,
-            onClickQuit = { finish() },
-            onDismissQuitDialog = {},
+            onClickTimeLimit = viewModel::updateTimeLimit,
+            onClickGameRound = viewModel::updateRounds,
+            onClickDifficulty = viewModel::updateDifficulty,
             onClickBack = {
                 viewModel.updateMultiGamePlayer(isAdd = false)
                 finish()

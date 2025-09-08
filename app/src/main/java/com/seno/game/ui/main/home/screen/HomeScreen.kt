@@ -66,7 +66,7 @@ import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.EntryActivity
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.QRScanActivity
-import com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.LobbyActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.LobbyActivity
 import com.seno.game.util.MusicPlayUtil
 
 

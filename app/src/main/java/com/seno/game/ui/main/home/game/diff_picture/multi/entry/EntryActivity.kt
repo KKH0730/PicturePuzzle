@@ -59,7 +59,7 @@ class EntryActivity : BaseComposeActivity(
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 Row(modifier = Modifier) {
                     OptionButton(
-                        painter = painterResource(R.drawable.ic_outline_add),
+                        painter = painterResource(R.drawable.ic_plus),
                         text = stringResource(R.string.entry_crate_lobby),
                         modifier = Modifier.weight(weight = 1f),
                         onClick = {

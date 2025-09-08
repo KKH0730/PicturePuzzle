@@ -117,5 +117,17 @@
     <string name="qr_guide_message">QR코드를 스캔하면\n대기방에 초대됩니다!</string>
     <string name="qr_dialog_message">지금 종료하면 게임이 시작되지 않을 수 있습니다.\n그래도 종료하시겠습니까?</string>
     <string name="multi_room_player_count_s">플레이어 %s명</string>
-    <string name="multi_lobby_title">대기방</string>
+    <string name="multi_lobby_title">로비</string>
+    <string name="multi_lobby_invite_subtitle">초대하기</string>
+    <string name="multi_lobby_game_setting_sub_title">게임설정</string>
+    <string name="multi_lobby_invite_lobby_num_title">초대코드</string>
+    <string name="multi_lobby_invite_copy_success">초대코드가 복사되었습니다.</string>
+    <string name="multi_lobby_game_setting_difficulty_1">쉬움</string>
+    <string name="multi_lobby_game_setting_difficulty_2">보통</string>
+    <string name="multi_lobby_game_setting_difficulty_3">어려움</string>
+    <string name="multi_lobby_game_setting_limit_time_title">제한시간</string>
+    <string name="multi_lobby_game_setting_limit_time_s">%s초</string>
+    <string name="multi_lobby_game_setting_game_round_title">라운드 수</string>
+    <string name="multi_lobby_game_setting_game_round_s">%s판</string>
+    <string name="multi_lobby_game_setting_difficulty_title">난이도</string>
 </resources>

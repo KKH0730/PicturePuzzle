@@ -55,7 +55,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.main.home.game.diff_picture.multi.entry.lobby.LobbyActivity"
+            android:name=".ui.main.home.game.diff_picture.multi.entry.multi.LobbyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

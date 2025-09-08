@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -69,7 +69,7 @@ fun LobbyPlayerList(
                     text = String.format(stringResource(R.string.multi_room_player_count_s), players.size.toString()),
                     style = TextStyle(
                         color = Color.White,
-                        fontSize = 16.textDp,
+                        fontSize = 18.textDp,
                         fontWeight = FontWeight.W400
                     ),
                     modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp)
@@ -77,7 +77,7 @@ fun LobbyPlayerList(
             }
             LazyColumn(
                 state = lazyListState,
-                contentPadding = PaddingValues(vertical = 16.dp, horizontal = 24.dp),
+                contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(
@@ -94,7 +94,7 @@ fun LobbyPlayerList(
                            if (players[index].profileUri.isEmpty()) {
                                Box(
                                    modifier = Modifier
-                                       .size(size = 48.dp)
+                                       .size(size = 40.dp)
                                        .border(
                                            border = BorderStroke(
                                                width = 2.dp,
@@ -109,7 +109,7 @@ fun LobbyPlayerList(
                                        contentScale = ContentScale.Crop,
                                        colorFilter = ColorFilter.tint(color = colorResource(R.color.color_D3CAC6C6)),
                                        modifier = Modifier
-                                           .size(size = 46.dp)
+                                           .size(size = 36.dp)
                                            .align(alignment = Alignment.Center)
                                    )
                                }
@@ -119,18 +119,18 @@ fun LobbyPlayerList(
                                    contentScale = ContentScale.Crop,
                                    placeHolder = painterResource(id = R.drawable.ic_profile_not_login),
                                    modifier = Modifier
-                                       .size(size = 48.dp)
+                                       .size(size = 40.dp)
                                        .clip(shape = CircleShape)
                                        .background(color = Color.Black)
                                )
                            }
-                           Spacer(modifier = Modifier.width(width = 12.dp))
+                           Spacer(modifier = Modifier.width(width = 14.dp))
                            Text(
                                text = players[index].nickname,
                                style = TextStyle(
                                    color = Color.Black,
-                                   fontSize = 18.textDp,
-                                   fontWeight = FontWeight.W400
+                                   fontSize = 14.textDp,
+                                   fontWeight = FontWeight.W500
                                )
                            )
                            Spacer(modifier = Modifier.weight(weight = 1f))

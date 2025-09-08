@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke

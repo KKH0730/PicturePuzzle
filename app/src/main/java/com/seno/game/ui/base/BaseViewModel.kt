@@ -26,11 +26,16 @@ open class BaseViewModel @Inject constructor() : ViewModel() {
     private val _loading = MutableStateFlow(false)
     val loading get() = _loading.asStateFlow()
 
+    private val _networkErrorDialog = MutableStateFlow(false)
+    val networkErrorDialog get() = _networkErrorDialog.asStateFlow()
+
     fun showToast(message: String) = vmScopeJob { _toast.emit(message) }
 
     fun showLoading()  = _loading.update { true }
 
     fun hideLoading() = _loading.update { false }
+
+    fun showNetworkErrorDialog(isShow: Boolean) = _networkErrorDialog.update { isShow }
 
     protected val exceptionHandler = CoroutineExceptionHandler { _, t ->
         t.printStackTrace()

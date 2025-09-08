@@ -1,4 +1,4 @@
-package com.seno.game.ui.main.home.game.diff_picture.multi.entry.lobby.component
+package com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -21,7 +21,7 @@ import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 
 @Composable
-fun LobbyHeader(onClickBack: () -> Unit) {
+fun LobbyToolbar(onClickBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier

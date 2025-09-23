@@ -27,11 +27,14 @@ import com.google.zxing.Result
 import com.seno.game.R
 import com.seno.game.extensions.safeStartActivity
 import com.seno.game.ui.base.BaseComposeActivity
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.component.QRScanFooter
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.component.QRScanHeader
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import timber.log.Timber
 
 @AndroidEntryPoint
 class QRScanActivity : BaseComposeActivity(
@@ -39,7 +42,11 @@ class QRScanActivity : BaseComposeActivity(
     isLightNavigationBar = false
 ), ZXingScannerView.ResultHandler {
     private val viewModel by viewModels<QRScanViewModel>()
-    private val scannerView: ZXingScannerView by lazy { ZXingScannerView(this@QRScanActivity) }
+    private val scannerView: ZXingScannerView by lazy {
+        ZXingScannerView(this@QRScanActivity).apply {
+            setLaserEnabled(false)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,12 +71,16 @@ class QRScanActivity : BaseComposeActivity(
                 .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
         ) {
             QRScanHeader(
-                onClickFlash = { scannerView.toggleFlash() },
                 onClickBack = { finish() }
             )
             AndroidView(
                 factory = { context -> scannerView },
-                update = { scannerView -> }
+                update = { scannerView -> scannerView },
+                modifier = Modifier.weight(weight = 1f)
+            )
+            QRScanFooter(
+                onClickFlash = { scannerView.toggleFlash() },
+                onClickRefocus = { scannerView.resumeCameraPreview(this@QRScanActivity) }
             )
         }
     }
@@ -108,8 +119,12 @@ class QRScanActivity : BaseComposeActivity(
 
     override fun onResume() {
         super.onResume()
-        scannerView.setResultHandler(this@QRScanActivity)
-        scannerView.startCamera()
+        lifecycleScope.launch {
+            scannerView.setResultHandler(this@QRScanActivity)
+            scannerView.startCamera()
+            delay(200)
+            scannerView.resumeCameraPreview(this@QRScanActivity)
+        }
     }
 
     override fun onPause() {

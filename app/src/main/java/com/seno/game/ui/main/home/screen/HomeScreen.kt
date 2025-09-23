@@ -1,5 +1,6 @@
 package com.seno.game.ui.main.home.screen
 
+import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gun0912.tedpermission.coroutine.TedPermission
 import com.seno.game.R
 import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.LifecycleEventListener
@@ -68,6 +71,7 @@ import com.seno.game.ui.main.home.game.diff_picture.multi.entry.EntryActivity
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.join.QRScanActivity
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.LobbyActivity
 import com.seno.game.util.MusicPlayUtil
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -118,6 +122,8 @@ fun HomeUI(
     onChangedPush: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
     val googleAccountManager = GoogleAccountManager(activity = context)
     val naverAccountManager = NaverAccountManager()
@@ -154,7 +160,19 @@ fun HomeUI(
     ) { result ->
         when (result.resultCode) {
             ResultConstants.RESULT_CREATE_LOBBY -> LobbyActivity.start(context = context, path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}")
-            ResultConstants.RESULT_JOIN_LOBBY -> QRScanActivity.start(context = context, launcher = qrScanLauncher)
+            ResultConstants.RESULT_JOIN_LOBBY -> {
+                scope.launch {
+                    val permissionResult = TedPermission.create()
+                        .setPermissions(Manifest.permission.CAMERA)
+                        .check()
+
+                    if (permissionResult.isGranted) {
+                        QRScanActivity.start(context = context, launcher = qrScanLauncher)
+                    } else {
+                        isShowPermissionAlertDialog = true
+                    }
+                }
+            }
         }
     }
 
@@ -268,8 +286,8 @@ fun HomeUI(
                 onClickQuit = { isShowQuitDialog = true },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(height = 50.dp))
-            BannerADView()
+            Spacer(modifier = Modifier.height(height = 20.dp))
+            BannerADView(modifier = Modifier.height(height = 50.dp))
             Spacer(modifier = Modifier.height(height = 16.dp))
         }
 

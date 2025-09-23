@@ -40,6 +40,7 @@ import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.GameTimeLi
 
 @Composable
 fun LobbyGameSettingPanel(
+    isOwner: Boolean,
     gameTimeLimit: GameTimeLimit,
     gameRounds: GameRounds,
     selectedGameDifficulty: Difficulty,
@@ -92,6 +93,7 @@ fun LobbyGameSettingPanel(
                     painter = painterResource(R.drawable.ic_clock),
                     text = stringResource(R.string.multi_lobby_game_setting_limit_time_title),
                     value = String.format(stringResource(R.string.multi_lobby_game_setting_limit_time_s), gameTimeLimit.seconds.toString()),
+                    isOwner = isOwner,
                     onClick = { value ->
                         val isAdd = value == 1
                         if (isAdd) {
@@ -106,6 +108,7 @@ fun LobbyGameSettingPanel(
                     painter = painterResource(R.drawable.ic_rounds_hash_tilted),
                     text = stringResource(R.string.multi_lobby_game_setting_game_round_title),
                     value = String.format(stringResource(R.string.multi_lobby_game_setting_game_round_s), gameRounds.count.toString()),
+                    isOwner = isOwner,
                     onClick = { value ->
                         val isAdd = value == 1
                         if (isAdd) {
@@ -121,6 +124,7 @@ fun LobbyGameSettingPanel(
                     text = stringResource(R.string.multi_lobby_game_setting_difficulty_title),
                     selectorList = Difficulty.entries.map { it },
                     selectedGameDifficulty = selectedGameDifficulty,
+                    isOwner = isOwner,
                     onClick = onClickDifficulty
                 )
                 Spacer(modifier = Modifier.height(height = 16.dp))
@@ -135,6 +139,7 @@ fun GameSettingCounterType(
     painter: Painter,
     text: String,
     value: String,
+    isOwner: Boolean,
     onClick: (Int) -> Unit
 ) {
     Row(
@@ -158,8 +163,10 @@ fun GameSettingCounterType(
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.weight(weight = 1f))
-        CounterControl(painter = painterResource(R.drawable.ic_minus), onClick = { onClick.invoke(-1) })
-        Spacer(modifier = Modifier.width(width = 4.dp))
+        if (isOwner) {
+            CounterControl(painter = painterResource(R.drawable.ic_minus), onClick = { onClick.invoke(-1) })
+            Spacer(modifier = Modifier.width(width = 4.dp))
+        }
         Box(modifier = Modifier.width(width = 44.dp)) {
             Text(
                 text = value,
@@ -172,7 +179,9 @@ fun GameSettingCounterType(
                 modifier = Modifier.align(alignment = Alignment.Center)
             )
         }
-        CounterControl(painter = painterResource(R.drawable.ic_plus), onClick = { onClick.invoke(1) })
+        if (isOwner) {
+            CounterControl(painter = painterResource(R.drawable.ic_plus), onClick = { onClick.invoke(1) })
+        }
     }
 }
 
@@ -202,6 +211,7 @@ fun GameSettingSelectorType(
     text: String,
     selectorList: List<Difficulty>,
     selectedGameDifficulty: Difficulty,
+    isOwner: Boolean,
     onClick: (Difficulty) -> Unit
 ) {
     Row(
@@ -225,10 +235,14 @@ fun GameSettingSelectorType(
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.weight(weight = 1f))
-        selectorList.forEachIndexed { index, difficulty ->
-            DifficultySelector(difficulty = difficulty, selectedGameDifficulty = selectedGameDifficulty, onClick = onClick)
-            if (index == selectorList.lastIndex) return@forEachIndexed
-            Spacer(modifier = Modifier.width(width = 8.dp))
+        if (isOwner) {
+            selectorList.forEachIndexed { index, difficulty ->
+                DifficultySelector(difficulty = difficulty, selectedGameDifficulty = selectedGameDifficulty, onClick = onClick)
+                if (index == selectorList.lastIndex) return@forEachIndexed
+                Spacer(modifier = Modifier.width(width = 8.dp))
+            }
+        } else {
+            DifficultySelector(difficulty = selectedGameDifficulty, selectedGameDifficulty = selectedGameDifficulty, onClick = {})
         }
     }
 }

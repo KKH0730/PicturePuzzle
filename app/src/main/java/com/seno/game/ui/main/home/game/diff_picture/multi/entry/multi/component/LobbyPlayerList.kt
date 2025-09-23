@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
+import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.manager.AccountManager
 import com.seno.game.model.Player
@@ -45,7 +46,8 @@ import com.skydoves.landscapist.glide.GlideImage
 fun LobbyPlayerList(
     ownerUid: String,
     players: List<Player>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickMultiGameStart: () -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     Card(
@@ -91,82 +93,101 @@ fun LobbyPlayerList(
                                .fillMaxWidth()
                                .height(height = 50.dp)
                        ) {
-                           if (players[index].profileUri.isEmpty()) {
-                               Box(
-                                   modifier = Modifier
-                                       .size(size = 40.dp)
-                                       .border(
-                                           border = BorderStroke(
-                                               width = 2.dp,
-                                               color = colorResource(R.color.color_D3CAC6C6)
-                                           ),
-                                           shape = CircleShape
-                                       )
-                               ) {
-                                   Image(
-                                       painter = painterResource(id = R.drawable.ic_rounded_person),
-                                       contentDescription = null,
-                                       contentScale = ContentScale.Crop,
-                                       colorFilter = ColorFilter.tint(color = colorResource(R.color.color_D3CAC6C6)),
-                                       modifier = Modifier
-                                           .size(size = 36.dp)
-                                           .align(alignment = Alignment.Center)
-                                   )
-                               }
-                           } else {
-                               GlideImage(
-                                   imageModel = players[index].profileUri,
-                                   contentScale = ContentScale.Crop,
-                                   placeHolder = painterResource(id = R.drawable.ic_profile_not_login),
-                                   modifier = Modifier
-                                       .size(size = 40.dp)
-                                       .clip(shape = CircleShape)
-                                       .background(color = Color.Black)
-                               )
-                           }
-                           Spacer(modifier = Modifier.width(width = 14.dp))
-                           Text(
-                               text = players[index].nickname,
-                               style = TextStyle(
-                                   color = Color.Black,
-                                   fontSize = 14.textDp,
-                                   fontWeight = FontWeight.W500
-                               )
-                           )
+                           PlayerProfile(index = index, players = players)
                            Spacer(modifier = Modifier.weight(weight = 1f))
-                           if (players[index].uid == ownerUid) {
-                               if (players[index].uid == AccountManager.firebaseUid) {
-                                   Image(
-                                       painter = painterResource(id = R.drawable.img_game_start),
-                                       contentDescription = null,
-                                       contentScale = ContentScale.Fit,
-                                       modifier = Modifier
-                                           .size(size = 50.dp)
-                                           .rotate(degrees = 45f)
-                                   )
-                               } else {
-                                   Image(
-                                       painter = painterResource(id = R.drawable.img_letter_room_owner),
-                                       contentDescription = null,
-                                       contentScale = ContentScale.Fit,
-                                       modifier = Modifier.size(size = 50.dp)
-                                   )
-                               }
-                           }
+                           OwnerActionImage(index = index, players = players, ownerUid = ownerUid, onClickMultiGameStart = onClickMultiGameStart)
                        }
                        if (index != players.lastIndex) {
-                           Spacer(modifier = Modifier.height(height = 8.dp))
-                           Spacer(
-                               modifier = Modifier
-                                   .fillMaxWidth()
-                                   .height(height = 1.dp)
-                                   .background(color = colorResource(R.color.color_B5EAEAE8))
-                           )
-                           Spacer(modifier = Modifier.height(height = 8.dp))
+                           PlayersDivider()
                        }
                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun PlayerProfile(index: Int, players: List<Player>) {
+    Row(verticalAlignment = Alignment.CenterVertically,) {
+        if (players[index].profileUri.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .size(size = 40.dp)
+                    .border(
+                        border = BorderStroke(
+                            width = 2.dp,
+                            color = colorResource(R.color.color_D3CAC6C6)
+                        ),
+                        shape = CircleShape
+                    )
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_rounded_person),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(color = colorResource(R.color.color_D3CAC6C6)),
+                    modifier = Modifier
+                        .size(size = 36.dp)
+                        .align(alignment = Alignment.Center)
+                )
+            }
+        } else {
+            GlideImage(
+                imageModel = players[index].profileUri,
+                contentScale = ContentScale.Crop,
+                placeHolder = painterResource(id = R.drawable.ic_profile_not_login),
+                modifier = Modifier
+                    .size(size = 40.dp)
+                    .clip(shape = CircleShape)
+                    .background(color = Color.Black)
+            )
+        }
+        Spacer(modifier = Modifier.width(width = 14.dp))
+        Text(
+            text = players[index].nickname,
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 14.textDp,
+                fontWeight = FontWeight.W500
+            )
+        )
+    }
+}
+
+@Composable
+fun OwnerActionImage(index: Int, players: List<Player>, ownerUid: String, onClickMultiGameStart: () -> Unit) {
+    if (players[index].uid == ownerUid) {
+        if (players[index].uid == AccountManager.firebaseUid) {
+            Image(
+                painter = painterResource(id = R.drawable.img_game_start),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(size = 50.dp)
+                    .rotate(degrees = 45f)
+                    .noRippleClickable(onClick = onClickMultiGameStart)
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.img_letter_room_owner),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(size = 50.dp)
+            )
+        }
+
+    }
+}
+
+@Composable
+fun PlayersDivider() {
+    Spacer(modifier = Modifier.height(height = 8.dp))
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height = 1.dp)
+            .background(color = colorResource(R.color.color_B5EAEAE8))
+    )
+    Spacer(modifier = Modifier.height(height = 8.dp))
 }

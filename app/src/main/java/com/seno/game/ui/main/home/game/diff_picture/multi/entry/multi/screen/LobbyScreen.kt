@@ -1,6 +1,6 @@
 package com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.screen
 
-import android.graphics.Bitmap
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +18,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.seno.game.R
-import com.seno.game.model.Player
-import com.seno.game.ui.component.BannerADView
-import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.Difficulty
-import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.GameRounds
-import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.GameTimeLimit
+import com.seno.game.extensions.createQRCode
+import com.seno.game.manager.AccountManager
+import com.seno.game.navigation.NavigationRoute
+import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.MultiGameViewModel
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component.LobbyGameSettingPanel
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component.LobbyInvitePanel
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component.LobbyPlayerList
@@ -34,17 +37,19 @@ import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.component.
 
 @Composable
 fun LobbyRoomScreen(
-    ownerUid: String,
-    qrBitmap: Bitmap,
-    gameTimeLimit: GameTimeLimit,
-    gameRounds: GameRounds,
-    selectedGameDifficulty: Difficulty,
-    players: List<Player>,
-    onClickTimeLimit: (GameTimeLimit) -> Unit,
-    onClickGameRound: (GameRounds) -> Unit,
-    onClickDifficulty: (Difficulty) -> Unit,
-    onClickBack: () -> Unit,
+    navController: NavController,
+    viewModel: MultiGameViewModel = hiltViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity)
 ) {
+    val qrBitmap = viewModel.path.createQRCode()
+    val ownerUid = try {
+        viewModel.path.split("_")[0]
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
+    }
+
+    if (qrBitmap == null || ownerUid.isEmpty()) return
+
     val insets = WindowInsets.systemBars.asPaddingValues()
     var isShowQROverlay by remember { mutableStateOf(false) }
 
@@ -60,28 +65,38 @@ fun LobbyRoomScreen(
                 .fillMaxSize()
                 .padding(
                     top = insets.calculateTopPadding(),
-                    bottom = insets.calculateBottomPadding(),
+                    bottom = insets.calculateBottomPadding() + 86.dp,
                     start = 16.dp,
                     end = 16.dp
                 )
         ) {
-            LobbyToolbar(onClickBack = onClickBack)
+            LobbyToolbar(onClickBack = {
+                viewModel.updateMultiGamePlayer(isAdd = false)
+                viewModel.finish()
+            })
             Spacer(modifier = Modifier.height(height = 10.dp))
             LobbyInvitePanel(qrBitmap = qrBitmap, onClickQRCode = { isShowQROverlay = true })
             Spacer(modifier = Modifier.height(height = 20.dp))
             LobbyGameSettingPanel(
-                gameTimeLimit = gameTimeLimit,
-                gameRounds = gameRounds,
-                selectedGameDifficulty = selectedGameDifficulty,
-                onClickTimeLimit = onClickTimeLimit,
-                onClickGameRound = onClickGameRound,
-                onClickDifficulty = onClickDifficulty
+                isOwner = ownerUid == AccountManager.firebaseUid,
+                gameTimeLimit = viewModel.gameTimeLimit.collectAsStateWithLifecycle().value,
+                gameRounds = viewModel.gameRounds.collectAsStateWithLifecycle().value,
+                selectedGameDifficulty = viewModel.gameDifficulty.collectAsStateWithLifecycle().value,
+                onClickTimeLimit = viewModel::updateTimeLimit,
+                onClickGameRound = viewModel::updateRounds,
+                onClickDifficulty = viewModel::updateDifficulty
             )
             Spacer(modifier = Modifier.height(height = 20.dp))
-            LobbyPlayerList(ownerUid = ownerUid, players = players, modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.height(height = 20.dp))
-            BannerADView()
-            Spacer(modifier = Modifier.height(height = 16.dp))
+            LobbyPlayerList(
+                ownerUid = ownerUid,
+                players = viewModel.players.collectAsStateWithLifecycle().value?.players ?: listOf(),
+                modifier = Modifier.weight(1f),
+                onClickMultiGameStart = {
+                    navController.navigate(NavigationRoute.DP_MULTIPLAY_SCREEN.routeName) {
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
         if (isShowQROverlay) {

@@ -26,8 +26,13 @@ open class BaseViewModel @Inject constructor() : ViewModel() {
     private val _loading = MutableStateFlow(false)
     val loading get() = _loading.asStateFlow()
 
+    private val _finish = MutableSharedFlow<Unit>()
+    val finish get() = _finish.asSharedFlow()
+
     private val _networkErrorDialog = MutableStateFlow(false)
     val networkErrorDialog get() = _networkErrorDialog.asStateFlow()
+
+    fun finish() = vmScopeJob { _finish.emit(Unit) }
 
     fun showToast(message: String) = vmScopeJob { _toast.emit(message) }
 

@@ -14,13 +14,11 @@ import com.google.android.gms.ads.AdView
 import com.seno.game.R
 
 @Composable
-fun BannerADView() {
+fun BannerADView(modifier: Modifier = Modifier.height(height = 50.dp)) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height = 50.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        val adId = stringResource(R.string.banner_ad_unit_id)
+        val adId = stringResource(R.string.banner_ad_unit_id_for_test)
         val adRequest = AdRequest.Builder().build()
         AndroidView(
             modifier = Modifier.fillMaxWidth(),

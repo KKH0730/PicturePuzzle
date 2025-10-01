@@ -36,7 +36,8 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
                     ?: PrefsManager.diffPictureHeartChargedTime
             } else {
                 PrefsManager.diffPictureHeartChargedTime
-            }
+            },
+            recentSinglePlayDate = param1.getString(ApiConstants.FirestoreKey.RECENT_SINGLE_PLAY_DATE) ?: PrefsManager.recentSinglePlayDate
         )
     }
 }

@@ -37,6 +37,7 @@ class DiffPictureImpl @Inject constructor(
         completeGameRound: String,
         heartCount: Int,
         heartChargedTime: Long,
+        recentSinglePlayDate: String
     ): Result<Unit> {
         return try {
             val updateSavedGameInfoTask = suspendCoroutine { continuation ->
@@ -44,7 +45,8 @@ class DiffPictureImpl @Inject constructor(
                     ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to stage,
                     ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to completeGameRound,
                     ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to heartCount,
-                    ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to heartChargedTime
+                    ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to heartChargedTime,
+                    ApiConstants.FirestoreKey.RECENT_SINGLE_PLAY_DATE to recentSinglePlayDate
                 )
                 kotlin.runCatching {
                     db.collection(ApiConstants.Collection.PROFILE)

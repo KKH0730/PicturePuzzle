@@ -12,3 +12,14 @@ fun <T> Flow<Result<T>>.catchError(dispatcher: CoroutineDispatcher): Flow<Result
         Timber.e(it)
         emit(Result.Error(Exception(it)))
     }.flowOn(dispatcher)
+
+inline fun <T> safeCall(block: () -> T): Result<T> {
+    return runCatching { block() }
+        .fold(
+            onSuccess = { Result.Success(it) },
+            onFailure = {
+                Timber.e(it)
+                Result.Error(it)
+            }
+        )
+}

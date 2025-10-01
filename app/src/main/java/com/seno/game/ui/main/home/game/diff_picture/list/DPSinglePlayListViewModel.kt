@@ -10,6 +10,7 @@ import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getOriginImageUrl
 import com.seno.game.extensions.getOtherImageUrl
 import com.seno.game.extensions.getString
+import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveOriginImageUrl
 import com.seno.game.extensions.saveRoundImageUrl
@@ -143,7 +144,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     suspend fun reqUpdateSavedGameInfo(
         heartCount: Int = PrefsManager.diffPictureHeartCount,
-        heartChargedTime: Long = PrefsManager.diffPictureHeartChargedTime
+        heartChargedTime: Long = PrefsManager.diffPictureHeartChargedTime,
+        recentSinglePlayDate: String = getTodayDate()
     ): Boolean {
         return withContext(Dispatchers.IO) {
             if (AccountManager.isUser) {
@@ -152,7 +154,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                     stage = PrefsManager.diffPictureStage,
                     completeGameRound = PrefsManager.diffPictureCompleteGameRound,
                     heartCount = heartCount,
-                    heartChargedTime = heartChargedTime
+                    heartChargedTime = heartChargedTime,
+                    recentSinglePlayDate = recentSinglePlayDate
                 )
                 result is Result.Success
             } else {

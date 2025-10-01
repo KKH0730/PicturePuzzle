@@ -15,5 +15,6 @@ data class SavedGameInfo(
     val diffPictureGameCurrentStage: Int = PrefsManager.diffPictureStage,
     val completeGameRound: String = PrefsManager.diffPictureCompleteGameRound,
     val diffPictureHeartCount: Int = PrefsManager.diffPictureHeartCount,
-    val diffPictureHeartChargedTime: Long = PrefsManager.diffPictureHeartChargedTime
+    val diffPictureHeartChargedTime: Long = PrefsManager.diffPictureHeartChargedTime,
+    val recentSinglePlayDate: String = PrefsManager.recentSinglePlayDate
 )

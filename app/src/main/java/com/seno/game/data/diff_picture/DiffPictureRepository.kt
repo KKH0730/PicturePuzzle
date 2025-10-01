@@ -12,7 +12,8 @@ interface DiffPictureRepository {
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChargedTime: Long
+        heartChargedTime: Long,
+        recentSinglePlayDate: String
     ): Result<Unit>
 
     suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>>

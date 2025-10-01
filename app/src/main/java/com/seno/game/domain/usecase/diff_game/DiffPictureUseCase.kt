@@ -18,14 +18,16 @@ class DiffPictureUseCase @Inject constructor(
         stage: Int,
         completeGameRound: String,
         heartCount: Int,
-        heartChargedTime: Long
+        heartChargedTime: Long,
+        recentSinglePlayDate: String
     ): Result<Unit> =
         diffPictureRepository.updateSavedGameInfo(
             uid = uid,
             stage = stage,
             completeGameRound = completeGameRound,
             heartCount = heartCount,
-            heartChargedTime = heartChargedTime
+            heartChargedTime = heartChargedTime,
+            recentSinglePlayDate = recentSinglePlayDate
         )
 
 

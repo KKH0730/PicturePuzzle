@@ -3,6 +3,7 @@ package com.seno.game.domain.usecase.user
 import com.seno.game.data.config.ConfigRepository
 import com.seno.game.di.coroutine.IoDispatcher
 import com.seno.game.extensions.catchError
+import com.seno.game.extensions.safeCall
 import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,8 +14,8 @@ class GameConfigUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    suspend fun reqGetSavedGameInfo(uid: String): Flow<Result<SavedGameInfo>> {
-        return configRepository.getSavedGameInfo(uid = uid).catchError(dispatcher = ioDispatcher)
+    suspend fun reqGetSavedGameInfo(uid: String): Result<SavedGameInfo> = safeCall {
+        configRepository.getSavedGameInfo(uid = uid)
     }
 
     suspend fun reqResetAndGetSavedGameInfo(uid: String, currentTimeMillis: Long): Flow<Result<SavedGameInfo>> {

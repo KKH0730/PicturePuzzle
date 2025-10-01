@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.seno.game.data.mapper.ConfigMapper
 import com.seno.game.data.mapper.DiffPictureSavedGameInfoMapper
 import com.seno.game.data.network.ApiConstants
+import com.seno.game.extensions.getTodayDate
 import com.seno.game.model.Result
 import com.seno.game.model.SavedGameInfo
 import kotlinx.coroutines.flow.Flow
@@ -18,41 +19,36 @@ class ConfigImpl @Inject constructor(
     private val configMapper: ConfigMapper,
     private val diffPictureSavedGameInfoMapper: DiffPictureSavedGameInfoMapper
 ): ConfigRepository {
-    override suspend fun getSavedGameInfo(uid: String): Flow<Result<SavedGameInfo>> =
-        flow {
-            val userInfoTask = suspendCoroutine { continuation ->
-                db.collection(ApiConstants.Collection.PROFILE)
-                    .document(uid)
-                    .get()
-                    .addOnCompleteListener { task -> continuation.resume(task) }
-            }
-
-            if (!userInfoTask.isSuccessful || !userInfoTask.result.exists()) {
-                emit(Result.Success(SavedGameInfo()))
-                return@flow
-            }
-
-            val diffPictureGameInfoTask = suspendCoroutine { continuation ->
-                db.collection(ApiConstants.Collection.PROFILE)
-                    .document(uid)
-                    .collection(ApiConstants.Collection.SAVE_GAME_INFO)
-                    .document(ApiConstants.Document.DIFF_PICTURE)
-                    .get()
-                    .addOnCompleteListener { task -> continuation.resume(task) }
-            }
-
-            if (!diffPictureGameInfoTask.isSuccessful || !diffPictureGameInfoTask.result.exists()) {
-                emit(Result.Success(SavedGameInfo()))
-                return@flow
-            }
-
-            diffPictureSavedGameInfoMapper.fromRemote(
-                param1 = diffPictureGameInfoTask.result,
-                param2 = configMapper.fromRemote(model = userInfoTask.result)
-            ).run {
-                emit(Result.Success(this))
-            }
+    override suspend fun getSavedGameInfo(uid: String): SavedGameInfo {
+        val userInfoTask = suspendCoroutine { continuation ->
+            db.collection(ApiConstants.Collection.PROFILE)
+                .document(uid)
+                .get()
+                .addOnCompleteListener { task -> continuation.resume(task) }
         }
+
+        if (!userInfoTask.isSuccessful || !userInfoTask.result.exists()) {
+            return SavedGameInfo()
+        }
+
+        val diffPictureGameInfoTask = suspendCoroutine { continuation ->
+            db.collection(ApiConstants.Collection.PROFILE)
+                .document(uid)
+                .collection(ApiConstants.Collection.SAVE_GAME_INFO)
+                .document(ApiConstants.Document.DIFF_PICTURE)
+                .get()
+                .addOnCompleteListener { task -> continuation.resume(task) }
+        }
+
+        if (!diffPictureGameInfoTask.isSuccessful || !diffPictureGameInfoTask.result.exists()) {
+            return SavedGameInfo()
+        }
+
+        return diffPictureSavedGameInfoMapper.fromRemote(
+            param1 = diffPictureGameInfoTask.result,
+            param2 = configMapper.fromRemote(model = userInfoTask.result)
+        )
+    }
 
     override suspend fun resetAndGetSavedGameInfo(uid: String, currentTimeMillis: Long): Flow<Result<SavedGameInfo>> =
         flow {
@@ -79,7 +75,8 @@ class ConfigImpl @Inject constructor(
                         ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE to 0,
                         ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND to "",
                         ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT to 5,
-                        ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to currentTimeMillis
+                        ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME to currentTimeMillis,
+                        ApiConstants.FirestoreKey.RECENT_SINGLE_PLAY_DATE to getTodayDate()
                     )
 
                     if (diffSnapshot.exists()) {

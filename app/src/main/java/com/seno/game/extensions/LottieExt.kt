@@ -8,38 +8,29 @@ import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
 
 fun Context.drawLottieAnswerCircle(
-    x: Float,
-    y: Float,
+    centerX: Float,
+    centerY: Float,
     imageContainerX: Int = 0,
     imageContainerY: Int = 0,
     @RawRes rawRes: Int,
     speed: Float,
     maxProgress: Float,
     radius: Int,
-    isWrongAnswer: Boolean,
     onAnimationStart: (animator: Animator?) -> Unit = {},
     onAnimationEnd: (animator: Animator?, view: LottieAnimationView) -> Unit = { _, _ -> },
     onAnimationRepeat: (animator: Animator?) -> Unit = {},
     onAnimationCancel: (animator: Animator?) -> Unit = {},
 ): LottieAnimationView {
     return LottieAnimationView(this).apply {
-        this.x = if (isWrongAnswer) {
-            x - (radius / 2) + imageContainerX
-        } else {
-            x + imageContainerX
-        }
-        this.y = if (isWrongAnswer) {
-            y - (radius / 2) + imageContainerY
-        } else {
-            y + imageContainerY
-        }
-        this.scaleX = 2.5f
-        this.scaleY = 2.5f
+        this.x = centerX + imageContainerX - radius
+        this.y = centerY + imageContainerY - radius
         this.setAnimation(rawRes)
         this.setMaxProgress(maxProgress)
         this.speed = speed
         this.scaleType = ImageView.ScaleType.FIT_XY
-        this.layoutParams = LinearLayout.LayoutParams(radius, radius)
+
+//        this.layoutParams = LinearLayout.LayoutParams(radius, radius)
+        this.layoutParams = LinearLayout.LayoutParams(radius * 2, radius * 2)
         this.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationCancel(animator: Animator) {
                 onAnimationCancel.invoke(animator)

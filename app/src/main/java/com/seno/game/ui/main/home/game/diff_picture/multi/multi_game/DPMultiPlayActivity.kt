@@ -149,30 +149,28 @@ class DPMultiPlayActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
                         (this@DPMultiPlayActivity).drawLottieAnswerCircle(
-                            x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
-                            y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
+                            centerX = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
+                            centerY = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
-                            radius = point.answerRadius.toInt(),
-                            isWrongAnswer = false
+                            radius = point.answerRadius.toInt()
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
                         }
 
                         (this@DPMultiPlayActivity).drawLottieAnswerCircle(
-                            x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
-                            y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
+                            centerX = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
+                            centerY = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
-                            radius = point.answerRadius.toInt(),
-                            isWrongAnswer = false
+                            radius = point.answerRadius.toInt()
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
@@ -194,15 +192,14 @@ class DPMultiPlayActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
                 launch {
                     viewModel.drawWrongAnswerMark.collectLatest {
                         (this@DPMultiPlayActivity).drawLottieAnswerCircle(
-                            x = it.first,
-                            y = it.second,
+                            centerX = it.first,
+                            centerY = it.second,
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.wrong_answer_mark,
                             speed = 5f,
                             maxProgress = 0.85f,
                             radius = 60,
-                            isWrongAnswer = true,
                             onAnimationEnd = { animator, view ->  binding.clAnswerMark.removeView(view) }
                         ).also { view ->
                             view.playAnimation()
@@ -219,15 +216,14 @@ class DPMultiPlayActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
 
                         (this@DPMultiPlayActivity).drawLottieAnswerCircle(
-                            x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
-                            y = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
+                            centerX = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
+                            centerY = binding.ivOrigin.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
-                            isWrongAnswer = false,
                             onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
                         ).also {
                             it.playAnimation()
@@ -235,14 +231,13 @@ class DPMultiPlayActivity : BaseActivity<ActivityDiffPictureMultiGameBinding>(
                         }
 
                         (this@DPMultiPlayActivity).drawLottieAnswerCircle(
-                            x = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
-                            y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
+                            centerX = binding.ivCopy.x + answerCenterX - (point.answerRadius / 2),
+                            centerY = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 2f,
                             maxProgress = 1f,
                             radius = point.answerRadius.toInt(),
-                            isWrongAnswer = false,
                             onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
                         ).also {
                             it.playAnimation()

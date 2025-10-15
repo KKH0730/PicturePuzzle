@@ -65,7 +65,6 @@
                 android:adjustViewBounds="true"
                 android:layout_marginEnd="16dp"
                 android:onClick="@{() -> activity.onClickHint()}"
-                bind:onLongClick="@{() -> activity.onClickResult()}"
                 app:layout_constraintTop_toTopOf="@+id/tvStage"
                 app:layout_constraintBottom_toBottomOf="@+id/tvStage"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -266,6 +265,7 @@
                 android:id="@+id/spacer"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:onClick="@{() -> activity.onClickResult()}"
                 app:layout_constraintVertical_weight="1"
                 app:layout_constraintTop_toBottomOf="@+id/rvAnswerMark"
                 app:layout_constraintBottom_toTopOf="@+id/adView"

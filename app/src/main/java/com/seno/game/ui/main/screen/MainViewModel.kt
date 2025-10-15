@@ -2,6 +2,7 @@ package com.seno.game.ui.main.screen
 
 import androidx.lifecycle.viewModelScope
 import com.seno.game.domain.usecase.user.GameConfigUseCase
+import com.seno.game.extensions.clearDiskCache
 import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getTodayDate
@@ -16,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,6 +48,7 @@ class MainViewModel @Inject constructor(
                                     PrefsManager.recentSinglePlayDate = getTodayDate()
                                     withContext(Dispatchers.Main) {
                                         clearMemoryCache()
+                                        clearDiskCache()
                                     }
 
                                     _savedGameInfoToLocalDB.emit(result.data)

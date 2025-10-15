@@ -72,8 +72,8 @@ fun clearMemoryCache() {
     Glide.get(App.getInstance()).clearMemory()
 }
 
-fun Application.clearDiskCache() {
-    Thread { Glide.get(this).clearDiskCache() }.start()
+fun clearDiskCache() {
+    Thread { Glide.get(App.getInstance()).clearDiskCache() }.start()
 }
 
 suspend fun String.getBitmapFromUrl(): Bitmap? {

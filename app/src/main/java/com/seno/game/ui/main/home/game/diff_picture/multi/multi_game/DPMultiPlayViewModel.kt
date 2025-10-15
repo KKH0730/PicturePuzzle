@@ -218,7 +218,8 @@ class DPMultiPlayViewModel @Inject constructor(
                     val distance = sqrt(xLength + yLength)
 
                     // Todo(point.answerRadius / 2 << 검증 필요)
-                    val isRightAnswer = distance <= (point.answerRadius / 2) + ANSWER_CORRECTION
+//                    val isRightAnswer = distance <= (point.answerRadius / 2) + ANSWER_CORRECTION
+                    val isRightAnswer = distance <= point.answerRadius
                     if (isRightAnswer) {
                         if (answerHashMap[answerCenterX] == null || answerHashMap[answerCenterX] != answerCenterY) {
                             answerHashMap[answerCenterX] = answerCenterY

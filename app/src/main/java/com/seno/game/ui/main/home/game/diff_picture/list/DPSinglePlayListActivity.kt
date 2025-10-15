@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
+import com.seno.game.extensions.clearDiskCache
 import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
@@ -136,6 +137,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                 onConfirm = {
                     PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
                     clearMemoryCache()
+                    clearDiskCache()
                     restartApp(this@DPSinglePlayListActivity)
                 }).show()
         }

@@ -21,7 +21,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fondesa.recyclerviewdivider.RecyclerViewDivider
 import com.google.android.gms.ads.AdRequest
 import com.seno.game.R
@@ -528,12 +527,10 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     private fun setDiffPictureResource(bitmap1: Bitmap, bitmap2: Bitmap) {
         Glide.with(this@DPSinglePlayActivity)
             .load(bitmap1)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(binding.ivOrigin)
 
         Glide.with(this@DPSinglePlayActivity)
             .load(bitmap2)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(binding.ivCopy)
     }
 

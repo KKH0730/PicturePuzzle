@@ -28,7 +28,7 @@ private val NO_CACHE_OPTIONS = RequestOptions()
 private val DISK_OPTIONS = RequestOptions()
     .format(DecodeFormat.PREFER_RGB_565)
     .timeout(1000 * 10)
-    .diskCacheStrategy(DiskCacheStrategy.ALL)
+    .diskCacheStrategy(DiskCacheStrategy.DATA)
     .skipMemoryCache(false)
 
 fun getRequestManager(): RequestManager =

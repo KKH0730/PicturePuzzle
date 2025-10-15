@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
@@ -55,19 +56,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Surface(Modifier.fillMaxSize()) {
-                var savedGameInfo by remember { mutableStateOf<SavedGameInfo?>(null) }
-                var isNetworkError by remember { mutableStateOf(false) }
+                val savedGameInfo = mainViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle(initialValue = null, minActiveState = Lifecycle.State.CREATED).value
+                val isNetworkError = mainViewModel.showNetworkErrorEvent.collectAsStateWithLifecycle(initialValue = false, minActiveState = Lifecycle.State.CREATED).value
 
                 if (!AccountManager.isUser) {
                     HomeLoadingScreen()
                     MainScreen()
                     return@Surface
                 }
-
-                startObserve(
-                    onCallbackSavedGameInfo = { savedGameInfo = it },
-                    onCallbackNetworkError = { isNetworkError = it }
-                )
 
                 if (AccountManager.isUser && savedGameInfo == null) {
                     mainViewModel.getSavedGameInfo(uid = AccountManager.firebaseUid)
@@ -99,18 +95,6 @@ class MainActivity : ComponentActivity() {
     private fun createRandomNickname() {
         if (PrefsManager.nickname.isEmpty() && AccountManager.isUser || !AccountManager.isUser) {
             PrefsManager.nickname = resources.createRandomNickname()
-        }
-    }
-
-    private fun startObserve(
-        onCallbackSavedGameInfo: (SavedGameInfo?) -> Unit,
-        onCallbackNetworkError: (Boolean) -> Unit
-    ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { mainViewModel.savedGameInfoToLocalDB.collect(onCallbackSavedGameInfo::invoke)}
-                launch { mainViewModel.showNetworkErrorEvent.collect(onCallbackNetworkError::invoke)}
-            }
         }
     }
 

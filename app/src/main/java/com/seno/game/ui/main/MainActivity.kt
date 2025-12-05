@@ -22,7 +22,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.R
+import com.seno.game.extensions.clearDiskCache
+import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.createRandomNickname
+import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.getTodayDate
+import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.restartApp
 import com.seno.game.extensions.safeStartActivity
 import com.seno.game.manager.AccountManager
@@ -34,7 +39,9 @@ import com.seno.game.ui.main.screen.MainScreen
 import com.seno.game.ui.main.screen.MainViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -60,6 +67,13 @@ class MainActivity : ComponentActivity() {
                 val isNetworkError = mainViewModel.showNetworkErrorEvent.collectAsStateWithLifecycle(initialValue = false, minActiveState = Lifecycle.State.CREATED).value
 
                 if (!AccountManager.isUser) {
+                    if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                        PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                        PrefsManager.recentSinglePlayDate = getTodayDate()
+                        clearMemoryCache()
+                        clearDiskCache()
+                    }
+
                     HomeLoadingScreen()
                     MainScreen()
                     return@Surface

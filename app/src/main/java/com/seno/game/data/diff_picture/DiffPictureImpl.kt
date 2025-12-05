@@ -76,13 +76,24 @@ class DiffPictureImpl @Inject constructor(
     }
 
     override suspend fun getRoundDiffPicture(stage: String, round: String): Result<Pair<String, String>> {
-        val today = LocalDate.now()
-        val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
-
+//        val today = LocalDate.now()
+//        val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMM"))
+//
+//        return withContext(Dispatchers.IO) {
+//            try {
+//                val originImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_1.png").downloadUrl.await()
+//                val otherImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_2.png").downloadUrl.await()
+//                Result.Success(originImage.toString() to otherImage.toString())
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                Timber.e(e)
+//                Result.Error(exception = e)
+//            }
+//        }
         return withContext(Dispatchers.IO) {
             try {
-                val originImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_1.png").downloadUrl.await()
-                val otherImage = ref.child(formattedDate).child("${formattedDate}_${stage}_${round}_2.png").downloadUrl.await()
+                val originImage = ref.child("total").child("${stage}_${round}_1.png").downloadUrl.await()
+                val otherImage = ref.child("total").child("${stage}_${round}_2.png").downloadUrl.await()
                 Result.Success(originImage.toString() to otherImage.toString())
             } catch (e: Exception) {
                 e.printStackTrace()

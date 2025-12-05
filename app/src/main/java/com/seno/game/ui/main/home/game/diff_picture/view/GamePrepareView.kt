@@ -36,7 +36,7 @@ class GamePrepareView @JvmOverloads constructor(
 
     private var translateYAnimator: ObjectAnimator? = null
     private var animatorSet: AnimatorSet? = null
-    private var prepareCount = MutableStateFlow(2)
+    private var prepareCount = MutableStateFlow(3)
 
     private var timer: Timer? = null
     private var timerTask: TimerTask? = null
@@ -57,9 +57,9 @@ class GamePrepareView @JvmOverloads constructor(
     private fun startObserve() {
         CoroutineScope(Dispatchers.Main).launch {
             prepareCount.collect { count ->
-                if (count < 1) {
+                if (count < 0) {
                     startTopMoveAndFadeOutAnimation()
-                } else if (count == 1) {
+                } else if (count == 0) {
                     tvCountDown.text = getString(R.string.game_prepare_start)
                 } else {
                     tvCountDown.text = count.toString()
@@ -124,7 +124,7 @@ class GamePrepareView @JvmOverloads constructor(
             )
             .apply {
                 startDelay = 500
-                duration = 1000
+                duration = 500
                 addListener(
                     object: Animator.AnimatorListener {
                         override fun onAnimationStart(p0: Animator) {
@@ -205,7 +205,7 @@ class GamePrepareView @JvmOverloads constructor(
                 }
             }
         }
-        timer?.schedule(timerTask, 500, 1000)
+        timer?.schedule(timerTask, 500, 500)
     }
 
     private fun releaseTimer() {

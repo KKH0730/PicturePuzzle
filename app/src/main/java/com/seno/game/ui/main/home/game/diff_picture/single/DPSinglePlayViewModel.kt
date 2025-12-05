@@ -20,6 +20,7 @@ import com.seno.game.ui.main.home.game.diff_picture.model.Answer
 import com.seno.game.ui.main.home.game.diff_picture.model.DiffGameInfo
 import com.seno.game.ui.main.home.game.diff_picture.model.Point
 import com.seno.game.ui.main.home.game.diff_picture.multi.multi_game.ANSWER_CORRECTION
+import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity.Companion.MARK_RADIUS
 import com.seno.game.ui.main.home.game.diff_picture.single.model.AnswerMark
 import com.seno.game.util.DiffPictureOpencvUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -214,9 +215,8 @@ class DPSinglePlayViewModel @Inject constructor(
                     val yLength = (currentY - answerCenterY).toDouble().pow(2.0)
                     val distance = sqrt(xLength + yLength)
 
-                    // Todo(point.answerRadius / 2 << 검증 필요)
-//                    val isRightAnswer = distance <= (point.answerRadius / 2) + ANSWER_CORRECTION
-                    val isRightAnswer = distance <= point.answerRadius
+//                    val isRightAnswer = distance <= point.answerRadius // 정답 범위 사물의 반지름
+                    val isRightAnswer = distance <= MARK_RADIUS // 정답 범위 보정
                     if (isRightAnswer) {
                         if (answerHashMap[answerCenterX] == null || answerHashMap[answerCenterX] != answerCenterY) {
                             answerHashMap[answerCenterX] = answerCenterY

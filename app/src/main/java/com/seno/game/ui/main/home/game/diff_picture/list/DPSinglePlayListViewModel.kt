@@ -92,17 +92,23 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     suspend fun reqRoundDiffPictures(stage: String, round: String): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
-            val imageDate = getImageDate()
-            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
-                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
-            } else {
-                val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
-                if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
-                    urlPair.first.saveOriginImageUrl(stage = stage, round = round)
-                    urlPair.second.saveRoundImageUrl(stage = stage, round = round)
-                }
-                urlPair
+            val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
+            if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
+                urlPair.first.saveOriginImageUrl(stage = stage, round = round)
+                urlPair.second.saveRoundImageUrl(stage = stage, round = round)
             }
+            urlPair
+//            val imageDate = getImageDate()
+//            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
+//                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
+//            } else {
+//                val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
+//                if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
+//                    urlPair.first.saveOriginImageUrl(stage = stage, round = round)
+//                    urlPair.second.saveRoundImageUrl(stage = stage, round = round)
+//                }
+//                urlPair
+//            }
         }
     }
 
@@ -166,34 +172,30 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     fun startGame() {
         viewModelScope.launch {
-            if (PrefsManager.diffPictureHeartCount > 0) {
-                val gameList = _gameList.value[_currentStage.value]
-                val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
-                if (selectedGameIndex != -1) {
-                    val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
-                    val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
-                    val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
-                    if (isSuccess) {
-                        updateEnableUpdateButton(enable = false)
+            val gameList = _gameList.value[_currentStage.value]
+            val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
+            if (selectedGameIndex != -1) {
+                val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
+                val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
+                val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
+                if (isSuccess) {
+                    updateEnableUpdateButton(enable = false)
 
-                        PrefsManager.diffPictureHeartCount = tempHeartCount
-                        PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
+                    PrefsManager.diffPictureHeartCount = tempHeartCount
+                    PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
 
-                        _currentGameRound.emit(
-                            StartGameModel(
-                                currentGameModel = gameList[selectedGameIndex],
-                                currentStagePosition = _currentStage.value,
-                                currentRoundPosition = selectedGameIndex,
-                                finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
-                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (selectedGameIndex + 1).toString())
-                            )
+                    _currentGameRound.emit(
+                        StartGameModel(
+                            currentGameModel = gameList[selectedGameIndex],
+                            currentStagePosition = _currentStage.value,
+                            currentRoundPosition = selectedGameIndex,
+                            finalRoundPosition = _gameList.value[_currentStage.value].size - 1,
+                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (selectedGameIndex + 1).toString())
                         )
-                    } else {
-                        _message.emit(getString(R.string.network_request_error))
-                    }
+                    )
+                } else {
+                    _message.emit(getString(R.string.network_request_error))
                 }
-            } else {
-                _message.emit(getString(R.string.diff_game_no_heart))
             }
         }
     }

@@ -184,17 +184,6 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
                         }
-
-                        val list = (binding.rvAnswerMark.adapter as AnswerMarkAdapter).currentList.toMutableList()
-                        for (i in list.size - 1 downTo 0) {
-                            if (!list[i].isAnswer) {
-                                val copyAnswerMark = list[i].copy()
-                                copyAnswerMark.isAnswer = true
-                                list[i] = copyAnswerMark
-                                break
-                            }
-                        }
-                        (binding.rvAnswerMark.adapter as AnswerMarkAdapter).submitList(list.toList())
                     }
                 }
 

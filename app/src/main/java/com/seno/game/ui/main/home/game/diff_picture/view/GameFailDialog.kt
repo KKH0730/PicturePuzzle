@@ -36,7 +36,7 @@ class GameFailDialog @JvmOverloads constructor(
     }
 
     fun clickBackground() {
-        visibility = View.GONE
+//        visibility = View.GONE
     }
 
     fun clickGiveUpButton() {

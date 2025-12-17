@@ -27,9 +27,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.collections.firstOrNull
 
 const val TOTAL_STAGE = 5
 
@@ -40,6 +43,9 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _message = MutableSharedFlow<String>()
     val message get() = _message.asSharedFlow()
 
+    private val _isShowAdPopup = MutableStateFlow(false)
+    val isShowAdPopup get() = _isShowAdPopup.asStateFlow()
+
     private val _currentStage = MutableStateFlow(PrefsManager.diffPictureStage)
     val currentStage get() = _currentStage.asStateFlow()
 
@@ -49,8 +55,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _currentGameRound = MutableSharedFlow<StartGameModel>()
     val currentGameRound get() = _currentGameRound.asSharedFlow()
 
-    private val _enablePlayButton = MutableStateFlow(true)
-    val enablePlayButton get() = _enablePlayButton.asStateFlow()
+    private var selectedGame: DPSingleGame? = null
+
     private val stageInfos: List<List<Pair<Int, Int>>>
         get() {
             val diffImages = getArrays(R.array.diff_picture_stage1)
@@ -77,9 +83,10 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                         isComplete = completeGameList.contains("$stageIndex-$roundIndex")
 
                         // 현재 도전해야 할 스테이지 표시
-                        isSelect = !isComplete && !isCheckActiveStage
+
+                        isSelect = !isComplete  && !isCheckActiveStage
                     }
-                    if (dpSingleGame.isSelect && !isCheckActiveStage) {
+                    if (dpSingleGame.isSelect) {
                         isCheckActiveStage = true
                         selectedGame = dpSingleGame
                     }
@@ -112,14 +119,14 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
-    fun refreshGameList() {
-        _gameList.value = singleGameList
+    fun showAdPopup(isShow: Boolean) = _isShowAdPopup.update { isShow }
+
+    fun showSnackMessage(message: String) {
+        viewModelScope.launch { _message.emit(message) }
     }
 
-    private var selectedGame: DPSingleGame? = null
-
-    fun updateEnableUpdateButton(enable: Boolean) {
-        _enablePlayButton.value = enable
+    fun refreshGameList() {
+        _gameList.value = singleGameList
     }
 
     fun syncGameItem(selectedItem: DPSingleGame) {
@@ -170,8 +177,13 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
-    fun startGame() {
+    fun startGame(isCheckHeartCount: Boolean = true) {
         viewModelScope.launch {
+            if (isCheckHeartCount && PrefsManager.diffPictureHeartCount <= 0) {
+                showAdPopup(isShow = true)
+                return@launch
+            }
+
             val gameList = _gameList.value[_currentStage.value]
             val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
             if (selectedGameIndex != -1) {
@@ -179,8 +191,6 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
                 val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
                 if (isSuccess) {
-                    updateEnableUpdateButton(enable = false)
-
                     PrefsManager.diffPictureHeartCount = tempHeartCount
                     PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
 
@@ -226,7 +236,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 }
 
             } else {
-                _message.emit(getString(R.string.diff_game_no_heart))
+                showAdPopup(isShow = true)
             }
         }
     }

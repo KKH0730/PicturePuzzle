@@ -107,8 +107,10 @@
     <string name="diff_fail_dialog_show_ad">이어서 할래</string>
     <string name="diff_new_month_update_alert_dialog">새로운 월간 스테이지가 열렸습니다 🎉\n지금 바로 새 도전에 나서보세요!</string>
 
-    <string name="diff_game_list_life_point_term">STAGE를 실패하면 하트가 소모돼요.\n하트는 시간이 지나면 다시 찬답니다.\n타이머를 누르고 광고를 보면 즉시 1개 회복돼요!</string>
+    <string name="diff_game_list_life_point_term">Tap a stage to view levels.</string>
     <string name="diff_game_no_heart">하트가 모자라요. 잠시 후 재도전!</string>
+    <string name="diff_game_no_heart_ad_popup_title">하트가 모자라요</string>
+    <string name="diff_game_no_heart_ad_popup_content">하트가 모자라요. 광고를 시청하고 게임을 진행하시겠어요?</string>
 
     <!--entry-->
     <string name="entry_crate_lobby">방 생성</string>

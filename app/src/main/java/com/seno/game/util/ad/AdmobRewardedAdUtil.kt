@@ -62,16 +62,31 @@ class AdmobRewardedAdUtil(private val activity: Activity) {
     }
 
     fun showRewardedAd(
-        onRewarded: () -> Unit
+        onRewarded: (() -> Unit)? = null,
+        onAdDismissedFullScreenContent: (() -> Unit)? = null,
+        onAdFailedToShowFullScreenContent: (() -> Unit)? = null
     ) {
         if (rewardedAd == null) {
             return
         }
 
+        rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                this@AdmobRewardedAdUtil.rewardedAd = null
+                onAdFailedToShowFullScreenContent?.invoke()
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                this@AdmobRewardedAdUtil.rewardedAd = null
+                onAdDismissedFullScreenContent?.invoke()
+            }
+        }
+
         rewardedAd?.show(
             activity
         ) { _ ->
-            onRewarded.invoke()
+            onRewarded?.invoke()
         }
     }
 

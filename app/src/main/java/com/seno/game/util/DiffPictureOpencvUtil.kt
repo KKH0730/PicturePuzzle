@@ -11,24 +11,29 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
-//지브리 화풍으로 그린 애완동물 미용실을 1:1 비율로 보여줘.
-//강아지·고양이 4~6마리, 미용사 2명 포함.
-//가위, 드라이기, 브러시, 목욕통, 간식 바구니, 장난감, 수건, 리본, 선반, 스프레이, 가운 등 작은 사물을 풍부하게 배치.
+//“토트픽셀 스타일, 1:1 비율. 난이도가 높도록 매우 많은 사물이 빽빽하게 채워진 장면.
+//이미지 스타일, 사물 배치, 색감, 조명, 배경 텍스처가 반복되거나 규칙적이지 않게 구성한다.
+//사물들은 크기·색상·형태가 다양하고, 동일한 사물이 일정 간격으로 반복되지 않도록 자연스럽고 불규칙하게 배치한다.
+//장면 전체는 복잡하고 디테일하며, 사물 간의 겹침은 최소화하면서도 공간을 꽉 채우는 고밀도 환경을 만든다.
+//픽셀 기반 특유의 선명한 질감과 미세한 그림자·하이라이트를 강조한다.
+//장면에는 인물이 포함될 수도 있고 포함되지 않을 수도 있으며, 포함되더라도 사물 밀도를 유지하면서 자연스럽게 배치한다.”
 //
-//이미지 비율은 1:1
-//이미지 스타일이나 사물 배치, 색감, 빛의 패턴이 반복되지 않도록 해줘.
-//주변 사물은 다양한 형태와 크기, 색감을 사용해 자연스럽고 불규칙하게 배치해줘.
-//동일한 사물이 일정 간격으로 반복되지 않도록 하고, 배경 텍스처나 조명 패턴도 규칙성이 없도록 만들어줘.
-//지브리 스타일은 유지하되, 장면 전체가 너무 대칭적이거나 일정한 간격으로 구성되지 않도록 해줘.
+///거대한 은빛 저수지
+//거대한 은빛 저수지의 가장자리에서 주인공이 수면 위로 비친 ‘악역의 과거 잔상’을 보고 있는 장면. 저수지는 거울처럼 잔잔하며, 주변의 석조 난간, 깨어진 계단, 침식된 바위 구조물, 흩어진 물가 사물들로 공간이
+//
+//돌계단 블록, 균열 난 석판 조각, 작은 조약돌 다발 여러 개, 이끼 낀 바위덩이, 금속 컵 두 개, 낡은 나무 바구니, 반파손 토기, 작은 도자기 뚜껑, 마른 풀더미, 갈대 숟가락처럼 생긴 파편, 얇은 나무 젓대 여러 개, 반쯤 젖은 고대 두루마리 조각, 금속 반지형 조각, 끊어진 쇠사슬 3~4조각, 녹슨 못 뭉치, 금속 고리 두 개, 무늬가 지워진 작은 석판 파편, 물가에 떨어진 낙엽 수십 장, 잎맥만 남은 잎 조각, 물 위에 떠 있는 부서진 잔가지 여러 개, 둑 근처에 세워진 작은 돌탑, 무너진 돌탑 잔해, 작은 노끈 묶음, 절반 타버린 나무 조각, 부서진 랜턴 외피, 랜턴 손잡이 파편, 금속 손잡이 링, 작은 보석 파편, 깨진 보주 조각 여러 개, 고대 문양이 새겨진 파편 5~6개, 석제 그릇 조각, 파손된 수저 모양 금속편, 둑 위 흩어진 작은 돌멩이 수십 개, 물가에 떨어진 작은 깃털 3~4개, 양초 조각 여러 개, 굳은 초 조각 부스러기, 부러진 나무 막대, 고대 주화 7~8개
+//
+
 
 
 //Please edit the attached image according to the following rules(For your information, This image is intended for a spot-the-difference game and is not the original source image):
 //
 //1. Change 5 incorrect parts in the image using one of the three methods below:
-//- Replace an object with other object. If the object you want to modify is part of a pair, change only one of them.
-//- Don't Change the color of a part of an object.
+//- Hide the object or replace an object with other object. If  the object you want to modify is part of a pair, change only one of them.
+//- Change the shape or form of an existing object without changing its color.
+//- Change the letters
 //- Subtly add a new object to the attached image.
-//- Intangible objects like sunlight or rainbows are excluded from being changed or added.
+//- Intangible objects like sunlight or rainbows are excluded from being changed or added.`
 //2. Place the 5 altered parts as far apart from each other as possible, because if the altered parts are too close together, the player may discover multiple differences at once.
 //3. Ensure that each altered part is relatively small in size and not elongated; avoid long or stretched objects.
 //4. Maintain sufficient distance between each altered part so that they are visually separate and will not merge when detected using contours in image processing.
@@ -37,7 +42,7 @@ import kotlin.math.sqrt
 //7. Do not change the overall brightness, tone, lighting, or color balance of the image.
 
 //이미지 비율은 1:1.
-//신카이 마코토 특유의 투명하고 맑은 색채감, 영화적 광원, 깊은 원근감, 공기 중에 빛이 흩어지는 듯한 대기광, 반사광과 하이라이트가 세밀하게 표현된 스타일을 강조해줘.
+//신카이 마코토 특유의 투명하고 맑은 색채감, 영화적 광원, 깊은 원근감, 공기   중에 빛이 흩어지는 듯한 대기광, 반사광과 하이라이트가 세밀하게 표현된 스타일을 강조해줘.
 //사물은 최소 30개 이상으로 매우 빽빽하게 배치해 난이도가 높도록 만들어줘.
 //이미지 스타일, 사물 배치, 색감, 빛의 패턴이 반복되지 않도록 해줘.
 //동일한 사물이 일정 간격으로 반복되거나 규칙적인 텍스처·패턴이 생기지 않도록 하고, 배경 텍스처나 조명 패턴 또한 규칙성을 없애 자연스럽고 불규칙한 장면을 구성해줘.

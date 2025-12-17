@@ -238,7 +238,6 @@ fun HomeUI(
                 .fillMaxSize()
                 .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
         ) {
-            Spacer(modifier = Modifier.height(14.dp))
             Row {
                 HomeProfileContainer(
                     nickname = nickname,

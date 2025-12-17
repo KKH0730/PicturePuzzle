@@ -159,7 +159,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
-                            speed = 2f,
+                            speed = 1f,
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS
@@ -176,7 +176,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
-                            speed = 2f,
+                            speed = 1f,
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS
@@ -196,7 +196,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.wrong_answer_mark,
                             speed = 5f,
-                            maxProgress = 0.85f,
+                            maxProgress = 1f,
                             radius = MARK_RADIUS,
                             onAnimationEnd = { animator, view ->  binding.clAnswerMark.removeView(view) }
                         ).also { view ->
@@ -221,7 +221,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
-                            speed = 2f,
+                            speed = 1f,
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS,
@@ -238,7 +238,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             centerY = binding.ivCopy.y + answerCenterY,
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
-                            speed = 2f,
+                            speed = 1f,
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS,

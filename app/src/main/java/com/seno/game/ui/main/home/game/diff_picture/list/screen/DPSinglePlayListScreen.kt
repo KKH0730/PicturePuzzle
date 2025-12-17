@@ -2,14 +2,20 @@ package com.seno.game.ui.main.home.game.diff_picture.list.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -17,56 +23,52 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.ui.main.home.game.diff_picture.list.component.GameListHeader
+import com.seno.game.ui.main.home.game.diff_picture.list.component.GameStageList
 import com.seno.game.ui.main.home.game.diff_picture.list.component.LifePointGuideTerm
-import com.seno.game.ui.main.home.game.diff_picture.list.component.PlayButton
-import com.seno.game.ui.main.home.game.diff_picture.list.component.SingleGameGridList
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
+import com.seno.game.ui.main.home.game.diff_picture.list.rememberGameListState
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnrememberedMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DPSinglePlayListScreen(
     stageInfos: List<List<DPSingleGame>>,
     stage: Int,
-    enablePlayButton: Boolean,
     onChangedStage: (Int) -> Unit,
     onClickBack: () -> Unit,
     onClickGameItem: (DPSingleGame) -> Unit,
-    onClickPlayButton: () -> Unit,
     onChangedHeartTime: suspend (Long) -> Unit
 ) {
-    val pagerPage by rememberUpdatedState(newValue = stage)
-    val snackbarHostState = remember { SnackbarHostState() }
     val insets = WindowInsets.systemBars.asPaddingValues()
+    val gameListState = rememberGameListState(
+        gridState = rememberLazyGridState(),
+        stageInfos = mutableStateOf(stageInfos),
+    )
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState)}) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_home_background),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_home_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = insets.calculateTopPadding())
+                .verticalScroll(rememberScrollState())
+        ) {
+            GameListHeader(onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
+            Spacer(modifier = Modifier.height(height = 16.dp))
+            LifePointGuideTerm()
+            Spacer(modifier = Modifier.height(height = 33.dp))
+            GameStageList(
+                gameListState = gameListState,
+                stage = stage,
+                onChangedStage = onChangedStage,
+                onClickGameItem = onClickGameItem
             )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
-            ) {
-                Spacer(modifier = Modifier.height(height = 30.dp))
-                GameListHeader(snackbarHostState = snackbarHostState, onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
-                Spacer(modifier = Modifier.height(height = 53.dp))
-                LifePointGuideTerm()
-                Spacer(modifier = Modifier.height(height = 33.dp))
-                SingleGameGridList(
-                    stageInfos = stageInfos,
-                    onChangedStage = onChangedStage,
-                    onClickGameItem = onClickGameItem,
-                    pagerPage = pagerPage,
-                    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(height = 40.dp))
-                PlayButton(enablePlayButton = enablePlayButton, onClick = onClickPlayButton)
-            }
+            Spacer(modifier = Modifier.height(height = 40.dp))
         }
     }
 }

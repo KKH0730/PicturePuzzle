@@ -35,13 +35,13 @@ fun DPSinglePlayListScreen(
     stage: Int,
     onChangedStage: (Int) -> Unit,
     onClickBack: () -> Unit,
-    onClickGameItem: (DPSingleGame) -> Unit,
+    onClickGameItem: () -> Unit,
     onChangedHeartTime: suspend (Long) -> Unit
 ) {
     val insets = WindowInsets.systemBars.asPaddingValues()
     val gameListState = rememberGameListState(
         gridState = rememberLazyGridState(),
-        stageInfos = mutableStateOf(stageInfos),
+        stageInfos = mutableStateOf(stageInfos)
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -58,6 +58,7 @@ fun DPSinglePlayListScreen(
                 .padding(top = insets.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(height = 14.dp))
             GameListHeader(onClickBack = onClickBack, onChangedHeartTime = onChangedHeartTime)
             Spacer(modifier = Modifier.height(height = 16.dp))
             LifePointGuideTerm()

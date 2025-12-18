@@ -161,7 +161,7 @@ fun BoxScope.GamePlayHeaderBack(onClickBack: () -> Unit) {
 
 @Composable
 fun GamePlayHeartPoint(heartCount: Int) {
-    Row(horizontalArrangement = Arrangement.spacedBy(space = 5.dp),) {
+    Row(horizontalArrangement = Arrangement.spacedBy(space = 5.dp)) {
         Image(
             painter = painterResource(id = if (heartCount > 0) R.drawable.ic_heart_full else R.drawable.ic_heart_empty),
             contentDescription = "heart1",

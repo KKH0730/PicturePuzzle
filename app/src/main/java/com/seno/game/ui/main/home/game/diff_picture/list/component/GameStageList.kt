@@ -74,7 +74,7 @@ fun GameStageList(
     gameListState: GameListState,
     stage: Int,
     onChangedStage: (Int) -> Unit,
-    onClickGameItem: (DPSingleGame) -> Unit
+    onClickGameItem: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(space = 15.dp),
@@ -103,13 +103,13 @@ fun StageCard(
     gameList: List<DPSingleGame>,
     modifier: Modifier = Modifier,
     onClickStage: (Int) -> Unit = {},
-    onClickGameItem: (DPSingleGame) -> Unit
+    onClickGameItem: () -> Unit
 ) {
     val height by animateDpAsState(targetValue = if (isStageSelected) 280.dp else 88.dp)
 
     Card(
         shape = RoundedCornerShape(size = 24.dp),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white)),
         modifier = modifier.height(height = height)
     ) {
@@ -172,16 +172,13 @@ fun StageCardCollapsedContents(
                     .fillMaxSize()
                     .background(
                         brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFFF472B6),
-                                Color(0xFFB794F6)
-                            )
+                            colors = if (isLockStage) listOf(Color(0x80FFFFFF), Color(0x80FFFFFF)) else listOf(Color(0xFFF472B6), Color(0xFFB794F6))
                         )
                     )
             ) {
                 Text(
                     "${stageIndex + 1}",
-                    color = colorResource(R.color.white),
+                    color = if (isLockStage) colorResource(R.color.color_9CA3AF) else colorResource(R.color.white),
                     fontSize = 16.textDp,
                     fontWeight = FontWeight.W600,
                     modifier = Modifier.align(alignment = Alignment.Center)
@@ -195,13 +192,13 @@ fun StageCardCollapsedContents(
         ) {
             Text(
                 "Stage ${String.format("%02d", stageIndex + 1)}",
-                color = colorResource(R.color.black),
+                color = if (isLockStage) colorResource(R.color.color_6B7280) else colorResource(R.color.black),
                 fontSize = 15.textDp,
                 fontWeight = FontWeight.W600,
             )
             Text(
-                "${gameList.count { it.isComplete } } /15 Cleared",
-                color = colorResource(R.color.color_B794F6),
+                if (isLockStage) "Locked" else "${gameList.count { it.isComplete } } /15 Cleared",
+                color = if (isLockStage) colorResource(R.color.color_9CA3AF) else colorResource(R.color.color_B794F6),
                 fontSize = 10.textDp,
                 fontWeight = FontWeight.W500,
             )
@@ -239,7 +236,7 @@ fun ColumnScope.StageCardExpandedContents(
     gameListState: GameListState,
     stageIndex: Int,
     gameList: List<DPSingleGame>,
-    onClickGameItem: (DPSingleGame) -> Unit
+    onClickGameItem: () -> Unit
 ) {
     val fistIsNotCompleteGame: DPSingleGame? = gameList.firstOrNull { !it.isComplete }
 
@@ -281,7 +278,7 @@ fun StageCircle(
     isSelected: Boolean,
     isFistIsNotCompleteIndex: Int?,
     dpSingleGame: DPSingleGame,
-    onClickGameItem: (DPSingleGame) -> Unit,
+    onClickGameItem: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scale = remember { Animatable(0f) }
@@ -335,7 +332,7 @@ fun StageCircle(
                     .noRippleClickable {
                         onClickGameItem
                             .takeIf { isComplete }
-                            ?.invoke(dpSingleGame)
+                            ?.invoke()
                             ?.run { animateTrigger += 1 }
                     }
             )
@@ -360,11 +357,11 @@ fun StageCircle(
                     .noRippleClickable {
                         if (isSelected && dpSingleGame.id == isFistIsNotCompleteIndex) {
                             animateTrigger += 1
-                            onClickGameItem.invoke(dpSingleGame)
+                            onClickGameItem.invoke()
                         } else {
                             onClickGameItem
                                 .takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }
-                                ?.invoke(dpSingleGame)
+                                ?.invoke()
                                 ?.run { animateTrigger += 1 }
                         }
 
@@ -390,18 +387,32 @@ fun StageCircle(
 @Preview
 fun GameStageListPreview() {
     val stageInfos: List<List<DPSingleGame>> = listOf(
-        listOf(DPSingleGame(0, 0, true, false), DPSingleGame(1, 0, false, false)),
+        listOf(DPSingleGame(0, 0, true, false), DPSingleGame(0, 0, false, false)),
         listOf(DPSingleGame(0, 1, true, false), DPSingleGame(1, 1, true, false), DPSingleGame(2, 1, false, false))
     )
     val gameListState = rememberGameListState(
         gridState = rememberLazyGridState(),
-        stageInfos = mutableStateOf(stageInfos),
+        stageInfos = mutableStateOf(stageInfos)
     )
 
     GameStageList(
         gameListState = gameListState,
         stage = 0,
         onChangedStage = {},
+        onClickGameItem = {}
+    )
+}
+
+@Preview
+@Composable
+fun StageCirclePreview() {
+    StageCircle(
+        stageIndex = 0,
+        index = 0,
+        isComplete = false,
+        isSelected = false,
+        isFistIsNotCompleteIndex = null,
+        dpSingleGame = DPSingleGame(0, 0, true, false),
         onClickGameItem = {}
     )
 }

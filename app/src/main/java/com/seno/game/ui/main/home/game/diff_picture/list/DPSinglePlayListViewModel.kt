@@ -46,6 +46,9 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _isShowAdPopup = MutableStateFlow(false)
     val isShowAdPopup get() = _isShowAdPopup.asStateFlow()
 
+    private val _isLockGameStart = MutableStateFlow(false)
+    val isLockGameStart get() = _isLockGameStart.asStateFlow()
+
     private val _currentStage = MutableStateFlow(PrefsManager.diffPictureStage)
     val currentStage get() = _currentStage.asStateFlow()
 
@@ -119,6 +122,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
+    fun lockGameStart(isLock: Boolean) = _isLockGameStart.update { isLock }
+
     fun showAdPopup(isShow: Boolean) = _isShowAdPopup.update { isShow }
 
     fun showSnackMessage(message: String) {
@@ -184,6 +189,9 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 return@launch
             }
 
+            if (isLockGameStart.value) return@launch
+            lockGameStart(isLock = true)
+
             val gameList = _gameList.value[_currentStage.value]
             val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
             if (selectedGameIndex != -1) {
@@ -207,37 +215,44 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                     _message.emit(getString(R.string.network_request_error))
                 }
             }
+
+            lockGameStart(isLock = false)
         }
     }
 
     fun startNextGame(currentRoundPosition: Int, finalRoundPosition: Int) {
         viewModelScope.launch {
-            if (PrefsManager.diffPictureHeartCount > 0) {
-                val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
-                val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
-                val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
-                if (isSuccess) {
-                    PrefsManager.diffPictureHeartCount = tempHeartCount
-                    PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
-
-                    if (currentRoundPosition <= finalRoundPosition - 1) {
-                        _currentGameRound.emit(
-                            StartGameModel(
-                                currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
-                                currentStagePosition = _currentStage.value,
-                                currentRoundPosition = currentRoundPosition + 1,
-                                finalRoundPosition = finalRoundPosition,
-                                images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 2).toString())
-                            )
-                        )
-                    }
-                } else {
-                    _message.emit(getString(R.string.network_request_error))
-                }
-
-            } else {
+            if (PrefsManager.diffPictureHeartCount <= 0) {
                 showAdPopup(isShow = true)
+                return@launch
             }
+
+            if (isLockGameStart.value) return@launch
+            lockGameStart(isLock = true)
+
+            val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
+            val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
+            val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
+            if (isSuccess) {
+                PrefsManager.diffPictureHeartCount = tempHeartCount
+                PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
+
+                if (currentRoundPosition <= finalRoundPosition - 1) {
+                    _currentGameRound.emit(
+                        StartGameModel(
+                            currentGameModel = _gameList.value[_currentStage.value][currentRoundPosition + 1],
+                            currentStagePosition = _currentStage.value,
+                            currentRoundPosition = currentRoundPosition + 1,
+                            finalRoundPosition = finalRoundPosition,
+                            images = reqRoundDiffPictures((_currentStage.value + 1).toString(), (currentRoundPosition + 2).toString())
+                        )
+                    )
+                }
+            } else {
+                _message.emit(getString(R.string.network_request_error))
+            }
+
+            lockGameStart(isLock = false)
         }
     }
 

@@ -110,14 +110,11 @@ class DPSinglePlayListActivity : BaseComposeActivity(
             }
 
             DPSinglePlayListScreen(
-                stageInfos = viewModel.gameList.collectAsState().value,
-                stage = viewModel.currentStage.collectAsState().value,
+                stageInfos = viewModel.gameList.collectAsStateWithLifecycle().value,
+                stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
                 onChangedStage = viewModel::onChangedPage,
                 onClickBack = { finish() },
-                onClickGameItem = { dPSingleGame ->
-//                    viewModel.syncGameItem(selectedItem = dPSingleGame)
-                    viewModel.startGame(isCheckHeartCount = false)
-                },
+                onClickGameItem = { viewModel.startGame(isCheckHeartCount = false) },
                 onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
             )
         }

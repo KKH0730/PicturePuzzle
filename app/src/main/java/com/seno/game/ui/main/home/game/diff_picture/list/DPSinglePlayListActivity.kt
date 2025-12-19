@@ -114,7 +114,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                 stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
                 onChangedStage = viewModel::onChangedPage,
                 onClickBack = { finish() },
-                onClickGameItem = { viewModel.startGame(isCheckHeartCount = false) },
+                onClickGameItem = { viewModel.startGame(isCheckHeartCount = true) },
                 onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
             )
         }

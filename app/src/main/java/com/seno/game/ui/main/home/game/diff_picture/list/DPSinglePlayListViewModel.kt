@@ -102,23 +102,17 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     suspend fun reqRoundDiffPictures(stage: String, round: String): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
-            val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
-            if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
-                urlPair.first.saveOriginImageUrl(stage = stage, round = round)
-                urlPair.second.saveRoundImageUrl(stage = stage, round = round)
+            val imageDate = getImageDate()
+            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
+                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
+            } else {
+                val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
+                if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
+                    urlPair.first.saveOriginImageUrl(stage = stage, round = round)
+                    urlPair.second.saveRoundImageUrl(stage = stage, round = round)
+                }
+                urlPair
             }
-            urlPair
-//            val imageDate = getImageDate()
-//            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
-//                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
-//            } else {
-//                val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
-//                if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
-//                    urlPair.first.saveOriginImageUrl(stage = stage, round = round)
-//                    urlPair.second.saveRoundImageUrl(stage = stage, round = round)
-//                }
-//                urlPair
-//            }
         }
     }
 
@@ -132,32 +126,6 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     fun refreshGameList() {
         _gameList.value = singleGameList
-    }
-
-    fun syncGameItem(selectedItem: DPSingleGame) {
-        if (selectedGame?.id == selectedItem.id) {
-            return
-        }
-        val newGameList = _gameList.value[_currentStage.value].toMutableList()
-
-        val previousSelectedGameIndex = newGameList.indexOfFirst { it.id == selectedGame?.id }
-        if (previousSelectedGameIndex != -1) {
-            newGameList[previousSelectedGameIndex] = newGameList[previousSelectedGameIndex].copy(isSelect = false)
-        }
-
-        val currentSelectedGameIndex = newGameList.indexOfFirst { it.id == selectedItem.id }
-        if (currentSelectedGameIndex != -1) {
-            newGameList[currentSelectedGameIndex] = newGameList[currentSelectedGameIndex].copy(isSelect = true)
-            selectedGame = newGameList[currentSelectedGameIndex]
-        }
-
-        _gameList.value = _gameList.value.mapIndexed { index, list ->
-            if (index == _currentStage.value) {
-                newGameList
-            } else {
-                list
-            }
-        }
     }
 
     suspend fun reqUpdateSavedGameInfo(

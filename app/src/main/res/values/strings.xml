@@ -1,9 +1,14 @@
 <resources>
-    <string name="app_name">game</string>
+    <string name="app_name">틀린그림쏙쏙</string>
+
+    <string name="app_name_part1">틀린</string>
+    <string name="app_name_part2">그</string>
+    <string name="app_name_part3">림쏙쏙</string>
 
     <!-- common -->
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
+    <string name="save">저장</string>
 
     <!-- AD -->
     <string name="admob_app_id">ca-app-pub-5813878503406225~5288452366</string>
@@ -35,7 +40,6 @@
     <!-- MyProfile -->
     <string name="account_facebook_login">Facebook 아이디로 로그인</string>
     <string name="account_google_login">Google 아이디로 로그인</string>
-    <string name="my_profile_guide">로그인을 하면 닉네임과 프로필 변경이 가능해져요!</string>
     <string name="my_profile_login">로그인</string>
     <string name="my_profile_logout">로그아웃</string>
     <string name="my_profile_create_account">계정생성</string>
@@ -91,6 +95,12 @@
     <string name="home_setting_account_logout">로그아웃</string>
     <string name="home_setting_account_create_account">계정생성</string>
     <string name="home_setting_account_profile">프로필 관리</string>
+    <string name="home_play_solo">혼자하기</string>
+    <string name="home_play_solo_en">Single Play</string>
+    <string name="home_play_multi">같이하기</string>
+    <string name="home_play_multi_en">Multi Play</string>
+    <string name="home_play_quit">종료하기</string>
+    <string name="home_play_quit_en">Exit Game</string>
 
     <!-- single game -->
     <string name="game_prepare_start">START!</string>

@@ -39,7 +39,7 @@ glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = 
 glide-compose = { module = "com.github.skydoves:landscapist-glide", version = "1.4.7" }
 lottie = { module = "com.airbnb.android:lottie", version = "5.2.0" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version = "6.0.1" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.1.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.7.0" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
@@ -74,7 +74,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" }
 kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
-google-services = { id = "com.google.gms.google-services", version = "4.4.3" }
+google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
 dagger-hilt = {  id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 

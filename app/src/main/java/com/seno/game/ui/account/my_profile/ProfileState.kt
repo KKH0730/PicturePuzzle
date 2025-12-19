@@ -15,8 +15,7 @@ class ProfileState(
     val isShowWithdrawalDialog: MutableState<Boolean>,
     val isShowEditNicknameDialog: MutableState<Boolean>,
     val nickname: MutableState<String>,
-    val profileUri: MutableState<String>,
-    val isSignedIn: MutableState<Boolean>,
+    val profileUri: MutableState<String>
 ) {
     fun showLoading(isShow: Boolean) {
         this.isLoading.value = isShow
@@ -41,10 +40,6 @@ class ProfileState(
     fun setProfileUri(profileUri: String) {
         this.profileUri.value = profileUri
     }
-
-    fun setSignedIn(isSignedIn: Boolean) {
-        this.isSignedIn.value = isSignedIn
-    }
 }
 
 @Composable
@@ -55,8 +50,7 @@ fun rememberProfileState(
     isShowWithdrawalDialog: MutableState<Boolean> = mutableStateOf(false),
     isShowEditNicknameDialog: MutableState<Boolean> = mutableStateOf(false),
     nickname: MutableState<String> = mutableStateOf(PrefsManager.nickname),
-    profileUri: MutableState<String> = mutableStateOf(PrefsManager.profileUri),
-    isSignedIn: MutableState<Boolean> = mutableStateOf(false),
+    profileUri: MutableState<String> = mutableStateOf(PrefsManager.profileUri)
 ): ProfileState =
     remember {
         ProfileState(
@@ -66,7 +60,6 @@ fun rememberProfileState(
             isShowWithdrawalDialog = isShowWithdrawalDialog,
             isShowEditNicknameDialog = isShowEditNicknameDialog,
             nickname = nickname,
-            profileUri = profileUri,
-            isSignedIn = isSignedIn
+            profileUri = profileUri
         )
     }

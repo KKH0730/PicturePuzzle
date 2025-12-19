@@ -40,8 +40,6 @@ class NaverAccountManager {
                     }
 
                     override fun onFailure(httpStatus: Int, message: String) {
-                        val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                        val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
                         onSigInFailed.invoke(Exception(message))
                     }
 
@@ -52,8 +50,7 @@ class NaverAccountManager {
             }
 
             override fun onFailure(httpStatus: Int, message: String) {
-                val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                onSigInFailed.invoke(Exception(message))
             }
 
             override fun onError(errorCode: Int, message: String) {

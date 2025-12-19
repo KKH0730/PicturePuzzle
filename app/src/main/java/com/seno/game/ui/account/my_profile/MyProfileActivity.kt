@@ -5,15 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.seno.game.extensions.snackbar
 import com.seno.game.extensions.toast
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.account.AccountViewModel
-import com.seno.game.ui.account.sign_gate.SignGateActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -28,10 +28,7 @@ class MyProfileActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    MyProfileScreen(
-                        onClickClose = { finish() },
-                        onClickLogin = { SignGateActivity.start(this@MyProfileActivity) }
-                    )
+                    MyProfileScreen(onClickClose = { finish() })
                 }
             }
         }

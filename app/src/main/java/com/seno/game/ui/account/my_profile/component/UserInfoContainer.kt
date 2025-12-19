@@ -11,10 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,49 +37,47 @@ import com.seno.game.prefs.PrefsManager
 
 @Composable
 fun UserInfoContainer(
-    isSignedIn: Boolean,
     nickname: String,
     onClickChangeNickname: () -> Unit,
     onClickWithdrawal: () -> Unit
 ) {
-    if (isSignedIn) {
-        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Card(
-                shape = RoundedCornerShape(size = 16.dp),
-                backgroundColor = Color.White,
-                elevation = 1.dp
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)) {
-                    UserInfoPanel(
-                        label = stringResource(id = R.string.my_profile_sso),
-                        drawableRight = when(PrefsManager.platform) {
-                            PlatForm.FACEBOOK.value -> painterResource(id = R.drawable.ic_sns_facebook)
-                            PlatForm.GOOGLE.value -> painterResource(id = R.drawable.ic_sns_google)
-                            PlatForm.KAKAO.value -> painterResource(id = R.drawable.ic_sns_kakao)
-                            PlatForm.NAVER.value -> painterResource(id = R.drawable.ic_sns_naver)
-                            else -> painterResource(id = R.drawable.bg_timer_wrong_answer)
-                        }
-                    )
-                    UserInfoSpacer()
-                    UserInfoPanel(
-                        label = stringResource(id = R.string.my_profile_nickname),
-                        value = nickname,
-                        drawableRight = Icons.Filled.KeyboardArrowRight,
-                        onClick = onClickChangeNickname
-                    )
-                    UserInfoSpacer()
-                    UserInfoPanel(
-                        label = stringResource(id = R.string.my_profile_version),
-                        value = App.getAppVersionName()
-                    )
-                    UserInfoSpacer()
-                    UserInfoPanel(
-                        label = "",
-                        value = stringResource(id = R.string.my_profile_withdrawal),
-                        drawableRight = Icons.Filled.KeyboardArrowRight,
-                        onClick = onClickWithdrawal
-                    )
-                }
+    Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+        Card(
+            shape = RoundedCornerShape(size = 36.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            )
+        ) {
+            Column(modifier = Modifier.padding(all = 24.dp)) {
+                UserInfoPanel(
+                    label = stringResource(id = R.string.my_profile_sso),
+                    drawableRight = when(PrefsManager.platform) {
+                        PlatForm.FACEBOOK.value -> painterResource(id = R.drawable.ic_sns_facebook)
+                        PlatForm.GOOGLE.value -> painterResource(id = R.drawable.ic_sns_google)
+                        PlatForm.KAKAO.value -> painterResource(id = R.drawable.ic_sns_kakao)
+                        PlatForm.NAVER.value -> painterResource(id = R.drawable.ic_sns_naver)
+                        else -> painterResource(id = R.drawable.bg_timer_wrong_answer)
+                    }
+                )
+
+                UserInfoSpacer()
+                UserInfoPanel(
+                    label = stringResource(id = R.string.my_profile_nickname),
+                    value = nickname,
+                    drawableRight = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    onClick = onClickChangeNickname
+                )
+                UserInfoSpacer()
+                UserInfoPanel(
+                    label = stringResource(id = R.string.my_profile_version),
+                    value = App.getAppVersionName()
+                )
+                UserInfoSpacer()
+                Spacer(modifier = Modifier.height(height = 120.dp))
+                WithdrawalButton(onClick = onClickWithdrawal)
             }
         }
     }
@@ -91,7 +90,7 @@ fun UserInfoPanel(
     onClick: (() -> Unit)? = null
 ) {
     Column {
-        Spacer(modifier = Modifier.height(height = 14.dp))
+        Spacer(modifier = Modifier.height(height = 15.dp))
         Row {
             Text(
                 text = label,
@@ -113,7 +112,7 @@ fun UserInfoPanel(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(height = 14.dp))
+        Spacer(modifier = Modifier.height(height = 15.dp))
     }
 }
 
@@ -125,13 +124,13 @@ fun UserInfoPanel(
     onClick: (() -> Unit)? = null
 ) {
     Column {
-        Spacer(modifier = Modifier.height(height = 14.dp))
+        Spacer(modifier = Modifier.height(height = 16.dp))
         Row {
             Text(
                 text = label,
-                color = colorResource(id = R.color.color_FF2F2F2F),
+                color = colorResource(id = R.color.color_334155),
                 fontSize = 12.textDp,
-                fontWeight = FontWeight.W600
+                fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
             Row(
@@ -154,7 +153,35 @@ fun UserInfoPanel(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(height = 14.dp))
+        Spacer(modifier = Modifier.height(height = 16.dp))
+    }
+}
+
+@Composable
+fun WithdrawalButton(onClick: (() -> Unit)) {
+    Column {
+        Spacer(modifier = Modifier.height(height = 16.dp))
+        Row {
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.noRippleClickable { onClick.invoke() }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.my_profile_withdrawal),
+                    color = colorResource(id = R.color.color_80b2b2b2),
+                    fontSize = 12.textDp,
+                    fontWeight = FontWeight.W500
+                )
+                Image(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    colorFilter = ColorFilter.tint(color = colorResource(id = R.color.color_80b2b2b2)),
+                    contentDescription = "right_arrow",
+                    modifier = Modifier.size(size = 14.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(height = 16.dp))
     }
 }
 
@@ -164,6 +191,6 @@ fun UserInfoSpacer() {
         modifier = Modifier
             .height(height = 1.dp)
             .fillMaxWidth()
-            .background(color = colorResource(id = R.color.color_804D4C4C))
+            .background(color = colorResource(id = R.color.divider))
     )
 }

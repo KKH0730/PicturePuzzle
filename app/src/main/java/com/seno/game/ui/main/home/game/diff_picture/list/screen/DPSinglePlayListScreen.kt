@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
+import com.seno.game.ui.component.BannerADView
 import com.seno.game.ui.main.home.game.diff_picture.list.component.GameListHeader
 import com.seno.game.ui.main.home.game.diff_picture.list.component.GameStageList
 import com.seno.game.ui.main.home.game.diff_picture.list.component.LifePointGuideTerm
@@ -70,6 +71,8 @@ fun DPSinglePlayListScreen(
                 onClickGameItem = onClickGameItem
             )
             Spacer(modifier = Modifier.height(height = 40.dp))
+            BannerADView(modifier = Modifier.height(height = 50.dp))
+            Spacer(modifier = Modifier.height(height = 80.dp))
         }
     }
 }

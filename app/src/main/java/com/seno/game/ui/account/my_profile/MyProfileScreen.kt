@@ -5,22 +5,29 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.toast
@@ -32,7 +39,6 @@ import com.seno.game.manager.NaverAccountManager
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.account.AccountViewModel
-import com.seno.game.ui.account.my_profile.component.GuideTextContainer
 import com.seno.game.ui.account.my_profile.component.MyProfileHeader
 import com.seno.game.ui.account.my_profile.component.NicknameEditDialog
 import com.seno.game.ui.account.my_profile.component.ProfileInfoPanel
@@ -42,12 +48,10 @@ import com.seno.game.ui.component.LoadingView
 import kotlinx.coroutines.launch
 
 @Composable
-fun MyProfileScreen(
-    onClickClose: () -> Unit,
-    onClickLogin: () -> Unit
-) {
+fun MyProfileScreen(onClickClose: () -> Unit) {
     val accountViewModel = hiltViewModel<AccountViewModel>()
     val context = LocalContext.current
+    val insets = WindowInsets.systemBars.asPaddingValues()
 
     val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
     val googleAccountManager = GoogleAccountManager(activity = context)
@@ -63,7 +67,6 @@ fun MyProfileScreen(
                 profileState.apply {
                     setNickname(nickname = PrefsManager.nickname)
                     setProfileUri(profileUri = PrefsManager.profileUri)
-                    setSignedIn(isSignedIn = AccountManager.isSignedIn)
                 }
             }
         }
@@ -76,23 +79,24 @@ fun MyProfileScreen(
             painter = painterResource(id = R.drawable.ic_home_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = insets.calculateStartPadding(LayoutDirection.Ltr),
+                    end = insets.calculateEndPadding(LayoutDirection.Ltr)
+                )
         )
         Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(height = insets.calculateTopPadding()))
             MyProfileHeader(onClickClose = onClickClose)
             Spacer(modifier = Modifier.height(height = 20.dp))
             ProfileInfoPanel(
                 nickname = profileState.nickname.value,
                 profileUri = profileState.profileUri.value,
-                isSignedIn = profileState.isSignedIn.value,
-                onClickLogin = onClickLogin,
                 onClickLogout = { profileState.showLogoutDialog(isShow = true) }
             )
-            Spacer(modifier = Modifier.height(height = 28.dp))
-            GuideTextContainer(isSignedIn = profileState.isSignedIn.value)
-            Spacer(modifier = Modifier.height(height = 15.dp))
+            Spacer(modifier = Modifier.height(height = 80.dp))
             UserInfoContainer(
-                isSignedIn = profileState.isSignedIn.value,
                 nickname = profileState.nickname.value,
                 onClickChangeNickname = { profileState.showEditNicknameDialog(isShow = true) },
                 onClickWithdrawal = { profileState.showWithdrawalDialog(isShow = true) }
@@ -127,9 +131,9 @@ fun MyProfileScreen(
                         profileState.apply {
                             setNickname(nickname = PrefsManager.nickname)
                             setProfileUri(profileUri = "")
-                            setSignedIn(isSignedIn = false)
                         }
 
+                        context.finish()
                         context.toast(context.getString(R.string.my_profile_logout_success))
                     }
                 )
@@ -163,7 +167,6 @@ fun MyProfileScreen(
                             profileState.apply {
                                 setNickname(nickname = PrefsManager.nickname)
                                 setProfileUri(profileUri = "")
-                                setSignedIn(isSignedIn = false)
                             }
 
                             context.toast(context.getString(R.string.my_profile_withdrawal_success))
@@ -216,10 +219,7 @@ fun MyProfileScreen(
 fun Preview() {
     AppTheme {
         Surface(Modifier.fillMaxSize()) {
-            MyProfileScreen(
-                onClickClose = {},
-                onClickLogin = {}
-            )
+            MyProfileScreen(onClickClose = {})
         }
     }
 }

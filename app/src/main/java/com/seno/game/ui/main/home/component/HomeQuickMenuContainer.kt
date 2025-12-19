@@ -4,13 +4,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.IconButton
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.util.MusicPlayUtil
 
@@ -19,7 +25,9 @@ fun HomeQuickMenuContainer(
     onClickSetting: () -> Unit,
     onToggledSound: () -> Unit
 ) {
-    Column {
+    Column(
+        horizontalAlignment = Alignment.End
+    ) {
         SettingButton(onClickSetting = onClickSetting)
         SoundOnOffButton(onToggledSound = onToggledSound)
     }
@@ -30,6 +38,7 @@ fun SoundOnOffButton(onToggledSound: () -> Unit) {
     val isPlaying = MusicPlayUtil.isPlaying
     if (isPlaying != null) {
         var isPlayingSound by remember { mutableStateOf(isPlaying) }
+
         IconButton(onClick = {
             onToggledSound.invoke()
             isPlayingSound = MusicPlayUtil.isPlaying ?: false

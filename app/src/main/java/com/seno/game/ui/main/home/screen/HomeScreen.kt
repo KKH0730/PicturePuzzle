@@ -61,9 +61,11 @@ import com.seno.game.ui.component.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.MainActivity
 import com.seno.game.ui.main.home.HomeViewModel
+import com.seno.game.ui.main.home.component.EyesLogo
 import com.seno.game.ui.main.home.component.GamePlayContainer
 import com.seno.game.ui.main.home.component.HomeProfileContainer
 import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
+import com.seno.game.ui.main.home.component.HomeTitle
 import com.seno.game.ui.main.home.component.QuitDialog
 import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
@@ -234,15 +236,23 @@ fun HomeUI(
         )
 
         Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = insets.calculateTopPadding(), bottom = insets.calculateBottomPadding())
         ) {
+            Spacer(modifier = Modifier.height(height = 12.dp))
             Row {
                 HomeProfileContainer(
                     nickname = nickname,
                     profileUri = profileUri,
-                    onClick = { context.safeStartActivity(MyProfileActivity::class.java) }
+                    onClick = {
+                        if (AccountManager.isSignedIn) {
+                            context.safeStartActivity(MyProfileActivity::class.java)
+                        } else {
+                            context.safeStartActivity(SignGateActivity::class.java)
+                        }
+                    }
                 )
                 Spacer(modifier = Modifier.weight(weight = 1f))
                 HomeQuickMenuContainer(
@@ -258,15 +268,9 @@ fun HomeUI(
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
-            Spacer(modifier = Modifier.height(height = 92.dp))
-            Image(
-                painter = painterResource(id = R.drawable.ic_splash),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(width = 216.dp)
-                    .aspectRatio(ratio = 2.37f)
-                    .align(Alignment.CenterHorizontally)
-            )
+            Spacer(modifier = Modifier.height(height = 22.dp))
+            EyesLogo(isBlink = true)
+            HomeTitle()
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(
                 onClickSoloPlay = { DPSinglePlayListActivity.start(context = context) },
@@ -283,9 +287,8 @@ fun HomeUI(
                     }
                 },
                 onClickQuit = { isShowQuitDialog = true },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.height(height = 20.dp))
+            Spacer(modifier = Modifier.height(height = 70.dp))
             BannerADView(modifier = Modifier.height(height = 50.dp))
             Spacer(modifier = Modifier.height(height = 16.dp))
         }

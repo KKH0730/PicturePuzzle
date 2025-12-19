@@ -40,12 +40,7 @@ fun CommonCustomDialog(
     onClickRight: () -> Unit,
     onDismissed: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .alpha(alpha = 0.7f)
-            .background(color = Color.Black)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Dialog(onDismissRequest = onDismissed) {
             Card(
                 backgroundColor = Color.White,

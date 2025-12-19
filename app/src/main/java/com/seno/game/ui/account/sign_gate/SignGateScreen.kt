@@ -6,15 +6,21 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
@@ -50,7 +57,18 @@ fun SignGateScreen(
     onClickClose: () -> Unit
 ) {
     var isLoading by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.fillMaxSize()) {
+    val insets = WindowInsets.systemBars.asPaddingValues()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                top = insets.calculateTopPadding(),
+                bottom = insets.calculateBottomPadding(),
+                start = insets.calculateStartPadding(LayoutDirection.Ltr),
+                end = insets.calculateEndPadding(LayoutDirection.Ltr)
+            )
+    ) {
         SignGateContainer(
             googleAccountManager = googleAccountManager,
             facebookAccountManager = facebookAccountManager,
@@ -73,13 +91,6 @@ fun SignGateScreen(
                 .offset(y = 42.dp)
                 .align(alignment = Alignment.TopCenter)
         )
-        Image(
-            painter = painterResource(id = R.drawable.img_bottom_second_logo),
-            contentDescription = null,
-            modifier = Modifier
-                .align(alignment = Alignment.BottomCenter)
-                .padding(bottom = 44.dp)
-        )
         if (isLoading) {
             LoadingView()
         }
@@ -93,7 +104,6 @@ fun SignGateHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(height = 93.dp)
             .background(color = colorResource(id = R.color.white))
     ) {
         Box(
@@ -104,14 +114,17 @@ fun SignGateHeader(
             Text(
                 text = stringResource(id = R.string.sign_gate_close),
                 color = colorResource(id = R.color.color_bbd0ff),
-                fontSize = 14.textDp,
-                modifier = Modifier.padding(start = 16.dp, top = 24.dp)
+                fontSize = 16.textDp,
+                fontWeight = FontWeight.W600,
+                modifier = Modifier.padding(start = 24.dp, top = 12.dp)
             )
         }
 
         Card(
             shape = CircleShape,
-            backgroundColor = Color.White,
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
             modifier = Modifier
                 .offset(y = 42.dp)
                 .size(size = 96.dp)

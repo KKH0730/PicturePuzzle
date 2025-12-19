@@ -71,7 +71,7 @@ class LobbyActivity : BaseComposeActivity(
         Column(
             modifier = modifier.fillMaxWidth()
                 .height(intrinsicSize = IntrinsicSize.Min)
-                .padding(bottom = insets.calculateBottomPadding(),)
+                .padding(bottom = insets.calculateBottomPadding())
         ) {
             Spacer(modifier = Modifier.height(height = 20.dp))
             BannerADView(modifier = Modifier.height(height = 50.dp))

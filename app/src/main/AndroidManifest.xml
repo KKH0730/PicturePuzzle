@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.seno.game">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -44,45 +48,49 @@
 
         <activity
             android:name=".ui.main.home.game.diff_picture.multi.multi_game.DPMultiPlayActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
         <activity
             android:name=".ui.main.home.game.diff_picture.multi.entry.join.QRScanActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".ui.main.home.game.diff_picture.multi.entry.multi.LobbyActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".ui.main.home.game.diff_picture.multi.entry.EntryActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
-            android:theme="@style/PopupTheme"
-            android:screenOrientation="portrait" />
+            android:theme="@style/PopupTheme" />
         <activity
             android:name=".ui.main.home.game.diff_picture.list.DPSinglePlayListActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.main.home.game.diff_picture.single.DPSinglePlayActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".ui.account.my_profile.MyProfileActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.account.sign_gate.SignGateActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".ui.splash.SplashActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:theme="@style/Theme.Splash" />
         <activity
             android:name=".ui.main.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.DiffGame">
             <intent-filter>
@@ -97,10 +105,12 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.facebook.FacebookActivity"
+            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
         <activity
             android:name="com.facebook.CustomTabActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -113,6 +123,7 @@
         </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

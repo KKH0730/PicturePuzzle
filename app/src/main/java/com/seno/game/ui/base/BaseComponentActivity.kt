@@ -47,8 +47,6 @@ abstract class BaseComposeActivity(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-//                    top = insets.calculateTopPadding(),
-//                    bottom = insets.calculateBottomPadding(),
                     start = insets.calculateStartPadding(LayoutDirection.Ltr),
                     end = insets.calculateEndPadding(LayoutDirection.Ltr)
                 )

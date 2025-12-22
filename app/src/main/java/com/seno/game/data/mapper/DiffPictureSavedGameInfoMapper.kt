@@ -6,11 +6,14 @@ import com.seno.game.data.network.ApiConstants
 import com.seno.game.model.SavedGameInfo
 import com.seno.game.model.response.UserInfoResponse
 import com.seno.game.prefs.PrefsManager
-import timber.log.Timber
 import javax.inject.Inject
 
 class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<DocumentSnapshot, UserInfoResponse, SavedGameInfo> {
     override fun fromRemote(param1: DocumentSnapshot, param2: UserInfoResponse): SavedGameInfo {
+
+        val heartChargedTime = param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: PrefsManager.diffPictureHeartChargedTime
+        val localHeartChargedTime = PrefsManager.diffPictureHeartChargedTime
+
         return SavedGameInfo(
             uid = param2.uid,
             nickname = param2.nickname,
@@ -31,12 +34,7 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
             } else {
                 PrefsManager.diffPictureHeartCount
             },
-            diffPictureHeartChargedTime = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
-                param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME)
-                    ?: PrefsManager.diffPictureHeartChargedTime
-            } else {
-                PrefsManager.diffPictureHeartChargedTime
-            },
+            diffPictureHeartChargedTime = heartChargedTime.coerceAtMost(localHeartChargedTime),
             recentSinglePlayDate = param1.getString(ApiConstants.FirestoreKey.RECENT_SINGLE_PLAY_DATE) ?: PrefsManager.recentSinglePlayDate
         )
     }

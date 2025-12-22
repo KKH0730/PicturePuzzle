@@ -329,12 +329,14 @@ fun StageCircle(
                         shape = CircleShape
                     )
                     .align(alignment = Alignment.Center)
-                    .noRippleClickable {
-                        onClickGameItem
-                            .takeIf { isComplete }
-                            ?.invoke()
-                            ?.run { animateTrigger += 1 }
-                    }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            onClickGameItem.takeIf { isComplete }?.invoke()
+                            animateTrigger += 1
+                        }
+                    )
             )
         } else {
             if (!isSelected || dpSingleGame.id != isFistIsNotCompleteIndex) {
@@ -346,6 +348,11 @@ fun StageCircle(
                         .size(size = 15.dp)
                         .align(alignment = Alignment.TopEnd)
                         .offset(x = (-5).dp, y = (-5).dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { animateTrigger += 1 }
+                        )
                 )
             }
             Box(
@@ -354,18 +361,14 @@ fun StageCircle(
                     .size(40.dp)
                     .background(color = if (isSelected && dpSingleGame.id == isFistIsNotCompleteIndex) colorResource(id = R.color.color_B794F6) else colorResource(id = R.color.color_B5EAEAE8))
                     .align(alignment = Alignment.Center)
-                    .noRippleClickable {
-                        if (isSelected && dpSingleGame.id == isFistIsNotCompleteIndex) {
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            onClickGameItem.takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }?.invoke()
                             animateTrigger += 1
-                            onClickGameItem.invoke()
-                        } else {
-                            onClickGameItem
-                                .takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }
-                                ?.invoke()
-                                ?.run { animateTrigger += 1 }
                         }
-
-                    }
+                    )
             ) {
                 Text(
                     text = "${index + 1}",

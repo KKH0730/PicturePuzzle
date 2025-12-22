@@ -211,7 +211,7 @@ fun StageCardCollapsedContents(
                 modifier = Modifier
                     .width(width = 20.dp)
                     .height(20.dp)
-                    .rotate(degrees = dropDownArrowAngle)
+                    .rotate(degrees = 0f)
             )
         } else {
             Icon(

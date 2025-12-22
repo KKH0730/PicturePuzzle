@@ -16,6 +16,7 @@ import java.util.regex.Pattern
 class App : Application() {
 
     companion object {
+        var isTest: Boolean = true
         private lateinit var instance: App
         fun getInstance(): App = instance
 

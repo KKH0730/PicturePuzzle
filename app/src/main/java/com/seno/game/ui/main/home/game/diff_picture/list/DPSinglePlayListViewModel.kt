@@ -2,6 +2,7 @@ package com.seno.game.ui.main.home.game.diff_picture.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.domain.usecase.diff_game.DiffPictureUseCase
 import com.seno.game.extensions.getArrays
@@ -102,9 +103,18 @@ class DiffPictureSingleGameViewModel @Inject constructor(
 
     suspend fun reqRoundDiffPictures(stage: String, round: String): Pair<String, String>? {
         return withContext(Dispatchers.IO) {
-            val imageDate = getImageDate()
-            if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
-                "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
+            if (App.isTest) {
+                val imageDate = getImageDate()
+                if ("${stage}-$round".getOriginImageUrl().contains(imageDate) && "${stage}-$round".getOtherImageUrl().contains(imageDate)) {
+                    "${stage}-$round".getOriginImageUrl() to "${stage}-$round".getOtherImageUrl()
+                } else {
+                    val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
+                    if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
+                        urlPair.first.saveOriginImageUrl(stage = stage, round = round)
+                        urlPair.second.saveRoundImageUrl(stage = stage, round = round)
+                    }
+                    urlPair
+                }
             } else {
                 val urlPair = diffPictureUseCase.reqRoundDiffPicture(stage = stage, round = round).successData()
                 if (urlPair?.first.isNotNullAndNotEmpty() && urlPair.second.isNotNullAndNotEmpty()) {
@@ -113,6 +123,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 }
                 urlPair
             }
+
+
         }
     }
 

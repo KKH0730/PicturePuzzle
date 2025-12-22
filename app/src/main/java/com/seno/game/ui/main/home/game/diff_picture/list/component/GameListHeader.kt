@@ -121,10 +121,13 @@ fun GameListHeader(
                 heartTime -= SECOND
             }  else {
                 if (heartCount < TOTAL_HEART_COUNT) {
-                    heartCount += 1
-                    PrefsManager.diffPictureHeartCount += 1
+                    PrefsManager.apply {
+                        diffPictureHeartCount += 1
+                        diffPictureHeartChargedTime = System.currentTimeMillis()
+                    }
 
-                    PrefsManager.diffPictureHeartChargedTime = System.currentTimeMillis()
+                    heartCount = PrefsManager.diffPictureHeartCount
+
                     onChangedHeartTime.invoke(PrefsManager.diffPictureHeartChargedTime)
                 }
 

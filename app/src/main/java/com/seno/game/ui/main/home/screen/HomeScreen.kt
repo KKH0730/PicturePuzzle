@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gun0912.tedpermission.coroutine.TedPermission
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.core.ResultConstants
 import com.seno.game.extensions.LifecycleEventListener
@@ -269,7 +270,7 @@ fun HomeUI(
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
             Spacer(modifier = Modifier.height(height = 22.dp))
-            EyesLogo(isBlink = true)
+            if (!App.isTest) EyesLogo(isBlink = true)
             HomeTitle()
             Spacer(modifier = Modifier.weight(weight = 1f))
             GamePlayContainer(

@@ -3,14 +3,11 @@ package com.seno.game.ui.main.home.game.diff_picture.list
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,18 +16,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.extensions.clearDiskCache
-import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.getImageDate
 import com.seno.game.extensions.getTodayDate
 import com.seno.game.extensions.parseImageDate
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.extensions.snackbar
-import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.startActivityAnimation
 import com.seno.game.prefs.PrefsManager
+import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.ui.component.CommonAlertDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
@@ -114,7 +112,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                 stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
                 onChangedStage = viewModel::onChangedPage,
                 onClickBack = { finish() },
-                onClickGameItem = { viewModel.startGame(isCheckHeartCount = true) },
+                onClickGameItem = { viewModel.startGame(isCheckHeartCount = !App.isTest) },
                 onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
             )
         }

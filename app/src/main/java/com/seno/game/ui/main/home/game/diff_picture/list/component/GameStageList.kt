@@ -74,7 +74,7 @@ fun GameStageList(
     gameListState: GameListState,
     stage: Int,
     onChangedStage: (Int) -> Unit,
-    onClickGameItem: () -> Unit
+    onClickGameItem: (DPSingleGame) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(space = 15.dp),
@@ -103,7 +103,7 @@ fun StageCard(
     gameList: List<DPSingleGame>,
     modifier: Modifier = Modifier,
     onClickStage: (Int) -> Unit = {},
-    onClickGameItem: () -> Unit
+    onClickGameItem: (DPSingleGame) -> Unit
 ) {
     val height by animateDpAsState(targetValue = if (isStageSelected) 280.dp else 88.dp)
 
@@ -236,7 +236,7 @@ fun ColumnScope.StageCardExpandedContents(
     gameListState: GameListState,
     stageIndex: Int,
     gameList: List<DPSingleGame>,
-    onClickGameItem: () -> Unit
+    onClickGameItem: (DPSingleGame) -> Unit
 ) {
     val fistIsNotCompleteGame: DPSingleGame? = gameList.firstOrNull { !it.isComplete }
 
@@ -278,7 +278,7 @@ fun StageCircle(
     isSelected: Boolean,
     isFistIsNotCompleteIndex: Int?,
     dpSingleGame: DPSingleGame,
-    onClickGameItem: () -> Unit,
+    onClickGameItem: (DPSingleGame) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scale = remember { Animatable(0f) }
@@ -333,7 +333,7 @@ fun StageCircle(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {
-                            onClickGameItem.takeIf { isComplete }?.invoke()
+                            onClickGameItem.takeIf { isComplete }?.invoke(dpSingleGame)
                             animateTrigger += 1
                         }
                     )
@@ -365,7 +365,7 @@ fun StageCircle(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {
-                            onClickGameItem.takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }?.invoke()
+                            onClickGameItem.takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }?.invoke(dpSingleGame)
                             animateTrigger += 1
                         }
                     )

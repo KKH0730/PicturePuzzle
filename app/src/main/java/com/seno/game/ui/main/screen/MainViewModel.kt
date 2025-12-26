@@ -1,6 +1,7 @@
 package com.seno.game.ui.main.screen
 
 import androidx.lifecycle.viewModelScope
+import com.seno.game.App
 import com.seno.game.domain.usecase.user.GameConfigUseCase
 import com.seno.game.extensions.clearDiskCache
 import com.seno.game.extensions.clearMemoryCache
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,24 +41,29 @@ class MainViewModel @Inject constructor(
                     return@withContext
                 }
 
-                if (savedUserInfoResponse.recentSinglePlayDate.parseImageDate() != getImageDate()) {
-                    configUseCase.reqResetAndGetSavedGameInfo(uid = uid, currentTimeMillis = System.currentTimeMillis())
-                        .collect { result: Result<SavedGameInfo> ->
-                            when (result) {
-                                is Result.Success -> {
-                                    PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
-                                    PrefsManager.recentSinglePlayDate = getTodayDate()
-                                    withContext(Dispatchers.Main) {
-                                        clearMemoryCache()
-                                        clearDiskCache()
-                                    }
+                if (App.isServeMonthService) {
+                    if (App.isServeMonthService && savedUserInfoResponse.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                        configUseCase.reqResetAndGetSavedGameInfo(uid = uid, currentTimeMillis = System.currentTimeMillis())
+                            .collect { result: Result<SavedGameInfo> ->
+                                when (result) {
+                                    is Result.Success -> {
+                                        PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
+                                        PrefsManager.recentSinglePlayDate = getTodayDate()
+                                        withContext(Dispatchers.Main) {
+                                            clearMemoryCache()
+                                            clearDiskCache()
+                                        }
 
-                                    _savedGameInfoToLocalDB.emit(result.data)
+                                        _savedGameInfoToLocalDB.emit(result.data)
+                                    }
+                                    is Result.Error -> { _showNetworkErrorEvent.value = true }
+                                    else -> {}
                                 }
-                                is Result.Error -> { _showNetworkErrorEvent.value = true }
-                                else -> {}
                             }
-                        }
+                    } else {
+                        PrefsManager.recentSinglePlayDate = savedUserInfoResponse.recentSinglePlayDate
+                        _savedGameInfoToLocalDB.emit(savedUserInfoResponse)
+                    }
                 } else {
                     _savedGameInfoToLocalDB.emit(savedUserInfoResponse)
                 }

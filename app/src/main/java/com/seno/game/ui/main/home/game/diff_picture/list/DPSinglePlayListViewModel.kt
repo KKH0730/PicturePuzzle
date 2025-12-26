@@ -162,8 +162,12 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
-    fun startGame(isCheckHeartCount: Boolean = true) {
+    fun startGame(isCheckHeartCount: Boolean = true, selectedGame: DPSingleGame? = null) {
         viewModelScope.launch {
+            if (selectedGame != null) {
+                this@DiffPictureSingleGameViewModel.selectedGame = selectedGame
+            }
+
             if (isCheckHeartCount && PrefsManager.diffPictureHeartCount <= 0) {
                 showAdPopup(isShow = true)
                 return@launch

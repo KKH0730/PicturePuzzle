@@ -23,6 +23,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
 import com.fondesa.recyclerviewdivider.RecyclerViewDivider
 import com.google.android.gms.ads.AdRequest
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.ui.base.BaseActivity
 import com.seno.game.databinding.ActivityDiffPictureSinglePlayBinding
@@ -580,7 +581,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     override fun onResume() {
         super.onResume()
 
-        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+        if (App.isServeMonthService && PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
             NewMonthAlertDialog (
                 context = this@DPSinglePlayActivity,
                 onConfirm = {

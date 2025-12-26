@@ -17,6 +17,7 @@ class App : Application() {
 
     companion object {
         var isTest: Boolean = true
+        var isServeMonthService = false
         private lateinit var instance: App
         fun getInstance(): App = instance
 

@@ -112,7 +112,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                 stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
                 onChangedStage = viewModel::onChangedPage,
                 onClickBack = { finish() },
-                onClickGameItem = { viewModel.startGame(isCheckHeartCount = !App.isTest) },
+                onClickGameItem = { selectedGame -> viewModel.startGame(isCheckHeartCount = !App.isTest, selectedGame = selectedGame) },
                 onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
             )
         }
@@ -126,7 +126,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                     viewModel.currentGameRound.collect {
                         it.images.saveDiskCacheData()
 
-                        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                        if (App.isServeMonthService && PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
                             onResume()
                             return@collect
                         } else {
@@ -158,7 +158,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
     override fun onResume() {
         super.onResume()
 
-        if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+        if (App.isServeMonthService && PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
             NewMonthAlertDialog(
                 context = this@DPSinglePlayListActivity,
                 onConfirm = {

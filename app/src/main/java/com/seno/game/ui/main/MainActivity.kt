@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.extensions.clearDiskCache
 import com.seno.game.extensions.clearMemoryCache
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 val savedGameInfo = mainViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle(initialValue = null, minActiveState = Lifecycle.State.CREATED).value
                 val isNetworkError = mainViewModel.showNetworkErrorEvent.collectAsStateWithLifecycle(initialValue = false, minActiveState = Lifecycle.State.CREATED).value
 
-                if (!AccountManager.isUser) {
+                if (!AccountManager.isUser && App.isServeMonthService) {
                     if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
                         PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
                         PrefsManager.recentSinglePlayDate = getTodayDate()

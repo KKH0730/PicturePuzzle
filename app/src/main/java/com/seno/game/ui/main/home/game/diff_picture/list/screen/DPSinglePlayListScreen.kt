@@ -36,7 +36,7 @@ fun DPSinglePlayListScreen(
     stage: Int,
     onChangedStage: (Int) -> Unit,
     onClickBack: () -> Unit,
-    onClickGameItem: () -> Unit,
+    onClickGameItem: (DPSingleGame) -> Unit,
     onChangedHeartTime: suspend (Long) -> Unit
 ) {
     val insets = WindowInsets.systemBars.asPaddingValues()

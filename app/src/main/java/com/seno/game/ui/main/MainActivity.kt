@@ -67,8 +67,8 @@ class MainActivity : ComponentActivity() {
                 val savedGameInfo = mainViewModel.savedGameInfoToLocalDB.collectAsStateWithLifecycle(initialValue = null, minActiveState = Lifecycle.State.CREATED).value
                 val isNetworkError = mainViewModel.showNetworkErrorEvent.collectAsStateWithLifecycle(initialValue = false, minActiveState = Lifecycle.State.CREATED).value
 
-                if (!AccountManager.isUser && App.isServeMonthService) {
-                    if (PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
+                if (!AccountManager.isUser) {
+                    if (App.isServeMonthService && PrefsManager.recentSinglePlayDate.parseImageDate() != getImageDate()) {
                         PrefsManager.clearSinglePlayData(currentTimeMillis = System.currentTimeMillis())
                         PrefsManager.recentSinglePlayDate = getTodayDate()
                         clearMemoryCache()

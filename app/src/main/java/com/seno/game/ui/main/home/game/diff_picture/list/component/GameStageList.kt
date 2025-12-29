@@ -61,8 +61,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import com.seno.game.App
 import com.seno.game.R
-import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
 import com.seno.game.ui.main.home.game.diff_picture.list.GameListState
 import com.seno.game.ui.main.home.game.diff_picture.list.model.DPSingleGame
@@ -365,7 +365,11 @@ fun StageCircle(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {
-                            onClickGameItem.takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }?.invoke(dpSingleGame)
+                            if (App.isLock) {
+                                onClickGameItem.takeIf { isFistIsNotCompleteIndex != null && dpSingleGame.id <= isFistIsNotCompleteIndex }?.invoke(dpSingleGame)
+                            } else {
+                                onClickGameItem.invoke(dpSingleGame)
+                            }
                             animateTrigger += 1
                         }
                     )

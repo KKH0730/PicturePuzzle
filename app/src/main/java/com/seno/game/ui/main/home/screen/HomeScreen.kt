@@ -271,7 +271,7 @@ fun HomeUI(
                 )
                 Spacer(modifier = Modifier.width(width = 6.dp))
             }
-            Spacer(modifier = Modifier.height(height = 22.dp))
+            Spacer(modifier = Modifier.height(height = 70.dp))
             if (!App.isTest) EyesLogo(isBlink = true)
             HomeTitle()
             Spacer(modifier = Modifier.weight(weight = 1f))

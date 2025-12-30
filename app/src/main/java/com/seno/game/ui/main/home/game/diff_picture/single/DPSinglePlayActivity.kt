@@ -290,6 +290,8 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             isShowAd = PrefsManager.isShowAD
         }
 
+        binding.tvStage.text = String.format("STAGE%02d", currentStagePosition + 1)
+
         val minute = String.format("%02d", binding.cvTimerView.maxTime / 60)
         val second = String.format("%02d", binding.cvTimerView.maxTime % 60)
         binding.tvRemainingTime.text = "$minute:$second"
@@ -575,6 +577,8 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
     }
 
     fun onClickResult() {
+        if (!App.isTest) return
+
         if (binding.ivResult.isVisible) {
             binding.clAnswerMark.visibility = View.VISIBLE
             binding.ivCopy.visibility = View.VISIBLE

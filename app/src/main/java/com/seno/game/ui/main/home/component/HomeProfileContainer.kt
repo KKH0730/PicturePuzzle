@@ -46,15 +46,16 @@ fun HomeProfileContainer(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(vertical = 9.dp, horizontal = 17.dp)
+                    .padding(vertical = 10.dp, horizontal = 15.dp)
                     .align(alignment = Alignment.Center)
             ) {
                 if (profileUri.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .size(size = 24.dp)
-                            .background(color = colorResource(R.color.color_F3E8FF))
                             .clip(CircleShape)
+                            .background(color = colorResource(R.color.color_E3CEF8))
+
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_profile_not_login),

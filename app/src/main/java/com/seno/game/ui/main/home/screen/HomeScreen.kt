@@ -67,6 +67,7 @@ import com.seno.game.ui.main.home.component.GamePlayContainer
 import com.seno.game.ui.main.home.component.HomeProfileContainer
 import com.seno.game.ui.main.home.component.HomeQuickMenuContainer
 import com.seno.game.ui.main.home.component.HomeTitle
+import com.seno.game.ui.main.home.component.MultiPlayPrepareDialog
 import com.seno.game.ui.main.home.component.QuitDialog
 import com.seno.game.ui.main.home.component.SettingDialog
 import com.seno.game.ui.main.home.game.diff_picture.list.DPSinglePlayListActivity
@@ -134,6 +135,7 @@ fun HomeUI(
 
     var isShowPermissionAlertDialog by remember { mutableStateOf(false) }
     var isShowQuitDialog by remember { mutableStateOf(false) }
+    var isShowMultiPlayPrepareDialog by remember { mutableStateOf(false) }
     var isShowLogoutDialog by remember { mutableStateOf(false) }
     var isShowSettingDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -276,16 +278,17 @@ fun HomeUI(
             GamePlayContainer(
                 onClickSoloPlay = { DPSinglePlayListActivity.start(context = context) },
                 onClickMultiPlay = {
-                    if (AccountManager.isUser) {
-                        EntryActivity.start(context = context, launcher = entryLauncher)
-                    } else {
-                        SignGateActivity.start(
-                            context = context,
-                            path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
-                            resultCode = ResultConstants.RESULT_ENTRY,
-                            launcher = loginLauncher
-                        )
-                    }
+                    isShowMultiPlayPrepareDialog = true
+//                    if (AccountManager.isUser) {
+//                        EntryActivity.start(context = context, launcher = entryLauncher)
+//                    } else {
+//                        SignGateActivity.start(
+//                            context = context,
+//                            path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
+//                            resultCode = ResultConstants.RESULT_ENTRY,
+//                            launcher = loginLauncher
+//                        )
+//                    }
                 },
                 onClickQuit = { isShowQuitDialog = true },
             )
@@ -304,6 +307,13 @@ fun HomeUI(
             onClickYes = { (context as MainActivity).finish() },
             onClickNo = { isShowQuitDialog = false },
             onDismissed = { isShowQuitDialog = false }
+        )
+    }
+
+    if (isShowMultiPlayPrepareDialog) {
+        MultiPlayPrepareDialog(
+            onClickYes = { isShowMultiPlayPrepareDialog = false },
+            onDismissed = { isShowMultiPlayPrepareDialog = false }
         )
     }
 

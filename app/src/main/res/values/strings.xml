@@ -65,6 +65,7 @@
     <string name="alert_duplicated_id">해당 아이디와 동일한 계정이 이미 존재합니다.</string>
 
     <!-- Home -->
+    <string name="home_play_multi_prepare">아직 멀티플레이는 준비 중이에요!</string>
     <string name="home_quit_message">앗, 떠나시나요?</string>
     <string name="home_quit_y">응!안녕</string>
     <string name="home_quit_n">아냐아냐</string>

@@ -28,7 +28,7 @@ fun SplashScreen(
 ) {
     var countState by remember { mutableIntStateOf(0) }
     LaunchedEffect(countState) {
-        if (countState > 2) {
+        if (countState > 1) {
             onFinished.invoke()
             return@LaunchedEffect
         }
@@ -48,9 +48,10 @@ fun SplashScreen(
         ) {
             Spacer(modifier = Modifier.height(height = 210.dp))
             Image(
-                painter = painterResource(id = R.drawable.ic_splash),
+                painter = painterResource(id = R.drawable.img_bottom_second_logo),
                 contentDescription = null,
-                modifier = Modifier.width(width = 216.dp)
+                modifier = Modifier
+                    .width(width = 216.dp)
                     .aspectRatio(ratio = 2.37f)
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
@@ -58,7 +59,7 @@ fun SplashScreen(
                 painter = painterResource(id = R.drawable.ic_studio_seno_logo),
                 contentDescription = null,
             )
-            Spacer(modifier = Modifier.height(height = 36.dp))
+            Spacer(modifier = Modifier.height(height = 120.dp))
         }
     }
 }

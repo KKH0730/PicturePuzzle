@@ -31,11 +31,7 @@ class SplashActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = colorResource(id = R.color.area_blue))
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         SplashScreen {
                             MainActivity.start(context = this@SplashActivity)
                             finish()

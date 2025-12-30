@@ -210,6 +210,7 @@ fun HomeUI(
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
             Lifecycle.Event.ON_RESUME -> {
+                isUser = AccountManager.isUser
                 nickname = PrefsManager.nickname
                 profileUri = PrefsManager.profileUri
                 MusicPlayUtil.restart(isBackgroundSound = true)
@@ -371,7 +372,13 @@ fun HomeUI(
                 isShowSettingDialog = false
                 isShowLogoutDialog = true
             },
-            onClickManageProfile = {},
+            onClickManageProfile = {
+                if (AccountManager.isSignedIn) {
+                    context.safeStartActivity(MyProfileActivity::class.java)
+                } else {
+                    context.safeStartActivity(SignGateActivity::class.java)
+                }
+            },
             onDismissed = { isShowSettingDialog = false }
         )
     }

@@ -40,7 +40,7 @@
                 android:paddingTop="24dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="20dp"
-                android:onClick="@{() -> activity.finish()}"
+                android:onClick="@{() -> activity.showExitDialog()}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 

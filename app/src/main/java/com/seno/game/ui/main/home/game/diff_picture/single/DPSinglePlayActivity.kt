@@ -5,12 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -33,6 +35,7 @@ import com.seno.game.extensions.clearMemoryCache
 import com.seno.game.extensions.dpToPx
 import com.seno.game.extensions.drawLottieAnswerCircle
 import com.seno.game.extensions.getImageDate
+import com.seno.game.extensions.onBackPressInvoked
 import com.seno.game.extensions.parseImageDate
 import com.seno.game.extensions.saveCompleteDPGameRound
 import com.seno.game.extensions.screenWidth
@@ -97,6 +100,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 
         initSetting()
 
+        setBackPressedEvent()
         setPrepareView()
         setGameCompleteDialog()
         setGameFailDialog()
@@ -107,6 +111,12 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         loadAD()
         setImageTouchListener()
         observeFlow()
+    }
+
+    private fun setBackPressedEvent() {
+        onBackPressInvoked {
+            showExitDialog()
+        }
     }
 
     private fun observeFlow() {
@@ -576,6 +586,31 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             binding.ivResult.visibility = View.VISIBLE
             binding.ivResult.setImageBitmap(viewModel.answer?.answerMat.bitmapFrom())
         }
+    }
+
+    fun showExitDialog() {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.diff_game_exit))
+            .setMessage(getString(R.string.diff_game_exit_alert))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.diff_finish)) { _, _ -> finish() }
+            .setNegativeButton(getString(R.string.diff_continue)) { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(Color.BLACK)
+
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextColor(Color.BLACK)
+        }
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            finish()
+        }
+
     }
 
     override fun onResume() {

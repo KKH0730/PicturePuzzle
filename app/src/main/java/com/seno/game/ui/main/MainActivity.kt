@@ -11,16 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.extensions.clearDiskCache
@@ -36,13 +30,10 @@ import com.seno.game.model.SavedGameInfo
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.component.CommonAlertDialog
 import com.seno.game.ui.main.home.screen.HomeLoadingScreen
-import com.seno.game.ui.main.screen.MainScreen
+import com.seno.game.ui.main.home.screen.HomeScreen
 import com.seno.game.ui.main.screen.MainViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -76,7 +67,8 @@ class MainActivity : ComponentActivity() {
                     }
 
                     HomeLoadingScreen()
-                    MainScreen()
+                    HomeScreen()
+//                    MainScreen()
                     return@Surface
                 }
 
@@ -98,7 +90,8 @@ class MainActivity : ComponentActivity() {
 
                         // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
                         HomeLoadingScreen()
-                        MainScreen()
+                        HomeScreen()
+//                        MainScreen()
                     } else {
                         HomeLoadingScreen()
                     }

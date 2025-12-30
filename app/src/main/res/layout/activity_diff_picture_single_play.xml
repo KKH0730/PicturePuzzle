@@ -276,7 +276,7 @@
                 android:id="@+id/adView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="10dp"
                 android:visibility="@{isShowAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintHeight_percent="0.1"
                 app:adSize="BANNER"

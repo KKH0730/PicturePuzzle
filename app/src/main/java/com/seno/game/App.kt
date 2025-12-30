@@ -48,12 +48,12 @@ class App : Application() {
 
         NaverIdLoginSDK.initialize(
             context = this,
-            clientId = getString(R.string.social_login_info_naver_client_id),
-            clientSecret = getString(R.string.social_login_info_naver_client_secret),
-            clientName = getString(R.string.social_login_info_naver_client_name)
+            clientId = BuildConfig.NAVER_LOGIN_CLIENT_ID,
+            clientSecret = BuildConfig.NAVER_LOGIN_CLIENT_SECRET,
+            clientName = "Naver"
         )
 
-        KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
+        KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
         OpenCVLoader.initDebug()
         if (!BuildConfig.DEBUG) {

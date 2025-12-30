@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -27,21 +28,22 @@ fun HomeLoadingScreen() {
         )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Spacer(modifier = Modifier.height(height = 210.dp))
             Image(
-                painter = painterResource(id = R.drawable.ic_splash),
+                painter = painterResource(id = R.drawable.img_bottom_second_logo),
                 contentDescription = null,
-                modifier = Modifier.width(width = 216.dp)
+                modifier = Modifier
+                    .width(width = 216.dp)
+                    .aspectRatio(ratio = 2.37f)
             )
             Spacer(modifier = Modifier.weight(weight = 1f))
             Image(
                 painter = painterResource(id = R.drawable.ic_studio_seno_logo),
                 contentDescription = null,
             )
-            Spacer(modifier = Modifier.height(height = 36.dp))
+            Spacer(modifier = Modifier.height(height = 120.dp))
         }
     }
 }

@@ -1,5 +1,5 @@
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -16,6 +16,13 @@ val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreFileInputStream = FileInputStream(keystorePropertiesFile)
 val keystoreProperties = Properties()
 keystoreProperties.load(keystoreFileInputStream)
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
 
 android {
     compileSdk = 36
@@ -49,6 +56,11 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = false
+            manifestPlaceholders["facebookAppId"] = localProperties.getProperty("FACEBOOK_APP_ID")
+            manifestPlaceholders["facebookLoginProtocolScheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
+            manifestPlaceholders["facebookClientToken"] = localProperties.getProperty("FACEBOOK_CLIENT_TOKEN")
+            manifestPlaceholders["kakaoNativeAppKeyScheme"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY_SCHEME")
+            manifestPlaceholders["admobAppId"] = localProperties.getProperty("ADMOB_APP_ID")
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 // If you don't need crash reporting for your debug build,
                 // you can speed up your build by disabling mapping file uploading.
@@ -62,8 +74,14 @@ android {
             resValue(
                 "string",
                 "ad_banner_id",
-                "ca-app-pub-3940256099942544/6300978111"
+                "\"${localProperties["ADMOB_BANNER_ID_DEBUG"]}\""
             )
+
+            buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", "\"${localProperties["NAVER_LOGIN_CLIENT_ID"]}\"")
+            buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", "\"${localProperties["NAVER_LOGIN_CLIENT_SECRET"]}\"")
+            buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${localProperties["KAKAO_NATIVE_APP_KEY"]}\"")
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"${localProperties["ADMOB_BANNER_ID_DEBUG"]}\"")
+            buildConfigField("String", "ADMOB_REWARD_ID", "\"${localProperties["ADMOB_REAWRD_ID_DEBUG"]}\"")
         }
 
         getByName("release") {
@@ -74,12 +92,23 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = true
+            manifestPlaceholders["facebookAppId"] = localProperties.getProperty("FACEBOOK_APP_ID")
+            manifestPlaceholders["facebookLoginProtocolSheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
+            manifestPlaceholders["facebookClientToken"] = localProperties.getProperty("FACEBOOK_CLIENT_TOKEN")
+            manifestPlaceholders["kakaoNativeAppKeyScheme"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY_SCHEME")
+            manifestPlaceholders["admobAppId"] = localProperties.getProperty("ADMOB_APP_ID")
 
             resValue(
                 "string",
                 "ad_banner_id",
-                "ca-app-pub-5813878503406225/1232877035"
+                "\"${localProperties["ADMOB_BANNER_ID_RELEASE"]}\""
             )
+
+            buildConfigField("String", "NAVER_LOGIN_CLIENT_ID", "\"${localProperties["NAVER_LOGIN_CLIENT_ID"]}\"")
+            buildConfigField("String", "NAVER_LOGIN_CLIENT_SECRET", "\"${localProperties["NAVER_LOGIN_CLIENT_SECRET"]}\"")
+            buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${localProperties["KAKAO_NATIVE_APP_KEY"]}\"")
+            buildConfigField("String", "ADMOB_BANNER_ID",  "\"${localProperties["ADMOB_BANNER_ID_RELEASE"]}\"")
+            buildConfigField("String", "ADMOB_REWARD_ID",  "\"${localProperties["ADMOB_REAWRD_ID_RELEASE"]}\"")
         }
     }
 

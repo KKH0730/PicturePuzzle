@@ -93,7 +93,7 @@ android {
 
             manifestPlaceholders["enableCrashReporting"] = true
             manifestPlaceholders["facebookAppId"] = localProperties.getProperty("FACEBOOK_APP_ID")
-            manifestPlaceholders["facebookLoginProtocolSheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
+            manifestPlaceholders["facebookLoginProtocolScheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
             manifestPlaceholders["facebookClientToken"] = localProperties.getProperty("FACEBOOK_CLIENT_TOKEN")
             manifestPlaceholders["kakaoNativeAppKeyScheme"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY_SCHEME")
             manifestPlaceholders["admobAppId"] = localProperties.getProperty("ADMOB_APP_ID")

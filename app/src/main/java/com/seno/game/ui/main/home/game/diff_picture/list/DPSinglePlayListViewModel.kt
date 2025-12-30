@@ -35,7 +35,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.collections.firstOrNull
 
-const val TOTAL_STAGE = 5
+const val TOTAL_STAGE = 4
 
 @HiltViewModel
 class DiffPictureSingleGameViewModel @Inject constructor(
@@ -47,8 +47,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
     private val _isShowAdPopup = MutableStateFlow(false)
     val isShowAdPopup get() = _isShowAdPopup.asStateFlow()
 
-    private val _isLockGameStart = MutableStateFlow(false)
-    val isLockGameStart get() = _isLockGameStart.asStateFlow()
+    private val _isShowLoading = MutableStateFlow(false)
+    val isShowLoading get() = _isShowLoading.asStateFlow()
 
     private val _currentStage = MutableStateFlow(PrefsManager.diffPictureStage)
     val currentStage get() = _currentStage.asStateFlow()
@@ -128,9 +128,9 @@ class DiffPictureSingleGameViewModel @Inject constructor(
         }
     }
 
-    fun lockGameStart(isLock: Boolean) = _isLockGameStart.update { isLock }
-
     fun showAdPopup(isShow: Boolean) = _isShowAdPopup.update { isShow }
+
+    fun showLoading(isShow: Boolean) = _isShowLoading.update { isShow }
 
     fun showSnackMessage(message: String) {
         viewModelScope.launch { _message.emit(message) }
@@ -173,8 +173,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 return@launch
             }
 
-            if (isLockGameStart.value) return@launch
-            lockGameStart(isLock = true)
+            if (isShowLoading.value) return@launch
+            showLoading(isShow = true)
 
             val gameList = _gameList.value[_currentStage.value]
             val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
@@ -200,7 +200,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 }
             }
 
-            lockGameStart(isLock = false)
+            showLoading(isShow = false)
         }
     }
 
@@ -211,8 +211,8 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 return@launch
             }
 
-            if (isLockGameStart.value) return@launch
-            lockGameStart(isLock = true)
+            if (isShowLoading.value) return@launch
+            showLoading(isShow = true)
 
             val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
             val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
@@ -236,7 +236,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 _message.emit(getString(R.string.network_request_error))
             }
 
-            lockGameStart(isLock = false)
+            showLoading(isShow = false)
         }
     }
 

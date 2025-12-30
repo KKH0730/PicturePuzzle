@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import com.seno.game.extensions.startActivityAnimation
 import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.base.BaseComposeActivity
 import com.seno.game.ui.component.CommonAlertDialog
+import com.seno.game.ui.component.LoadingView
 import com.seno.game.ui.main.home.game.diff_picture.list.screen.DPSinglePlayListScreen
 import com.seno.game.ui.main.home.game.diff_picture.single.DPSinglePlayActivity
 import com.seno.game.ui.view.NewMonthAlertDialog
@@ -85,6 +87,7 @@ class DPSinglePlayListActivity : BaseComposeActivity(
     override fun ComposeContent() {
         val admobRewardedAdUtil by remember { mutableStateOf(AdmobRewardedAdUtil(activity = this@DPSinglePlayListActivity)) }
         val isShowAdPopup = viewModel.isShowAdPopup.collectAsStateWithLifecycle().value
+        val isShowLoading = viewModel.isShowLoading.collectAsStateWithLifecycle().value
 
         Surface(Modifier.fillMaxSize()) {
             if (isShowAdPopup) {
@@ -107,14 +110,20 @@ class DPSinglePlayListActivity : BaseComposeActivity(
                 )
             }
 
-            DPSinglePlayListScreen(
-                stageInfos = viewModel.gameList.collectAsStateWithLifecycle().value,
-                stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
-                onChangedStage = viewModel::onChangedPage,
-                onClickBack = { finish() },
-                onClickGameItem = { selectedGame -> viewModel.startGame(isCheckHeartCount = !App.isTest, selectedGame = selectedGame) },
-                onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                DPSinglePlayListScreen(
+                    stageInfos = viewModel.gameList.collectAsStateWithLifecycle().value,
+                    stage = viewModel.currentStage.collectAsStateWithLifecycle().value,
+                    onChangedStage = viewModel::onChangedPage,
+                    onClickBack = { finish() },
+                    onClickGameItem = { selectedGame -> viewModel.startGame(isCheckHeartCount = !App.isTest, selectedGame = selectedGame) },
+                    onChangedHeartTime = { viewModel.reqUpdateSavedGameInfo() }
+                )
+
+                if (isShowLoading) {
+                    LoadingView()
+                }
+            }
         }
     }
 

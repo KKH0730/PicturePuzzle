@@ -98,6 +98,12 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 }
             }
 
+            val isFirstGame = stageInfos.find { it.find { dPSingleGame -> dPSingleGame.isSelect } != null } == null
+            if (isFirstGame) {
+                stageInfos[0][0].isSelect = true
+                selectedGame = stageInfos[0][0]
+            }
+
             return stageInfos
         }
 
@@ -177,7 +183,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
             showLoading(isShow = true)
 
             val gameList = _gameList.value[_currentStage.value]
-            val selectedGameIndex = gameList.indexOfFirst { it.id == selectedGame?.id }
+            val selectedGameIndex = gameList.indexOfFirst { it.id == this@DiffPictureSingleGameViewModel.selectedGame?.id }
             if (selectedGameIndex != -1) {
                 val tempHeartCount = PrefsManager.diffPictureHeartCount - 1
                 val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime

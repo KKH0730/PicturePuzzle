@@ -58,6 +58,12 @@ android {
             extra.set("enableCrashlytics", false)
             // crashlytics 빌드 ID 업데이트 막기
             extra.set("alwaysUpdateBuildId", false)
+
+            resValue(
+                "string",
+                "ad_banner_id",
+                "ca-app-pub-3940256099942544/6300978111"
+            )
         }
 
         getByName("release") {
@@ -68,6 +74,12 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = true
+
+            resValue(
+                "string",
+                "ad_banner_id",
+                "ca-app-pub-5813878503406225/1232877035"
+            )
         }
     }
 

@@ -280,7 +280,7 @@
                 android:visibility="@{isShowAd ? View.VISIBLE : View.GONE}"
                 app:layout_constraintHeight_percent="0.1"
                 app:adSize="BANNER"
-                app:adUnitId="@string/banner_ad_unit_id_for_test"
+                app:adUnitId="@string/ad_banner_id"
                 app:layout_constraintTop_toBottomOf="@+id/spacer"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

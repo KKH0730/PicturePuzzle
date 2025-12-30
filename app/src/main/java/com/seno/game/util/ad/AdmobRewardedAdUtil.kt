@@ -9,8 +9,8 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.seno.game.BuildConfig
 import com.seno.game.R
-import timber.log.Timber
 
 class AdmobRewardedAdUtil(private val activity: Activity) {
     private var rewardedAd: RewardedAd? = null
@@ -31,7 +31,8 @@ class AdmobRewardedAdUtil(private val activity: Activity) {
 
         if (rewardedAd == null) {
             val adRequest = AdRequest.Builder().build()
-            RewardedAd.load(activity, activity.getString(R.string.reward_ad_unit_id_for_test), adRequest,
+            val adRewardId = if (BuildConfig.DEBUG) activity.getString(R.string.reward_ad_unit_id_for_test) else activity.getString(R.string.reward_ad_unit_id)
+            RewardedAd.load(activity, adRewardId, adRequest,
                 object : RewardedAdLoadCallback() {
                     override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                         this@AdmobRewardedAdUtil.rewardedAd = null

@@ -92,7 +92,7 @@ fun GameListHeader(
                 currentTime = currentTime,
                 prevChargeHeartTime = prevChargeHeartTime
             ).also {
-                PrefsManager.diffPictureHeartCount = it
+                PrefsManager.setHeartCount(count = it, from = 3)
 
                 if (prevHeartCount != it) {
                     PrefsManager.diffPictureHeartChargedTime = if (prevChargeHeartTime == 0L) 0L else currentTime - (currentTime % prevChargeHeartTime)

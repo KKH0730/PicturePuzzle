@@ -172,7 +172,7 @@ fun SavedGameInfo?.savedGameInfoToLocalDB() {
             it.completeGameRound.split(",").forEach { round ->
                 diffPictureCompleteGameRound = round
             }
-            diffPictureHeartCount = it.diffPictureHeartCount
+            PrefsManager.setHeartCount(count = it.diffPictureHeartCount, from = 0)
             diffPictureHeartChargedTime = it.diffPictureHeartChargedTime
         }
     }

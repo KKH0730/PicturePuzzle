@@ -13,6 +13,22 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
 
         val heartChargedTime = param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: PrefsManager.diffPictureHeartChargedTime
         val localHeartChargedTime = PrefsManager.diffPictureHeartChargedTime
+        val recentChargedTime = heartChargedTime.coerceAtMost(localHeartChargedTime)
+        val recentHeartCount = if (recentChargedTime == localHeartChargedTime) {
+            PrefsManager.diffPictureHeartCount
+        } else {
+            param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: 0
+        }
+        val recentStage = if (recentChargedTime == localHeartChargedTime) {
+            param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: 0
+        } else {
+            PrefsManager.diffPictureStage
+        }
+        val recentCompleteRound = if (recentChargedTime == localHeartChargedTime) {
+            param1.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: ""
+        } else {
+            PrefsManager.diffPictureCompleteGameRound
+        }
 
         return SavedGameInfo(
             uid = param2.uid,
@@ -24,17 +40,10 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
             isVibrationOn = param2.isVibrationOn,
             isPushOn = param2.isPushOn,
             isShowAD = param2.isShowAD,
-            diffPictureGameCurrentStage = param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt()
-                ?: PrefsManager.diffPictureStage,
-            completeGameRound = param1.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND)
-                ?: PrefsManager.diffPictureCompleteGameRound,
-            diffPictureHeartCount = if (PrefsManager.diffPictureHeartChargedTime == 0L) {
-                param1.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt()
-                    ?: PrefsManager.diffPictureHeartCount
-            } else {
-                PrefsManager.diffPictureHeartCount
-            },
-            diffPictureHeartChargedTime = heartChargedTime.coerceAtMost(localHeartChargedTime),
+            diffPictureGameCurrentStage = recentStage,
+            completeGameRound = recentCompleteRound,
+            diffPictureHeartCount = recentHeartCount,
+            diffPictureHeartChargedTime = recentChargedTime,
             recentSinglePlayDate = param1.getString(ApiConstants.FirestoreKey.RECENT_SINGLE_PLAY_DATE) ?: PrefsManager.recentSinglePlayDate
         )
     }

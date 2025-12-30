@@ -2,6 +2,7 @@ package com.seno.game.prefs
 
 import com.pixplicity.easyprefs.library.Prefs
 import com.seno.game.extensions.getTodayDate
+import timber.log.Timber
 
 object PrefsManager {
     var nickname: String
@@ -78,6 +79,11 @@ object PrefsManager {
         set(value) {
             Prefs.putInt("diffPictureHeartCount", value)
         }
+
+    fun setHeartCount(count: Int, from: Int) {
+        Timber.e("setHeartCount -> count: $count, from: $from")
+        diffPictureHeartCount = count
+    }
 
     var diffPictureHeartChargedTime: Long
         get() = Prefs.getLong("diffPictureHeartChargedTime", 0L)

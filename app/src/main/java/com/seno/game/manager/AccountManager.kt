@@ -366,19 +366,34 @@ object AccountManager {
 
             val savedGameInfoDoc = savedGameInfoTask.result as DocumentSnapshot
             if (savedGameInfoDoc.exists()) {
-                PrefsManager.apply {
-                    (savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: diffPictureCompleteGameRound)
-                        .split(",")
-                        .forEach { round ->
-                            this.diffPictureCompleteGameRound = round
-                        }
-                    this.diffPictureStage =
-                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: diffPictureStage
-                    this.diffPictureHeartCount =
-                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: diffPictureHeartCount
-                    this.diffPictureHeartChargedTime =
-                        savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: diffPictureHeartChargedTime
+                val heartChargedTime = savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: PrefsManager.diffPictureHeartChargedTime
+                val localHeartChargedTime = PrefsManager.diffPictureHeartChargedTime
+                val recentChargedTime = heartChargedTime.coerceAtMost(localHeartChargedTime)
+                val recentHeartCount = if (recentChargedTime == localHeartChargedTime) {
+                    PrefsManager.diffPictureHeartCount
+                } else {
+                    savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: 0
                 }
+                val recentStage = if (recentChargedTime == localHeartChargedTime) {
+                    savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: 0
+                } else {
+                    PrefsManager.diffPictureStage
+                }
+                val recentCompleteRound = if (recentChargedTime == localHeartChargedTime) {
+                    savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: ""
+                } else {
+                    PrefsManager.diffPictureCompleteGameRound
+                }
+
+                PrefsManager.apply {
+                    recentCompleteRound
+                        .split(",")
+                        .forEach { round -> this.diffPictureCompleteGameRound = round }
+                    this.diffPictureStage = recentStage
+                    this.diffPictureHeartCount = recentHeartCount
+                    this.diffPictureHeartChargedTime = recentChargedTime
+                }
+
             }
             onSignInSucceed.invoke()
         } ?: onSignInFailed.invoke(Exception("uid is null"))

@@ -189,7 +189,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
                 val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
                 val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
                 if (isSuccess) {
-                    PrefsManager.diffPictureHeartCount = tempHeartCount
+                    PrefsManager.setHeartCount(count = tempHeartCount, from = 1)
                     PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
 
                     _currentGameRound.emit(
@@ -224,7 +224,7 @@ class DiffPictureSingleGameViewModel @Inject constructor(
             val tempHeartChargedTime = if (PrefsManager.diffPictureHeartCount == 5) System.currentTimeMillis() else PrefsManager.diffPictureHeartChargedTime
             val isSuccess = reqUpdateSavedGameInfo(tempHeartCount, tempHeartChargedTime)
             if (isSuccess) {
-                PrefsManager.diffPictureHeartCount = tempHeartCount
+                PrefsManager.setHeartCount(count = tempHeartCount, from = 2)
                 PrefsManager.diffPictureHeartChargedTime = tempHeartChargedTime
 
                 if (currentRoundPosition <= finalRoundPosition - 1) {

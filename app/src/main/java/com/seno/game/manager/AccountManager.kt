@@ -29,7 +29,6 @@ const val UNKNOWN_UID = "unknownUid"
 enum class PlatForm(val value: String) {
     KAKAO(value = "kakao"),
     GOOGLE(value = "google"),
-    FACEBOOK(value = "facebook"),
     NAVER(value = "naver")
 }
 
@@ -51,6 +50,20 @@ object AccountManager {
         get() = firebaseUid.isNotEmpty() && firebaseUid != UNKNOWN_UID
 
     val profileColRef = FirebaseFirestore.getInstance().collection("profile")
+
+    val firebaseEmail: String get() {
+        return when(authProviderId) {
+            PlatForm.GOOGLE.value ->  currentUser?.email ?: ""
+            else -> {
+                val emailParts  = currentUser?.email?.split("_") ?: listOf()
+                if (emailParts.size > 1) {
+                    (1 until emailParts.size).joinToString { emailParts[it] }
+                } else {
+                    ""
+                }
+            }
+        }
+    }
 
     private fun getSaveGameInfoColRef(uid: String): CollectionReference {
         return FirebaseFirestore.getInstance()

@@ -32,6 +32,7 @@ import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
+import com.seno.game.manager.AccountManager
 import com.seno.game.manager.PlatForm
 import com.seno.game.prefs.PrefsManager
 
@@ -61,7 +62,11 @@ fun UserInfoContainer(
                         else -> painterResource(id = R.drawable.bg_timer_wrong_answer)
                     }
                 )
-
+                UserInfoSpacer()
+                UserInfoPanel(
+                    label = stringResource(id = R.string.my_profile_email),
+                    value = AccountManager.firebaseEmail
+                )
                 UserInfoSpacer()
                 UserInfoPanel(
                     label = stringResource(id = R.string.my_profile_nickname),

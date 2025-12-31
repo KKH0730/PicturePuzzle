@@ -36,6 +36,7 @@
     <string name="my_profile_create_account">계정생성</string>
     <string name="my_profile_close">닫기</string>
     <string name="my_profile_sso">간편 로그인</string>
+    <string name="my_profile_email">아이디</string>
     <string name="my_profile_nickname">닉네임</string>
     <string name="my_profile_version">버전정보</string>
     <string name="my_profile_withdrawal">탈퇴하기</string>

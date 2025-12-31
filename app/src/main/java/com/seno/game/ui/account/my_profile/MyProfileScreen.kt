@@ -48,7 +48,10 @@ import com.seno.game.ui.component.LoadingView
 import kotlinx.coroutines.launch
 
 @Composable
-fun MyProfileScreen(onClickClose: () -> Unit) {
+fun MyProfileScreen(
+    onClickClose: () -> Unit,
+    onCompleteWithdrawal: () -> Unit
+) {
     val accountViewModel = hiltViewModel<AccountViewModel>()
     val context = LocalContext.current
     val insets = WindowInsets.systemBars.asPaddingValues()
@@ -178,6 +181,8 @@ fun MyProfileScreen(onClickClose: () -> Unit) {
                                 kakaoAccountManager = kakaoAccountManager,
                                 isCompleteLogout = {}
                             )
+
+                            onCompleteWithdrawal.invoke()
                         },
                         onFail = {
                             context.toast(context.getString(R.string.my_profile_withdrawal_fail))
@@ -219,7 +224,10 @@ fun MyProfileScreen(onClickClose: () -> Unit) {
 fun Preview() {
     AppTheme {
         Surface(Modifier.fillMaxSize()) {
-            MyProfileScreen(onClickClose = {})
+            MyProfileScreen(
+                onClickClose = {},
+                onCompleteWithdrawal = {}
+            )
         }
     }
 }

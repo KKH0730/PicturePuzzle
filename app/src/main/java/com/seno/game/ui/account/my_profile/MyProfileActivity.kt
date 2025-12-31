@@ -28,7 +28,10 @@ class MyProfileActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    MyProfileScreen(onClickClose = { finish() })
+                    MyProfileScreen(
+                        onClickClose = { finish() },
+                        onCompleteWithdrawal = { finish() }
+                    )
                 }
             }
         }

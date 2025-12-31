@@ -6,22 +6,21 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.seno.game.R
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.screen.DPMultiPlayScreen
 import com.seno.game.ui.main.home.game.diff_picture.multi.entry.multi.screen.LobbyRoomScreen
 import com.seno.game.ui.main.home.screen.HomeScreen
 import com.seno.game.ui.main.screen.MainScreen
 
-enum class NavigationRoute(val routeName: String, val icon: Int?) {
-    MAIN("MAIN", null),
-    LOGIN("LOGIN", null),
-    HOME("HOME", icon = R.drawable.ic_launcher_foreground),
-    HOME2("HOME2", R.drawable.ic_launcher_foreground),
-    HOME3("HOME3", R.drawable.ic_launcher_foreground),
-    PROFILE("PROFILE", R.drawable.ic_launcher_foreground),
-    SPLASH("SPLASH", null),
-    LOBBY_SCREEN("LobbyScreen", null),
-    DP_MULTIPLAY_SCREEN("DPMultiPlayScreen", null),
+enum class NavigationRoute(val routeName: String) {
+    MAIN("MAIN"),
+    LOGIN("LOGIN"),
+    HOME("HOME"),
+    HOME2("HOME2"),
+    HOME3("HOME3"),
+    PROFILE("PROFILE"),
+    SPLASH("SPLASH"),
+    LOBBY_SCREEN("LobbyScreen"),
+    DP_MULTIPLAY_SCREEN("DPMultiPlayScreen"),
 }
 
 @Composable

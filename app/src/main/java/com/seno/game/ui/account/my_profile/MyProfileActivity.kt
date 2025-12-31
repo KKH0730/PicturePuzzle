@@ -1,8 +1,11 @@
 package com.seno.game.ui.account.my_profile
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -10,7 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.seno.game.extensions.snackbar
+import com.seno.game.core.ResultConstants
+import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.toast
 import com.seno.game.theme.AppTheme
 import com.seno.game.ui.account.AccountViewModel
@@ -30,7 +34,10 @@ class MyProfileActivity : ComponentActivity() {
                 Surface(Modifier.fillMaxSize()) {
                     MyProfileScreen(
                         onClickClose = { finish() },
-                        onCompleteWithdrawal = { finish() }
+                        onCompleteWithdrawal = {
+                            setResult(ResultConstants.RESULT_WITHDRAWAL)
+                            finish()
+                        }
                     )
                 }
             }
@@ -46,6 +53,13 @@ class MyProfileActivity : ComponentActivity() {
                     accountViewModel.message.collectLatest { toast(it) }
                 }
             }
+        }
+    }
+
+    companion object {
+
+        fun start(context: Context, launcher: ActivityResultLauncher<Intent>) {
+            context.safeStartActivity(MyProfileActivity::class.java, launcher)
         }
     }
 }

@@ -72,11 +72,16 @@ class SignGateActivity : AppCompatActivity() {
         const val PATH = "path"
         const val RESULT_CODE = "resultCode"
 
+        fun start(context: Context) {
+            context.safeStartActivity(SignGateActivity::class.java)
+        }
+
         fun start(context: Context, path: String = "") {
             context.safeStartActivity(SignGateActivity::class.java) {
                 putExtra(PATH, path)
             }
         }
+
         fun start(context: Context, path: String = "", resultCode: Int, launcher: ActivityResultLauncher<Intent>) {
             context.safeStartActivity(SignGateActivity::class.java, launcher) {
                 putExtra(PATH, path)

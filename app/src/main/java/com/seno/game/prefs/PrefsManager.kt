@@ -81,7 +81,6 @@ object PrefsManager {
         }
 
     fun setHeartCount(count: Int, from: Int) {
-        Timber.e("setHeartCount -> count: $count, from: $from")
         diffPictureHeartCount = count
     }
 

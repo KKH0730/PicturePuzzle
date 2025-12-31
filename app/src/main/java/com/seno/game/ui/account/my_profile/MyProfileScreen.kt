@@ -156,29 +156,27 @@ fun MyProfileScreen(
                 profileState.coroutineScope.launch {
                     AccountManager.startWithdrawal(
                         isCompleteWithdrawal = {
-                            profileState.showLoading(isShow = false)
-                            profileState.showWithdrawalDialog(isShow = false)
-
-                            PrefsManager.apply {
-                                this.nickname = context.resources.createRandomNickname()
-                                this.platform = ""
-                                this.profileUri = ""
-                            }
-                            profileState.apply {
-                                setNickname(nickname = PrefsManager.nickname)
-                                setProfileUri(profileUri = "")
-                            }
-
-                            context.toast(context.getString(R.string.my_profile_withdrawal_success))
-
                             AccountManager.startLogout(
                                 googleAccountManager = googleAccountManager,
                                 naverAccountManager = naverAccountManager,
                                 kakaoAccountManager = kakaoAccountManager,
-                                isCompleteLogout = {}
-                            )
+                                isCompleteLogout = {
+                                    profileState.showLoading(isShow = false)
+                                    profileState.showWithdrawalDialog(isShow = false)
 
-                            onCompleteWithdrawal.invoke()
+                                    PrefsManager.apply {
+                                        this.nickname = context.resources.createRandomNickname()
+                                        this.platform = ""
+                                        this.profileUri = ""
+                                    }
+                                    profileState.apply {
+                                        setNickname(nickname = PrefsManager.nickname)
+                                        setProfileUri(profileUri = "")
+                                    }
+
+                                    onCompleteWithdrawal.invoke()
+                                }
+                            )
                         },
                         onFail = {
                             context.toast(context.getString(R.string.my_profile_withdrawal_fail))

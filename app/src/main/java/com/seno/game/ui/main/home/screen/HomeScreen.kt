@@ -179,6 +179,14 @@ fun HomeUI(
         }
     }
 
+    val withdrawalLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == ResultConstants.RESULT_WITHDRAWAL) {
+            context.toast(context.getString(R.string.my_profile_withdrawal_success))
+        }
+    }
+
     loginLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -250,9 +258,9 @@ fun HomeUI(
                     profileUri = profileUri,
                     onClick = {
                         if (AccountManager.isSignedIn) {
-                            context.safeStartActivity(MyProfileActivity::class.java)
+                            MyProfileActivity.start(context = context, launcher = withdrawalLauncher)
                         } else {
-                            context.safeStartActivity(SignGateActivity::class.java)
+                            SignGateActivity.start(context = context)
                         }
                     }
                 )
@@ -371,9 +379,9 @@ fun HomeUI(
             },
             onClickManageProfile = {
                 if (AccountManager.isSignedIn) {
-                    context.safeStartActivity(MyProfileActivity::class.java)
+                    MyProfileActivity.start(context = context, launcher = withdrawalLauncher)
                 } else {
-                    context.safeStartActivity(SignGateActivity::class.java)
+                    SignGateActivity.start(context = context)
                 }
             },
             onDismissed = { isShowSettingDialog = false }

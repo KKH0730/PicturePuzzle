@@ -1,6 +1,5 @@
 package com.seno.game.manager
 
-import android.net.Uri
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -9,6 +8,7 @@ import com.seno.game.R
 import com.seno.game.data.network.ApiConstants
 import com.seno.game.data.network.FirebaseRequest
 import com.seno.game.extensions.getString
+import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveDiskCacheData
 import com.seno.game.prefs.PrefsManager
 import kotlinx.coroutines.CoroutineScope
@@ -50,20 +50,6 @@ object AccountManager {
         get() = firebaseUid.isNotEmpty() && firebaseUid != UNKNOWN_UID
 
     val profileColRef = FirebaseFirestore.getInstance().collection("profile")
-
-    val firebaseEmail: String get() {
-        return when(authProviderId) {
-            PlatForm.GOOGLE.value ->  currentUser?.email ?: ""
-            else -> {
-                val emailParts  = currentUser?.email?.split("_") ?: listOf()
-                if (emailParts.size > 1) {
-                    (1 until emailParts.size).joinToString { emailParts[it] }
-                } else {
-                    ""
-                }
-            }
-        }
-    }
 
     private fun getSaveGameInfoColRef(uid: String): CollectionReference {
         return FirebaseFirestore.getInstance()
@@ -120,10 +106,19 @@ object AccountManager {
             return FirebaseAuth.getInstance().currentUser?.displayName
         }
 
-    private val profileUri: Uri?
-        get() {
-            return FirebaseAuth.getInstance().currentUser?.photoUrl
+    val firebaseEmail: String get() {
+        return when(authProviderId) {
+            LOGIN_TYPE_GOOGLE ->  currentUser?.providerData?.firstOrNull { it.email.isNotNullAndNotEmpty() }?.email ?: ""
+            else -> {
+                val emailParts  = currentUser?.email?.split("_") ?: listOf()
+                if (emailParts.size > 1) {
+                    (1 until emailParts.size).joinToString { emailParts[it] }
+                } else {
+                    ""
+                }
+            }
         }
+    }
 
     @JvmStatic
     fun addAuthStateListener(onSignedIn: () -> Unit, onSignedOut: () -> Unit) {
@@ -187,7 +182,7 @@ object AccountManager {
                         uid = uid,
                         platform = platform,
                         nickname = displayName,
-                        profileUri = profileUri?.toString(),
+                        profileUri = signInTask.result.user?.photoUrl?.toString(),
                         onSignInSucceed = onSignInSucceed,
                         onSignInFailed = onSignInFailed
                     )
@@ -253,6 +248,17 @@ object AccountManager {
         }
     }
 
+    suspend fun reauthenticate(credential: AuthCredential?) = suspendCoroutine { continuation ->
+        if (credential == null) {
+            continuation.resume(false)
+            return@suspendCoroutine
+        }
+
+        firebaseRequest.currentUser?.reauthenticate(credential)
+            ?.addOnSuccessListener { continuation.resume(true) }
+            ?.addOnFailureListener { e -> continuation.resume(false) }
+    }
+
     private suspend fun setProfileInfo(
         uid: String?,
         platform: PlatForm,
@@ -264,7 +270,7 @@ object AccountManager {
         uid?.let {
             profileUri?.saveDiskCacheData(size = null)
 
-            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname)
+            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname, profileUri = profileUri)
             if (!userInfoTask.isSuccessful) {
                 onSignInFailed.invoke(userInfoTask.exception)
                 return
@@ -290,9 +296,10 @@ object AccountManager {
         uid: String,
         platform: PlatForm,
         nickname: String?,
+        profileUri: String?,
     ) = suspendCoroutine { continuation ->
-        val userNickname = nickname ?: PrefsManager.nickname
-        val userProfileUri = profileUri ?: PrefsManager.profileUri
+        val userNickname = nickname ?: ""
+        val userProfileUri = profileUri ?: ""
         val map = mutableMapOf(
             ApiConstants.UserInfo.UID to uid,
             ApiConstants.UserInfo.NICKNAME to userNickname,
@@ -463,6 +470,50 @@ object AccountManager {
         deleteUserInfo(uid = uid)
         withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
     }
+
+    // 오랜기간 접속한 경우 탈퇴시 reauthenticate 호출하여 재인증필요
+    // 구글, 카카오 개발 필요
+//    suspend fun startWithdrawal(
+//        context: Context,
+//        googleAccountManager: GoogleAccountManager,
+//        naverAccountManager: NaverAccountManager,
+//        kakaoAccountManager: KakaoAccountManager,
+//        isCompleteWithdrawal: () -> Unit,
+//        onFail: () -> Unit
+//    ) {
+//        val uid = firebaseUid
+//        if (uid.isEmpty()) {
+//            withContext(Dispatchers.Main) { onFail.invoke() }
+//            return
+//        }
+//
+//        if (uid == UNKNOWN_UID) {
+//            withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
+//            return
+//        }
+//
+//        val deleteAuthTask = withdrawalFirebase()
+//        if (!deleteAuthTask.isSuccessful) {
+//            withContext(Dispatchers.Main) {
+//                if (deleteAuthTask.exception is FirebaseAuthRecentLoginRequiredException) {
+//                    val credential = naverAccountManager.suspendLogin(context)
+//                    val isSuccessReAuth = reauthenticate(credential)
+//                    if (isSuccessReAuth) {
+//                        deleteUserInfo(uid = uid)
+//                        isCompleteWithdrawal.invoke()
+//                    } else {
+//                        onFail.invoke()
+//                    }
+//                } else {
+//                    onFail.invoke()
+//                }
+//            }
+//            return
+//        }
+//
+//        deleteUserInfo(uid = uid)
+//        isCompleteWithdrawal.invoke()
+//    }
 
     private fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
         if (onSignOutCallbackListener == null) {

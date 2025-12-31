@@ -33,14 +33,14 @@ public class Videoio {
             CAP_PROP_OPENNI_GENERATOR_PRESENT = 109,
             CAP_PROP_OPENNI2_SYNC = 110,
             CAP_PROP_OPENNI2_MIRROR = 111,
-            CAP_OPENNI_IMAGE_GENERATOR_PRESENT = CAP_OPENNI_IMAGE_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
-            CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE = CAP_OPENNI_IMAGE_GENERATOR + CAP_PROP_OPENNI_OUTPUT_MODE,
-            CAP_OPENNI_DEPTH_GENERATOR_PRESENT = CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
-            CAP_OPENNI_DEPTH_GENERATOR_BASELINE = CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_BASELINE,
-            CAP_OPENNI_DEPTH_GENERATOR_FOCAL_LENGTH = CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_FOCAL_LENGTH,
-            CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION = CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_REGISTRATION,
+            CAP_OPENNI_IMAGE_GENERATOR_PRESENT = +CAP_OPENNI_IMAGE_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
+            CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE = +CAP_OPENNI_IMAGE_GENERATOR + CAP_PROP_OPENNI_OUTPUT_MODE,
+            CAP_OPENNI_DEPTH_GENERATOR_PRESENT = +CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
+            CAP_OPENNI_DEPTH_GENERATOR_BASELINE = +CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_BASELINE,
+            CAP_OPENNI_DEPTH_GENERATOR_FOCAL_LENGTH = +CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_FOCAL_LENGTH,
+            CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION = +CAP_OPENNI_DEPTH_GENERATOR + CAP_PROP_OPENNI_REGISTRATION,
             CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION_ON = CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION,
-            CAP_OPENNI_IR_GENERATOR_PRESENT = CAP_OPENNI_IR_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
+            CAP_OPENNI_IR_GENERATOR_PRESENT = +CAP_OPENNI_IR_GENERATOR + CAP_PROP_OPENNI_GENERATOR_PRESENT,
             CAP_OPENNI_DEPTH_MAP = 0,
             CAP_OPENNI_POINT_CLOUD_MAP = 1,
             CAP_OPENNI_DISPARITY_MAP = 2,
@@ -230,6 +230,7 @@ public class Videoio {
             CAP_PROP_XI_SENSOR_FEATURE_SELECTOR = 585,
             CAP_PROP_XI_SENSOR_FEATURE_VALUE = 586,
             CAP_PROP_ARAVIS_AUTOTRIGGER = 600,
+            CAP_PROP_ANDROID_DEVICE_TORCH = 8001,
             CAP_PROP_IOS_DEVICE_FOCUS = 9001,
             CAP_PROP_IOS_DEVICE_EXPOSURE = 9002,
             CAP_PROP_IOS_DEVICE_FLASH = 9003,
@@ -315,7 +316,31 @@ public class Videoio {
             CAP_OPENCV_MJPEG = 2200,
             CAP_INTEL_MFX = 2300,
             CAP_XINE = 2400,
-            CAP_UEYE = 2500;
+            CAP_UEYE = 2500,
+            CAP_OBSENSOR = 2600;
+
+
+    // C++: enum VideoCaptureOBSensorDataType (cv.VideoCaptureOBSensorDataType)
+    public static final int
+            CAP_OBSENSOR_DEPTH_MAP = 0,
+            CAP_OBSENSOR_BGR_IMAGE = 1,
+            CAP_OBSENSOR_IR_IMAGE = 2;
+
+
+    // C++: enum VideoCaptureOBSensorGenerators (cv.VideoCaptureOBSensorGenerators)
+    public static final int
+            CAP_OBSENSOR_DEPTH_GENERATOR = 1 << 29,
+            CAP_OBSENSOR_IMAGE_GENERATOR = 1 << 28,
+            CAP_OBSENSOR_IR_GENERATOR = 1 << 27,
+            CAP_OBSENSOR_GENERATORS_MASK = CAP_OBSENSOR_DEPTH_GENERATOR + CAP_OBSENSOR_IMAGE_GENERATOR + CAP_OBSENSOR_IR_GENERATOR;
+
+
+    // C++: enum VideoCaptureOBSensorProperties (cv.VideoCaptureOBSensorProperties)
+    public static final int
+            CAP_PROP_OBSENSOR_INTRINSIC_FX = 26001,
+            CAP_PROP_OBSENSOR_INTRINSIC_FY = 26002,
+            CAP_PROP_OBSENSOR_INTRINSIC_CX = 26003,
+            CAP_PROP_OBSENSOR_INTRINSIC_CY = 26004;
 
 
     // C++: enum VideoCaptureProperties (cv.VideoCaptureProperties)
@@ -387,7 +412,11 @@ public class Videoio {
             CAP_PROP_AUDIO_TOTAL_STREAMS = 65,
             CAP_PROP_AUDIO_SYNCHRONIZE = 66,
             CAP_PROP_LRF_HAS_KEY_FRAME = 67,
-            CAP_PROP_CODEC_EXTRADATA_INDEX = 68;
+            CAP_PROP_CODEC_EXTRADATA_INDEX = 68,
+            CAP_PROP_FRAME_TYPE = 69,
+            CAP_PROP_N_THREADS = 70,
+            CAP_PROP_PTS = 71,
+            CAP_PROP_DTS_DELAY = 72;
 
 
     // C++: enum VideoWriterProperties (cv.VideoWriterProperties)
@@ -399,7 +428,12 @@ public class Videoio {
             VIDEOWRITER_PROP_DEPTH = 5,
             VIDEOWRITER_PROP_HW_ACCELERATION = 6,
             VIDEOWRITER_PROP_HW_DEVICE = 7,
-            VIDEOWRITER_PROP_HW_ACCELERATION_USE_OPENCL = 8;
+            VIDEOWRITER_PROP_HW_ACCELERATION_USE_OPENCL = 8,
+            VIDEOWRITER_PROP_RAW_VIDEO = 9,
+            VIDEOWRITER_PROP_KEY_INTERVAL = 10,
+            VIDEOWRITER_PROP_KEY_FLAG = 11,
+            VIDEOWRITER_PROP_PTS = 12,
+            VIDEOWRITER_PROP_DTS_DELAY = 13;
 
 
     //
@@ -432,6 +466,13 @@ public class Videoio {
 
     //
     // C++:  vector_VideoCaptureAPIs cv::videoio_registry::getStreamBackends()
+    //
+
+    // Return type 'vector_VideoCaptureAPIs' is not supported, skipping the function
+
+
+    //
+    // C++:  vector_VideoCaptureAPIs cv::videoio_registry::getStreamBufferedBackends()
     //
 
     // Return type 'vector_VideoCaptureAPIs' is not supported, skipping the function
@@ -515,6 +556,27 @@ public class Videoio {
 
 
     //
+    // C++:  string cv::videoio_registry::getStreamBufferedBackendPluginVersion(VideoCaptureAPIs api, int& version_ABI, int& version_API)
+    //
+
+    /**
+     * Returns description and ABI/API version of videoio plugin's buffer capture interface
+     * @param api automatically generated
+     * @param version_ABI automatically generated
+     * @param version_API automatically generated
+     * @return automatically generated
+     */
+    public static String getStreamBufferedBackendPluginVersion(int api, int[] version_ABI, int[] version_API) {
+        double[] version_ABI_out = new double[1];
+        double[] version_API_out = new double[1];
+        String retVal = getStreamBufferedBackendPluginVersion_0(api, version_ABI_out, version_API_out);
+        if(version_ABI!=null) version_ABI[0] = (int)version_ABI_out[0];
+        if(version_API!=null) version_API[0] = (int)version_API_out[0];
+        return retVal;
+    }
+
+
+    //
     // C++:  string cv::videoio_registry::getWriterBackendPluginVersion(VideoCaptureAPIs api, int& version_ABI, int& version_API)
     //
 
@@ -551,6 +613,9 @@ public class Videoio {
 
     // C++:  string cv::videoio_registry::getStreamBackendPluginVersion(VideoCaptureAPIs api, int& version_ABI, int& version_API)
     private static native String getStreamBackendPluginVersion_0(int api, double[] version_ABI_out, double[] version_API_out);
+
+    // C++:  string cv::videoio_registry::getStreamBufferedBackendPluginVersion(VideoCaptureAPIs api, int& version_ABI, int& version_API)
+    private static native String getStreamBufferedBackendPluginVersion_0(int api, double[] version_ABI_out, double[] version_API_out);
 
     // C++:  string cv::videoio_registry::getWriterBackendPluginVersion(VideoCaptureAPIs api, int& version_ABI, int& version_API)
     private static native String getWriterBackendPluginVersion_0(int api, double[] version_ABI_out, double[] version_API_out);

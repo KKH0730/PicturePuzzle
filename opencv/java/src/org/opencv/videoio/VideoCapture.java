@@ -8,6 +8,7 @@ import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.utils.Converters;
+import org.opencv.videoio.IStreamReader;
 
 // C++: class VideoCapture
 /**
@@ -87,10 +88,10 @@ public class VideoCapture {
      *      or GStreamer pipeline string in gst-launch tool format in case if GStreamer is used as backend
      *       Note that each video stream or IP camera feed has its own URL scheme. Please refer to the
      *       documentation of source stream to know the right URL.
-     *     @param apiPreference preferred Capture API backends to use. Can be used to enforce a specific reader
-     *     implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
      *   </li>
      * </ul>
+     *     @param apiPreference preferred Capture API backends to use. Can be used to enforce a specific reader
+     *     implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
      *
      *     SEE: cv::VideoCaptureAPIs
      */
@@ -117,9 +118,9 @@ public class VideoCapture {
      *      or GStreamer pipeline string in gst-launch tool format in case if GStreamer is used as backend
      *       Note that each video stream or IP camera feed has its own URL scheme. Please refer to the
      *       documentation of source stream to know the right URL.
-     *     implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
      *   </li>
      * </ul>
+     *     implementation if multiple are available: e.g. cv::CAP_FFMPEG or cv::CAP_IMAGES or cv::CAP_DSHOW.
      *
      *     SEE: cv::VideoCaptureAPIs
      */
@@ -199,6 +200,26 @@ public class VideoCapture {
     public VideoCapture(int index, int apiPreference, MatOfInt params) {
         Mat params_mat = params;
         nativeObj = VideoCapture_6(index, apiPreference, params_mat.nativeObj);
+    }
+
+
+    //
+    // C++:   cv::VideoCapture::VideoCapture(Ptr_IStreamReader source, int apiPreference, vector_int params)
+    //
+
+    /**
+     *
+     *     Opens a video using data stream.
+     *
+     *     The {@code params} parameter allows to specify extra parameters encoded as pairs {@code (paramId_1, paramValue_1, paramId_2, paramValue_2, ...)}.
+     *     See cv::VideoCaptureProperties
+     * @param source automatically generated
+     * @param apiPreference automatically generated
+     * @param params automatically generated
+     */
+    public VideoCapture(IStreamReader source, int apiPreference, MatOfInt params) {
+        Mat params_mat = params;
+        nativeObj = VideoCapture_7(source.getNativeObjAddr(), apiPreference, params_mat.nativeObj);
     }
 
 
@@ -321,6 +342,31 @@ public class VideoCapture {
     public boolean open(int index, int apiPreference, MatOfInt params) {
         Mat params_mat = params;
         return open_5(nativeObj, index, apiPreference, params_mat.nativeObj);
+    }
+
+
+    //
+    // C++:  bool cv::VideoCapture::open(Ptr_IStreamReader source, int apiPreference, vector_int params)
+    //
+
+    /**
+     * Opens a video using data stream.
+     *
+     *     
+     *
+     *     The {@code params} parameter allows to specify extra parameters encoded as pairs {@code (paramId_1, paramValue_1, paramId_2, paramValue_2, ...)}.
+     *     See cv::VideoCaptureProperties
+     *
+     *     @return {@code true} if the file has been successfully opened
+     *
+     *     The method first calls VideoCapture::release to close the already opened file or camera.
+     * @param source automatically generated
+     * @param apiPreference automatically generated
+     * @param params automatically generated
+     */
+    public boolean open(IStreamReader source, int apiPreference, MatOfInt params) {
+        Mat params_mat = params;
+        return open_6(nativeObj, source.getNativeObjAddr(), apiPreference, params_mat.nativeObj);
     }
 
 
@@ -540,6 +586,13 @@ public class VideoCapture {
     }
 
 
+    //
+    // C++: static bool cv::VideoCapture::waitAny(vector_VideoCapture streams, vector_int& readyIndex, int64 timeoutNs = 0)
+    //
+
+    // Unknown type 'vector_VideoCapture' (I), skipping the function
+
+
     @Override
     protected void finalize() throws Throwable {
         delete(nativeObj);
@@ -564,6 +617,9 @@ public class VideoCapture {
     // C++:   cv::VideoCapture::VideoCapture(int index, int apiPreference, vector_int params)
     private static native long VideoCapture_6(int index, int apiPreference, long params_mat_nativeObj);
 
+    // C++:   cv::VideoCapture::VideoCapture(Ptr_IStreamReader source, int apiPreference, vector_int params)
+    private static native long VideoCapture_7(long source_nativeObj, int apiPreference, long params_mat_nativeObj);
+
     // C++:  bool cv::VideoCapture::open(String filename, int apiPreference = CAP_ANY)
     private static native boolean open_0(long nativeObj, String filename, int apiPreference);
     private static native boolean open_1(long nativeObj, String filename);
@@ -577,6 +633,9 @@ public class VideoCapture {
 
     // C++:  bool cv::VideoCapture::open(int index, int apiPreference, vector_int params)
     private static native boolean open_5(long nativeObj, int index, int apiPreference, long params_mat_nativeObj);
+
+    // C++:  bool cv::VideoCapture::open(Ptr_IStreamReader source, int apiPreference, vector_int params)
+    private static native boolean open_6(long nativeObj, long source_nativeObj, int apiPreference, long params_mat_nativeObj);
 
     // C++:  bool cv::VideoCapture::isOpened()
     private static native boolean isOpened_0(long nativeObj);

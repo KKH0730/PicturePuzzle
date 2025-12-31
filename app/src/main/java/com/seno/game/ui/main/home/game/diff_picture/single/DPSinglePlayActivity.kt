@@ -236,7 +236,12 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS,
-                            onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
+                            onAnimationEnd = { animator, view ->
+                                lifecycleScope.launch {
+                                    delay(500)
+                                    binding.clAnswerMark.removeView(view)
+                                }
+                            }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
@@ -253,7 +258,12 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                             maxProgress = 1f,
 //                            radius = point.answerRadius.toInt(),
                             radius = MARK_RADIUS,
-                            onAnimationEnd = { animator, view -> binding.clAnswerMark.removeView(view) }
+                            onAnimationEnd = { animator, view ->
+                                lifecycleScope.launch {
+                                    delay(500)
+                                    binding.clAnswerMark.removeView(view)
+                                }
+                            }
                         ).also {
                             it.playAnimation()
                             binding.clAnswerMark.addView(it)
@@ -543,6 +553,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
         binding.clLoadingView.visibility = View.VISIBLE
         binding.cvTimerView.stopTimer()
 
+
         admobRewardedAdUtil.loadRewardedAd(
             onAdFailedToLoad = {
                 binding.clLoadingView.visibility = View.GONE
@@ -552,27 +563,27 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
             onAdLoaded = {
                 isShowHint = false
                 admobRewardedAdUtil.showRewardedAd(
-                    onRewarded = { isShowHint = true }
+                    onRewarded = { isShowHint = true },
+                    onAdDismissedFullScreenContent = {
+                        if (isShowHint) {
+                            viewModel.drawAnswerHint(
+                                imageViewWidth = binding.ivOrigin.width.toFloat(),
+                                resizedLength = resizedLength,
+                                diff = diff
+                            )
+                        }
+                        binding.clLoadingView.visibility = View.GONE
+                        binding.cvTimerView.timerRestart()
+
+                        isShowHint = false
+                    },
+                    onAdFailedToShowFullScreenContent = {
+                        binding.clLoadingView.visibility = View.GONE
+                        binding.cvTimerView.timerRestart()
+                        isShowHint = false
+                    }
                 )
             },
-            onAdDismissedFullScreenContent = {
-                if (isShowHint) {
-                    viewModel.drawAnswerHint(
-                        imageViewWidth = binding.ivOrigin.width.toFloat(),
-                        resizedLength = resizedLength,
-                        diff = diff
-                    )
-                }
-                binding.clLoadingView.visibility = View.GONE
-                binding.cvTimerView.timerRestart()
-
-                isShowHint = false
-            },
-            onAdFailedToShowFullScreenContent = {
-                binding.clLoadingView.visibility = View.GONE
-                binding.cvTimerView.timerRestart()
-                isShowHint = false
-            }
         )
     }
 

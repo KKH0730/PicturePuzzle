@@ -2,7 +2,6 @@ package com.seno.game
 
 import android.app.Application
 import android.content.ContextWrapper
-import com.facebook.appevents.AppEventsLogger
 import com.google.android.gms.ads.MobileAds
 import com.kakao.sdk.common.KakaoSdk
 import com.navercorp.nid.NaverIdLoginSDK
@@ -56,8 +55,5 @@ class App : Application() {
         KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
         OpenCVLoader.initDebug()
-        if (!BuildConfig.DEBUG) {
-            AppEventsLogger.activateApp(application = getInstance())
-        }
     }
 }

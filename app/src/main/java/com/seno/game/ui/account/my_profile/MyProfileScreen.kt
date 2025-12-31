@@ -32,7 +32,6 @@ import com.seno.game.R
 import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
-import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
@@ -56,8 +55,7 @@ fun MyProfileScreen(
     val context = LocalContext.current
     val insets = WindowInsets.systemBars.asPaddingValues()
 
-    val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
-    val googleAccountManager = GoogleAccountManager(activity = context)
+    val googleAccountManager = GoogleAccountManager(activity = context as ComponentActivity)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
@@ -118,7 +116,6 @@ fun MyProfileScreen(
             onClickRight = {
                 profileState.showLoading(isShow = true)
                 AccountManager.startLogout(
-                    facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,
                     kakaoAccountManager = kakaoAccountManager,
@@ -175,7 +172,6 @@ fun MyProfileScreen(
                             context.toast(context.getString(R.string.my_profile_withdrawal_success))
 
                             AccountManager.startLogout(
-                                facebookAccountManager = facebookAccountManager,
                                 googleAccountManager = googleAccountManager,
                                 naverAccountManager = naverAccountManager,
                                 kakaoAccountManager = kakaoAccountManager,

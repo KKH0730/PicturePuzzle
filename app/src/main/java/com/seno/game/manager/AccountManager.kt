@@ -21,7 +21,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val LOGIN_TYPE_GOOGLE = "google.com"
-private const val LOGIN_TYPE_FACEBOOK = "facebook.com"
 private const val LOGIN_TYPE_NAVER = "naver.com"
 private const val LOGIN_TYPE_KAKAO = "kakao.com"
 private const val LOGIN_TYPE_UNKNOWN = "unknown"
@@ -67,7 +66,6 @@ object AccountManager {
             var providerId = ""
             FirebaseAuth.getInstance().currentUser?.providerData?.forEach {
                 providerId = when (it.providerId) {
-                    "facebook.com" -> LOGIN_TYPE_FACEBOOK
                     "google.com" -> LOGIN_TYPE_GOOGLE
                     "password" -> {
                         val list = currentUser?.email?.split("_") ?: listOf()
@@ -400,17 +398,12 @@ object AccountManager {
     }
 
     fun startLogout(
-        facebookAccountManager: FacebookAccountManager?,
         googleAccountManager: GoogleAccountManager?,
         naverAccountManager: NaverAccountManager?,
         kakaoAccountManager: KakaoAccountManager?,
         isCompleteLogout: () -> Unit,
     ) {
         signOut(object : OnSignOutCallbackListener {
-            override fun onSignOutFacebook() {
-                facebookAccountManager?.logout()
-                signOutFirebase(isCompleteLogout = isCompleteLogout)
-            }
 
             override fun onSignOutGoogle() {
                 googleAccountManager?.logout(
@@ -464,7 +457,6 @@ object AccountManager {
         }
 
         when (authProviderId) {
-            LOGIN_TYPE_FACEBOOK -> onSignOutCallbackListener.onSignOutFacebook()
             LOGIN_TYPE_GOOGLE -> onSignOutCallbackListener.onSignOutGoogle()
             LOGIN_TYPE_NAVER -> onSignOutCallbackListener.onSignOutNaver()
             else -> onSignOutCallbackListener.onSignOutKakao()
@@ -510,7 +502,6 @@ interface OnSocialSignInCallbackListener {
 }
 
 interface OnSignOutCallbackListener {
-    fun onSignOutFacebook()
     fun onSignOutGoogle()
     fun onSignOutNaver()
     fun onSignOutKakao()

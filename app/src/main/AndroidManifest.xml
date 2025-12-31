@@ -35,14 +35,9 @@
         tools:replace="android?:allowBackup">
 
         <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="${facebookAppId}" />
-        <meta-data
-            android:name="com.facebook.sdk.ClientToken"
-            android:value="${facebookClientToken}" />
-        <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
+
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${enableCrashReporting}" />
@@ -102,24 +97,8 @@
             android:name=".ui.main.home.game.areagame.AreaGameActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-        <activity
-            android:name="com.facebook.FacebookActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
-        <activity
-            android:name="com.facebook.CustomTabActivity"
-            android:screenOrientation="portrait"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="${facebookLoginProtocolScheme}" />
-            </intent-filter>
-        </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:screenOrientation="portrait"

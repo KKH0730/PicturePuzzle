@@ -56,9 +56,6 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = false
-            manifestPlaceholders["facebookAppId"] = localProperties.getProperty("FACEBOOK_APP_ID")
-            manifestPlaceholders["facebookLoginProtocolScheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
-            manifestPlaceholders["facebookClientToken"] = localProperties.getProperty("FACEBOOK_CLIENT_TOKEN")
             manifestPlaceholders["kakaoNativeAppKeyScheme"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY_SCHEME")
             manifestPlaceholders["admobAppId"] = localProperties.getProperty("ADMOB_APP_ID")
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
@@ -92,9 +89,6 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             manifestPlaceholders["enableCrashReporting"] = true
-            manifestPlaceholders["facebookAppId"] = localProperties.getProperty("FACEBOOK_APP_ID")
-            manifestPlaceholders["facebookLoginProtocolScheme"] = localProperties.getProperty("FACEBOOK_LOGIN_PROTOCOL_SCHEME")
-            manifestPlaceholders["facebookClientToken"] = localProperties.getProperty("FACEBOOK_CLIENT_TOKEN")
             manifestPlaceholders["kakaoNativeAppKeyScheme"] = localProperties.getProperty("KAKAO_NATIVE_APP_KEY_SCHEME")
             manifestPlaceholders["admobAppId"] = localProperties.getProperty("ADMOB_APP_ID")
 
@@ -164,10 +158,6 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.ui.controller)
     implementation(libs.accompanist.pager)
-
-    // Facebook
-    implementation(libs.facebook.login)
-    implementation(libs.facebook.applink)
 
     // Naver
     implementation(libs.naver.jdk)

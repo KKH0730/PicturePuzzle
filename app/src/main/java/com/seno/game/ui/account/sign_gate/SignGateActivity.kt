@@ -20,7 +20,6 @@ import com.seno.game.theme.AppTheme
 
 class SignGateActivity : AppCompatActivity() {
     private lateinit var googleAccountManager: GoogleAccountManager
-    private lateinit var facebookAccountManager: FacebookAccountManager
     private lateinit var naverAccountManager: NaverAccountManager
     private lateinit var kakaoAccountManager: KakaoAccountManager
 
@@ -31,14 +30,11 @@ class SignGateActivity : AppCompatActivity() {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
                     googleAccountManager = GoogleAccountManager(activity = this@SignGateActivity)
-                    facebookAccountManager =
-                        FacebookAccountManager(activity = this@SignGateActivity)
                     naverAccountManager = NaverAccountManager()
                     kakaoAccountManager = KakaoAccountManager(context = this@SignGateActivity)
 
                     SignGateScreen(
                         googleAccountManager = googleAccountManager,
-                        facebookAccountManager = facebookAccountManager,
                         naverAccountManager = naverAccountManager,
                         kakaoAccountManager = kakaoAccountManager,
                         onSignInSucceed = {
@@ -68,16 +64,8 @@ class SignGateActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        facebookAccountManager.removeCallback()
         kakaoAccountManager.release()
         super.onDestroy()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == LOGIN_FACEBOOK_REQUEST_CODE) {
-            facebookAccountManager.onActivityResult(requestCode, resultCode, data)
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     companion object {

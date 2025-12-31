@@ -27,7 +27,6 @@ import timber.log.Timber
 @Composable
 fun SocialLoginContainer(
     googleAccountManager: GoogleAccountManager,
-    facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
     kakaoAccountManager: KakaoAccountManager,
     onClickSocialLogin: () -> Unit,
@@ -57,12 +56,12 @@ fun SocialLoginContainer(
             onSignInSucceed = onSignInSucceed,
             onSignInFailed = onSignInFailed
         )
-        FaceBookLoginButton(
-            facebookAccountManager = facebookAccountManager,
-            onClickSocialLogin = onClickSocialLogin,
-            onSignInSucceed = onSignInSucceed,
-            onSignInFailed = onSignInFailed
-        )
+//        FaceBookLoginButton(
+//            facebookAccountManager = facebookAccountManager,
+//            onClickSocialLogin = onClickSocialLogin,
+//            onSignInSucceed = onSignInSucceed,
+//            onSignInFailed = onSignInFailed
+//        )
     }
 }
 
@@ -151,44 +150,6 @@ fun NaverLoginButton(
             context = context,
             onSignInSucceed = onSignInSucceed,
             onSigInFailed = onSignInFailed,
-        )
-    }
-}
-
-@Composable
-fun FaceBookLoginButton(
-    facebookAccountManager: FacebookAccountManager,
-    onClickSocialLogin: () -> Unit,
-    onSignInSucceed: () -> Unit,
-    onSignInFailed: (java.lang.Exception?) -> Unit
-) {
-    SnsLoginButton(
-        snsImage = painterResource(id = R.drawable.ic_sns_facebook)
-    ) {
-        onClickSocialLogin.invoke()
-        facebookAccountManager.login(
-            onSocialLoginCallbackListener = object : OnSocialSignInCallbackListener {
-                override fun signInWithCredential(idToken: String?) {
-                    try {
-                        idToken?.let { token ->
-                            val credential = FacebookAuthProvider.getCredential(token)
-                            AccountManager.signInWithCredential(
-                                credential = credential,
-                                platform = PlatForm.FACEBOOK,
-                                onSignInSucceed = onSignInSucceed,
-                                onSignInFailed = onSignInFailed
-                            )
-                        }
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                    }
-                }
-
-                override fun onError(e: Exception?) {
-                    Timber.e(e)
-                    onSignInFailed.invoke(e)
-                }
-            }
         )
     }
 }

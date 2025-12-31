@@ -55,7 +55,6 @@ fun UserInfoContainer(
                 UserInfoPanel(
                     label = stringResource(id = R.string.my_profile_sso),
                     drawableRight = when(PrefsManager.platform) {
-                        PlatForm.FACEBOOK.value -> painterResource(id = R.drawable.ic_sns_facebook)
                         PlatForm.GOOGLE.value -> painterResource(id = R.drawable.ic_sns_google)
                         PlatForm.KAKAO.value -> painterResource(id = R.drawable.ic_sns_kakao)
                         PlatForm.NAVER.value -> painterResource(id = R.drawable.ic_sns_naver)

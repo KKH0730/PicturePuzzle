@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
-import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
@@ -49,7 +48,6 @@ import com.seno.game.ui.component.LoadingView
 @Composable
 fun SignGateScreen(
     googleAccountManager: GoogleAccountManager,
-    facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
     kakaoAccountManager: KakaoAccountManager,
     onSignInSucceed: () -> Unit,
@@ -71,7 +69,6 @@ fun SignGateScreen(
     ) {
         SignGateContainer(
             googleAccountManager = googleAccountManager,
-            facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
             kakaoAccountManager = kakaoAccountManager,
             onClickSocialLogin = { isLoading = true },
@@ -157,7 +154,6 @@ fun CatCircleImage(modifier: Modifier = Modifier) {
 @Composable
 fun SignGateContainer(
     googleAccountManager: GoogleAccountManager,
-    facebookAccountManager: FacebookAccountManager,
     naverAccountManager: NaverAccountManager,
     kakaoAccountManager: KakaoAccountManager,
     onClickSocialLogin: () -> Unit,
@@ -188,7 +184,6 @@ fun SignGateContainer(
         Spacer(modifier = Modifier.height(height = 81.dp))
         SocialLoginContainer(
             googleAccountManager = googleAccountManager,
-            facebookAccountManager = facebookAccountManager,
             naverAccountManager = naverAccountManager,
             kakaoAccountManager = kakaoAccountManager,
             onClickSocialLogin = onClickSocialLogin,

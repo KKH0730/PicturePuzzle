@@ -48,7 +48,6 @@ import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.safeStartActivity
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
-import com.seno.game.manager.FacebookAccountManager
 import com.seno.game.manager.GoogleAccountManager
 import com.seno.game.manager.KakaoAccountManager
 import com.seno.game.manager.NaverAccountManager
@@ -128,8 +127,7 @@ fun HomeUI(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val facebookAccountManager = FacebookAccountManager(activity = context as ComponentActivity)
-    val googleAccountManager = GoogleAccountManager(activity = context)
+    val googleAccountManager = GoogleAccountManager(activity = context as ComponentActivity)
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
@@ -329,7 +327,6 @@ fun HomeUI(
             onClickRight = {
                 isLoading = true
                 AccountManager.startLogout(
-                    facebookAccountManager = facebookAccountManager,
                     googleAccountManager = googleAccountManager,
                     naverAccountManager = naverAccountManager,
                     kakaoAccountManager = kakaoAccountManager,

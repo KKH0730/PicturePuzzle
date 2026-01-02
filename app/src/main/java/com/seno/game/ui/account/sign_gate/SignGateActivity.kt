@@ -29,7 +29,7 @@ class SignGateActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    googleAccountManager = GoogleAccountManager(activity = this@SignGateActivity)
+                    googleAccountManager = GoogleAccountManager()
                     naverAccountManager = NaverAccountManager()
                     kakaoAccountManager = KakaoAccountManager(context = this@SignGateActivity)
 

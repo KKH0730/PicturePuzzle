@@ -127,7 +127,7 @@ fun HomeUI(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val googleAccountManager = GoogleAccountManager(activity = context as ComponentActivity)
+    val googleAccountManager = GoogleAccountManager()
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
@@ -211,7 +211,7 @@ fun HomeUI(
         isShowQuitDialog = true
     }
 
-    context.LifecycleEventListener {
+    (context as MainActivity).LifecycleEventListener {
         when (it) {
             Lifecycle.Event.ON_CREATE -> {}
             Lifecycle.Event.ON_START -> {}
@@ -333,28 +333,31 @@ fun HomeUI(
             rightButtonText = stringResource(id = R.string.home_logout_y),
             onClickLeft = { isShowLogoutDialog = false },
             onClickRight = {
-                isLoading = true
-                AccountManager.startLogout(
-                    googleAccountManager = googleAccountManager,
-                    naverAccountManager = naverAccountManager,
-                    kakaoAccountManager = kakaoAccountManager,
-                    isCompleteLogout = {
-                        isLoading = false
-                        isShowLogoutDialog = false
-                        isUser = false
+                scope.launch {
+                    isLoading = true
+                    AccountManager.startLogout(
+                        context = context,
+                        googleAccountManager = googleAccountManager,
+                        naverAccountManager = naverAccountManager,
+                        kakaoAccountManager = kakaoAccountManager,
+                        isCompleteLogout = {
+                            isLoading = false
+                            isShowLogoutDialog = false
+                            isUser = false
 
-                        PrefsManager.apply {
-                            this.nickname = context.resources.createRandomNickname()
-                            this.platform = ""
-                            this.profileUri = ""
-                            this.isShowAD = true
+                            PrefsManager.apply {
+                                this.nickname = context.resources.createRandomNickname()
+                                this.platform = ""
+                                this.profileUri = ""
+                                this.isShowAD = true
+                            }
+                            nickname = PrefsManager.nickname
+                            profileUri = ""
+
+                            context.toast(context.getString(R.string.my_profile_logout_success))
                         }
-                        nickname = PrefsManager.nickname
-                        profileUri = ""
-
-                        context.toast(context.getString(R.string.my_profile_logout_success))
-                    }
-                )
+                    )
+                }
             },
             onDismissed = { isShowLogoutDialog = false }
         )

@@ -1,28 +1,22 @@
 package com.seno.game.ui.account.sign_gate.component
 
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FacebookAuthProvider
-import com.navercorp.nid.NaverIdLoginSDK
 import com.seno.game.R
 import com.seno.game.extensions.noRippleClickable
-import com.seno.game.extensions.toast
-import com.seno.game.manager.*
-import timber.log.Timber
+import com.seno.game.manager.GoogleAccountManager
+import com.seno.game.manager.KakaoAccountManager
+import com.seno.game.manager.NaverAccountManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun SocialLoginContainer(
@@ -56,12 +50,6 @@ fun SocialLoginContainer(
             onSignInSucceed = onSignInSucceed,
             onSignInFailed = onSignInFailed
         )
-//        FaceBookLoginButton(
-//            facebookAccountManager = facebookAccountManager,
-//            onClickSocialLogin = onClickSocialLogin,
-//            onSignInSucceed = onSignInSucceed,
-//            onSignInFailed = onSignInFailed
-//        )
     }
 }
 
@@ -72,46 +60,18 @@ fun GoogleLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
-    val launcher: ManagedActivityResultLauncher<Intent, ActivityResult> =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                googleAccountManager.onActivityResult(
-                    data = it.data,
-                    onSocialSignInCallbackListener = object : OnSocialSignInCallbackListener {
-                        override fun signInWithCredential(idToken: String?) {
-                            try {
-                                idToken?.let { token ->
-                                    val authCredential = googleAccountManager.getAuthCredential(token)
-                                    AccountManager.signInWithCredential(
-                                        credential = authCredential,
-                                        platform = PlatForm.GOOGLE,
-                                        onSignInSucceed = onSignInSucceed,
-                                        onSignInFailed = onSignInFailed
-                                    )
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Timber.e(e)
-                                onSignInFailed.invoke(e)
-                            }
-                        }
-
-                        override fun onError(e: Exception?) {
-                            Timber.e(e)
-                            onSignInFailed.invoke(e)
-                        }
-                    }
-                )
-            } else if (it.resultCode == Activity.RESULT_CANCELED) {
-                onSignInFailed.invoke(java.lang.Exception("user cancel"))
-            }
-        }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     SnsLoginButton(snsImage = painterResource(id = R.drawable.ic_sns_google)) {
         onClickSocialLogin.invoke()
-        googleAccountManager.login(launcher = launcher)
+        coroutineScope.launch {
+            googleAccountManager.login(
+                context = context,
+                onSignInSucceed = onSignInSucceed,
+                onSignInFailed = onSignInFailed
+            )
+        }
     }
 }
 

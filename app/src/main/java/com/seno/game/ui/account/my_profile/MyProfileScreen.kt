@@ -1,6 +1,5 @@
 package com.seno.game.ui.account.my_profile
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,7 +54,7 @@ fun MyProfileScreen(
     val context = LocalContext.current
     val insets = WindowInsets.systemBars.asPaddingValues()
 
-    val googleAccountManager = GoogleAccountManager(activity = context as ComponentActivity)
+    val googleAccountManager = GoogleAccountManager()
     val naverAccountManager = NaverAccountManager()
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
@@ -114,29 +113,32 @@ fun MyProfileScreen(
             rightButtonText = stringResource(id = R.string.home_logout_y),
             onClickLeft = { profileState.showLogoutDialog(isShow = false) },
             onClickRight = {
-                profileState.showLoading(isShow = true)
-                AccountManager.startLogout(
-                    googleAccountManager = googleAccountManager,
-                    naverAccountManager = naverAccountManager,
-                    kakaoAccountManager = kakaoAccountManager,
-                    isCompleteLogout = {
-                        profileState.showLoading(isShow = false)
-                        profileState.showLogoutDialog(isShow = false)
+                profileState.coroutineScope.launch {
+                    profileState.showLoading(isShow = true)
+                    AccountManager.startLogout(
+                        context = context,
+                        googleAccountManager = googleAccountManager,
+                        naverAccountManager = naverAccountManager,
+                        kakaoAccountManager = kakaoAccountManager,
+                        isCompleteLogout = {
+                            profileState.showLoading(isShow = false)
+                            profileState.showLogoutDialog(isShow = false)
 
-                        PrefsManager.apply {
-                            this.nickname = context.resources.createRandomNickname()
-                            this.platform = ""
-                            this.profileUri = ""
-                        }
-                        profileState.apply {
-                            setNickname(nickname = PrefsManager.nickname)
-                            setProfileUri(profileUri = "")
-                        }
+                            PrefsManager.apply {
+                                this.nickname = context.resources.createRandomNickname()
+                                this.platform = ""
+                                this.profileUri = ""
+                            }
+                            profileState.apply {
+                                setNickname(nickname = PrefsManager.nickname)
+                                setProfileUri(profileUri = "")
+                            }
 
-                        context.finish()
-                        context.toast(context.getString(R.string.my_profile_logout_success))
-                    }
-                )
+                            onClickClose.invoke()
+                            context.toast(context.getString(R.string.my_profile_logout_success))
+                        }
+                    )
+                }
             },
             onDismissed = { profileState.showLogoutDialog(isShow = false) }
         )
@@ -155,28 +157,35 @@ fun MyProfileScreen(
 
                 profileState.coroutineScope.launch {
                     AccountManager.startWithdrawal(
+                        context = context,
+                        googleAccountManager = googleAccountManager,
+                        naverAccountManager = naverAccountManager,
+                        kakaoAccountManager = kakaoAccountManager,
                         isCompleteWithdrawal = {
-                            AccountManager.startLogout(
-                                googleAccountManager = googleAccountManager,
-                                naverAccountManager = naverAccountManager,
-                                kakaoAccountManager = kakaoAccountManager,
-                                isCompleteLogout = {
-                                    profileState.showLoading(isShow = false)
-                                    profileState.showWithdrawalDialog(isShow = false)
+                            profileState.coroutineScope.launch {
+                                AccountManager.startLogout(
+                                    context = context,
+                                    googleAccountManager = googleAccountManager,
+                                    naverAccountManager = naverAccountManager,
+                                    kakaoAccountManager = kakaoAccountManager,
+                                    isCompleteLogout = {
+                                        profileState.showLoading(isShow = false)
+                                        profileState.showWithdrawalDialog(isShow = false)
 
-                                    PrefsManager.apply {
-                                        this.nickname = context.resources.createRandomNickname()
-                                        this.platform = ""
-                                        this.profileUri = ""
-                                    }
-                                    profileState.apply {
-                                        setNickname(nickname = PrefsManager.nickname)
-                                        setProfileUri(profileUri = "")
-                                    }
+                                        PrefsManager.apply {
+                                            this.nickname = context.resources.createRandomNickname()
+                                            this.platform = ""
+                                            this.profileUri = ""
+                                        }
+                                        profileState.apply {
+                                            setNickname(nickname = PrefsManager.nickname)
+                                            setProfileUri(profileUri = "")
+                                        }
 
-                                    onCompleteWithdrawal.invoke()
-                                }
-                            )
+                                        onCompleteWithdrawal.invoke()
+                                    }
+                                )
+                            }
                         },
                         onFail = {
                             context.toast(context.getString(R.string.my_profile_withdrawal_fail))

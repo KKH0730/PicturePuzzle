@@ -1,10 +1,13 @@
 package com.seno.game.manager
 
 import android.content.Context
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.kakao.sdk.auth.network.RxAuthOperations
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.kakao.sdk.user.model.User
 import com.kakao.sdk.user.rx
 import com.seno.game.extensions.isNotNullAndNotEmpty
 import io.reactivex.Single
@@ -12,6 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class KakaoAccountManager(private val context: Context) {
     var disposables = CompositeDisposable()
@@ -134,6 +140,40 @@ class KakaoAccountManager(private val context: Context) {
             }, { onSignInFailed.invoke(Exception(it.message)) })
             .addTo(disposables)
     }
+
+    suspend fun suspendLogin(): AuthCredential? {
+        return try {
+            val user = getKakaoUser()
+            if (user == null) {
+                return null
+            }
+
+            val email = user.kakaoAccount?.email ?: ""
+            val kakaoUid = user.id.toString()
+
+            if (email.isNotNullAndNotEmpty() && kakaoUid.isNotNullAndNotEmpty()) {
+                EmailAuthProvider.getCredential(email, kakaoUid)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
+    }
+
+    suspend fun getKakaoUser(): User? =
+        suspendCoroutine { continuation ->
+            UserApiClient.instance.me { user, error ->
+                if (error != null) {
+                    continuation.resume(null)
+                } else if (user != null) {
+                    continuation.resume(user)
+                } else {
+                    continuation.resume(null)
+                }
+            }
+        }
 
     fun release() {
         disposables.dispose()

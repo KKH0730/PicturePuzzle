@@ -1,5 +1,6 @@
 package com.seno.game.manager
 
+import android.content.Context
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -417,7 +418,8 @@ object AccountManager {
         } ?: onSignInFailed.invoke(Exception("uid is null"))
     }
 
-    fun startLogout(
+    suspend fun startLogout(
+        context: Context,
         googleAccountManager: GoogleAccountManager?,
         naverAccountManager: NaverAccountManager?,
         kakaoAccountManager: KakaoAccountManager?,
@@ -425,13 +427,9 @@ object AccountManager {
     ) {
         signOut(object : OnSignOutCallbackListener {
 
-            override fun onSignOutGoogle() {
-                googleAccountManager?.logout(
-                    logoutListener = object : GoogleAccountManager.LogoutListener {
-                        override fun onSuccessLogout() {
-                            signOutFirebase(isCompleteLogout = isCompleteLogout)
-                        }
-                    })
+            override suspend fun onSignOutGoogle() {
+                googleAccountManager?.logout(context = context)
+                signOutFirebase(isCompleteLogout = isCompleteLogout)
             }
 
             override fun onSignOutNaver() {
@@ -473,49 +471,73 @@ object AccountManager {
 
     // 오랜기간 접속한 경우 탈퇴시 reauthenticate 호출하여 재인증필요
     // 구글, 카카오 개발 필요
-//    suspend fun startWithdrawal(
-//        context: Context,
-//        googleAccountManager: GoogleAccountManager,
-//        naverAccountManager: NaverAccountManager,
-//        kakaoAccountManager: KakaoAccountManager,
-//        isCompleteWithdrawal: () -> Unit,
-//        onFail: () -> Unit
-//    ) {
-//        val uid = firebaseUid
-//        if (uid.isEmpty()) {
-//            withContext(Dispatchers.Main) { onFail.invoke() }
-//            return
-//        }
-//
-//        if (uid == UNKNOWN_UID) {
-//            withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
-//            return
-//        }
-//
-//        val deleteAuthTask = withdrawalFirebase()
-//        if (!deleteAuthTask.isSuccessful) {
-//            withContext(Dispatchers.Main) {
-//                if (deleteAuthTask.exception is FirebaseAuthRecentLoginRequiredException) {
-//                    val credential = naverAccountManager.suspendLogin(context)
-//                    val isSuccessReAuth = reauthenticate(credential)
-//                    if (isSuccessReAuth) {
-//                        deleteUserInfo(uid = uid)
-//                        isCompleteWithdrawal.invoke()
-//                    } else {
-//                        onFail.invoke()
-//                    }
-//                } else {
-//                    onFail.invoke()
-//                }
-//            }
-//            return
-//        }
-//
-//        deleteUserInfo(uid = uid)
-//        isCompleteWithdrawal.invoke()
-//    }
+    suspend fun startWithdrawal(
+        context: Context,
+        googleAccountManager: GoogleAccountManager,
+        naverAccountManager: NaverAccountManager,
+        kakaoAccountManager: KakaoAccountManager,
+        isCompleteWithdrawal: () -> Unit,
+        onFail: () -> Unit
+    ) {
+        val uid = firebaseUid
+        if (uid.isEmpty()) {
+            withContext(Dispatchers.Main) { onFail.invoke() }
+            return
+        }
 
-    private fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
+        if (uid == UNKNOWN_UID) {
+            withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
+            return
+        }
+
+        val deleteAuthTask = withdrawalFirebase()
+        if (!deleteAuthTask.isSuccessful) {
+            withContext(Dispatchers.Main) {
+                if (deleteAuthTask.exception is FirebaseAuthRecentLoginRequiredException) {
+                    reauthenticate(
+                        context = context,
+                        uid = uid,
+                        googleAccountManager = googleAccountManager,
+                        naverAccountManager = naverAccountManager,
+                        kakaoAccountManager = kakaoAccountManager,
+                        isCompleteWithdrawal = isCompleteWithdrawal,
+                        onFail = onFail
+                    )
+                } else {
+                    onFail.invoke()
+                }
+            }
+            return
+        }
+
+        deleteUserInfo(uid = uid)
+        isCompleteWithdrawal.invoke()
+    }
+
+    private suspend fun reauthenticate(
+        context: Context,
+        uid: String,
+        googleAccountManager: GoogleAccountManager,
+        naverAccountManager: NaverAccountManager,
+        kakaoAccountManager: KakaoAccountManager,
+        isCompleteWithdrawal: () -> Unit,
+        onFail: () -> Unit
+    ) {
+        val credential = when (authProviderId) {
+            LOGIN_TYPE_GOOGLE -> googleAccountManager.suspendLogin(context = context)
+            LOGIN_TYPE_NAVER -> naverAccountManager.suspendLogin(context = context)
+            else -> kakaoAccountManager.suspendLogin()
+        }
+        val isSuccessReAuth = reauthenticate(credential)
+        if (isSuccessReAuth) {
+            deleteUserInfo(uid = uid)
+            isCompleteWithdrawal.invoke()
+        } else {
+            onFail.invoke()
+        }
+    }
+
+    private suspend fun signOut(onSignOutCallbackListener: OnSignOutCallbackListener?) {
         if (onSignOutCallbackListener == null) {
             return
         }
@@ -530,10 +552,6 @@ object AccountManager {
     fun signOutFirebase(isCompleteLogout: () -> Unit) {
         firebaseRequest.signOut()
         isCompleteLogout.invoke()
-//        signInAnonymous(
-//            onSuccess = isCompleteLogout,
-//            onFail = isCompleteLogout
-//        )
     }
 
     fun signInAnonymous(
@@ -566,7 +584,7 @@ interface OnSocialSignInCallbackListener {
 }
 
 interface OnSignOutCallbackListener {
-    fun onSignOutGoogle()
+    suspend fun onSignOutGoogle()
     fun onSignOutNaver()
     fun onSignOutKakao()
 }

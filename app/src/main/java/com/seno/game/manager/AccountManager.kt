@@ -5,9 +5,11 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.seno.game.App
 import com.seno.game.R
 import com.seno.game.data.network.ApiConstants
 import com.seno.game.data.network.FirebaseRequest
+import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.getString
 import com.seno.game.extensions.isNotNullAndNotEmpty
 import com.seno.game.extensions.saveDiskCacheData
@@ -154,6 +156,9 @@ object AccountManager {
     fun signInWithCredential(
         credential: AuthCredential,
         platform: PlatForm,
+        email: String,
+        nickname: String,
+        profileUri: String,
         onSignInSucceed: () -> Unit,
         onSignInFailed: (Exception?) -> Unit
     ) {
@@ -182,8 +187,55 @@ object AccountManager {
                     setProfileInfo(
                         uid = uid,
                         platform = platform,
-                        nickname = displayName,
-                        profileUri = signInTask.result.user?.photoUrl?.toString(),
+                        email = email,
+                        nickname = nickname,
+                        profileUri = profileUri,
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                }
+            }
+        }
+    }
+
+    fun signInWithCustomToken(
+        customToken: String,
+        platform: PlatForm,
+        email: String,
+        nickname: String?,
+        profileUri: String,
+        onSignInSucceed: () -> Unit,
+        onSignInFailed: (Exception?) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val signInTask = firebaseRequest.signInWithCustomToken(fCredentialToken = customToken)
+            if (!signInTask.isSuccessful) {
+                onSignInFailed.invoke(signInTask.exception)
+                return@launch
+            }
+
+            val uid = signInTask.result.user?.uid
+            if (uid == null) {
+                onSignInFailed.invoke(Exception("uid is null"))
+                return@launch
+            } else {
+                val isProfileDocExist = isExistProfileDocument(uid = uid)
+                Timber.e("isProfileDocExist : $isProfileDocExist")
+                if (isProfileDocExist) {
+                    // SNS 로그인
+                    getProfileInfo(
+                        uid = uid,
+                        onSignInSucceed = onSignInSucceed,
+                        onSignInFailed = onSignInFailed
+                    )
+                } else {
+                    // SNS 회원가입
+                    setProfileInfo(
+                        uid = uid,
+                        platform = platform,
+                        email = email,
+                        nickname = nickname,
+                        profileUri = profileUri,
                         onSignInSucceed = onSignInSucceed,
                         onSignInFailed = onSignInFailed
                     )
@@ -203,57 +255,12 @@ object AccountManager {
             }
     }
 
-    fun createUserWithEmailAndPassword(
-        email: String,
-        password: String,
-        platform: PlatForm,
-        nickname: String?,
-        profileUri: String?,
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: (Exception?) -> Unit,
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            when (val createUserWithEmailAndPasswordResult = firebaseRequest.createUserWithEmailAndPassword(email, password)) {
-                null -> {
-                    onSignInFailed.invoke(Exception("Result is null"))
-                }
-                is FirebaseAuthUserCollisionException -> {
-                    val signInUserWithEmailAndPasswordResult = firebaseRequest.signInWithEmailAndPassword(
-                        email = email,
-                        password = password,
-                    )
-
-                    if (signInUserWithEmailAndPasswordResult == null || signInUserWithEmailAndPasswordResult is Exception) {
-                        onSignInFailed.invoke(Exception("FirebaseAuthUserCollisionException"))
-                    } else {
-                        val user = (signInUserWithEmailAndPasswordResult as AuthResult).user
-                        getProfileInfo(
-                            uid = user?.uid,
-                            onSignInSucceed = onSignInSucceed,
-                            onSignInFailed = onSignInFailed
-                        )
-                    }
-                }
-                else -> {
-                    val user = (createUserWithEmailAndPasswordResult as AuthResult).user
-                    setProfileInfo(
-                        uid = user?.uid,
-                        platform = platform,
-                        nickname = nickname,
-                        profileUri = profileUri,
-                        onSignInSucceed = onSignInSucceed,
-                        onSignInFailed = onSignInFailed
-                    )
-                }
-            }
-        }
-    }
-
     suspend fun reauthenticate(credential: AuthCredential?) = suspendCoroutine { continuation ->
         if (credential == null) {
             continuation.resume(false)
             return@suspendCoroutine
         }
+
 
         firebaseRequest.currentUser?.reauthenticate(credential)
             ?.addOnSuccessListener { continuation.resume(true) }
@@ -263,6 +270,7 @@ object AccountManager {
     private suspend fun setProfileInfo(
         uid: String?,
         platform: PlatForm,
+        email: String,
         nickname: String?,
         profileUri: String?,
         onSignInSucceed: () -> Unit,
@@ -271,7 +279,7 @@ object AccountManager {
         uid?.let {
             profileUri?.saveDiskCacheData(size = null)
 
-            val userInfoTask = setUserInfo(uid = uid, platform = platform, nickname = nickname, profileUri = profileUri)
+            val userInfoTask = setUserInfo(uid = uid, platform = platform, email = email, nickname = nickname, profileUri = profileUri)
             if (!userInfoTask.isSuccessful) {
                 onSignInFailed.invoke(userInfoTask.exception)
                 return
@@ -284,9 +292,10 @@ object AccountManager {
             }
 
             PrefsManager.apply {
-                nickname?.let { this.nickname = it }
+                this.nickname = nickname ?: ""
+                this.email = email
                 this.platform = platform.value
-                profileUri?.let { this.profileUri = it }
+                this.profileUri = profileUri ?: ""
             }
 
             onSignInSucceed.invoke()
@@ -296,6 +305,7 @@ object AccountManager {
     private suspend fun setUserInfo(
         uid: String,
         platform: PlatForm,
+        email: String,
         nickname: String?,
         profileUri: String?,
     ) = suspendCoroutine { continuation ->
@@ -303,8 +313,9 @@ object AccountManager {
         val userProfileUri = profileUri ?: ""
         val map = mutableMapOf(
             ApiConstants.UserInfo.UID to uid,
-            ApiConstants.UserInfo.NICKNAME to userNickname,
             ApiConstants.UserInfo.PLATFORM to platform.value,
+            ApiConstants.UserInfo.EMAIL to email,
+            ApiConstants.UserInfo.NICKNAME to userNickname,
             ApiConstants.UserInfo.PROFILE_URI to userProfileUri,
             ApiConstants.UserInfo.BACKGROUND_VOLUME to PrefsManager.backgroundVolume.toString(),
             ApiConstants.UserInfo.EFFECT_VOLUME to PrefsManager.effectVolume.toString(),
@@ -366,6 +377,7 @@ object AccountManager {
             val userDoc = userInfoTask.result as DocumentSnapshot
             if (userDoc.exists()) {
                 PrefsManager.apply {
+                    this.email = userDoc.getString(ApiConstants.UserInfo.EMAIL) ?: email
                     this.nickname = userDoc.getString(ApiConstants.UserInfo.NICKNAME) ?: nickname
                     this.platform = userDoc.getString(ApiConstants.UserInfo.PLATFORM) ?: platform
                     this.profileUri = userDoc.getString(ApiConstants.UserInfo.PROFILE_URI) ?: profileUri
@@ -444,33 +456,6 @@ object AccountManager {
         })
     }
 
-    suspend fun startWithdrawal(
-        isCompleteWithdrawal: () -> Unit,
-        onFail: () -> Unit
-    ) {
-        val uid = firebaseUid
-        if (uid.isEmpty()) {
-            withContext(Dispatchers.Main) { onFail.invoke() }
-            return
-        }
-
-        if (uid == UNKNOWN_UID) {
-            withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
-            return
-        }
-
-        val deleteAuthTask = withdrawalFirebase()
-        if (!deleteAuthTask.isSuccessful) {
-            withContext(Dispatchers.Main) { onFail.invoke() }
-            return
-        }
-
-        deleteUserInfo(uid = uid)
-        withContext(Dispatchers.Main) { isCompleteWithdrawal.invoke() }
-    }
-
-    // 오랜기간 접속한 경우 탈퇴시 reauthenticate 호출하여 재인증필요
-    // 구글, 카카오 개발 필요
     suspend fun startWithdrawal(
         context: Context,
         googleAccountManager: GoogleAccountManager,
@@ -576,11 +561,15 @@ object AccountManager {
             transaction.delete(profileColRef.document(uid))
         }.addOnCompleteListener { task -> continuation.resume(task) }
     }
-}
 
-interface OnSocialSignInCallbackListener {
-    fun signInWithCredential(idToken: String?)
-    fun onError(e: Exception?)
+    fun initData() {
+        PrefsManager.apply {
+            this.email = ""
+            this.nickname = App.getInstance().resources.createRandomNickname()
+            this.platform = ""
+            this.profileUri = ""
+        }
+    }
 }
 
 interface OnSignOutCallbackListener {

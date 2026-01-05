@@ -5,6 +5,11 @@ import com.seno.game.extensions.getTodayDate
 import timber.log.Timber
 
 object PrefsManager {
+    var email: String
+        get() = Prefs.getString("email", "")
+        set(email) {
+            Prefs.putString("email", email)
+        }
     var nickname: String
         get() = Prefs.getString("nickname", "")
         set(nickname) {

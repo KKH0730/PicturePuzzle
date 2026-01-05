@@ -49,6 +49,9 @@ class GoogleAccountManager() {
                 AccountManager.signInWithCredential(
                     credential = authCredential,
                     platform = PlatForm.GOOGLE,
+                    email = googleIdTokenCredential.id,
+                    nickname = googleIdTokenCredential.displayName ?: "",
+                    profileUri = googleIdTokenCredential.profilePictureUri?.toString() ?: "",
                     onSignInSucceed = onSignInSucceed,
                     onSignInFailed = onSignInFailed
                 )

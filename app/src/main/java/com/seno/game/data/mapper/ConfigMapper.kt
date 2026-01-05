@@ -13,6 +13,7 @@ class ConfigMapper @Inject constructor(): Mapper<DocumentSnapshot, UserInfoRespo
         return with(model) {
             UserInfoResponse(
                 getString(ApiConstants.UserInfo.UID) ?: AccountManager.firebaseUid,
+                getString(ApiConstants.UserInfo.EMAIL) ?: PrefsManager.email,
                 getString(ApiConstants.UserInfo.NICKNAME) ?: PrefsManager.nickname,
                 getString(ApiConstants.UserInfo.PLATFORM) ?: PrefsManager.platform,
                 getString(ApiConstants.UserInfo.PROFILE_URI) ?: PrefsManager.profileUri,

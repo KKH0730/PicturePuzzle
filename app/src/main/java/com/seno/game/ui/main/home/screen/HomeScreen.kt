@@ -345,12 +345,8 @@ fun HomeUI(
                             isShowLogoutDialog = false
                             isUser = false
 
-                            PrefsManager.apply {
-                                this.nickname = context.resources.createRandomNickname()
-                                this.platform = ""
-                                this.profileUri = ""
-                                this.isShowAD = true
-                            }
+                            AccountManager.initData()
+
                             nickname = PrefsManager.nickname
                             profileUri = ""
 

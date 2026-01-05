@@ -48,6 +48,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storeage = { module = "com.google.firebase:firebase-storage" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+firebase-functions = { module = "com.google.firebase:firebase-functions" }
 dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 dagger-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }

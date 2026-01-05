@@ -59,8 +59,14 @@ class FirebaseRequest {
     fun updatePassword(password: String): Task<Void>? =
         currentUser?.updatePassword(password)
 
-    fun signInWithCustomToken(fCredentialToken: String): Task<AuthResult> =
+
+    suspend fun signInWithCustomToken(fCredentialToken: String) = suspendCoroutine { continuation ->
         firebaseAuth.signInWithCustomToken(fCredentialToken)
+            .addOnCompleteListener { task -> continuation.resume(task) }
+            .addOnFailureListener {
+                Timber.e("exception : $it")
+            }
+    }
 
     fun sendPasswordResetEmail(email: String): Task<Void> =
         firebaseAuth.sendPasswordResetEmail(email)

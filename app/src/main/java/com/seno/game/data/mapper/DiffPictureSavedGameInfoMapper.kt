@@ -32,6 +32,7 @@ class DiffPictureSavedGameInfoMapper @Inject constructor(): MapperType2<Document
 
         return SavedGameInfo(
             uid = param2.uid,
+            email = param2.email,
             nickname = param2.nickname,
             platform = param2.platform,
             profileUri = param2.profileUri,

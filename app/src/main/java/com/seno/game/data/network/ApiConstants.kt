@@ -20,6 +20,7 @@ object ApiConstants {
 
     object UserInfo {
         const val UID = "uid"
+        const val EMAIL = "email"
         const val NICKNAME = "nickname"
         const val PLATFORM = "platform"
         const val PROFILE_URI = "profileUri"

@@ -158,6 +158,7 @@ dependencies {
     implementation(libs.firebase.storeage)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.functions)
 
     // Accompanist
     implementation(libs.accompanist.ui.controller)

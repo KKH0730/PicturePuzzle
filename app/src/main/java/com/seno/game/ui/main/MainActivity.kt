@@ -153,6 +153,7 @@ class MainActivity : ComponentActivity() {
 fun SavedGameInfo?.savedGameInfoToLocalDB() {
     this?.let {
         PrefsManager.apply {
+            email = it.email
             nickname = it.nickname
             platform = it.platform
             profileUri = it.profileUri

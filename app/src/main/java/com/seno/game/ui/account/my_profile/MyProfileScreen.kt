@@ -1,5 +1,6 @@
 package com.seno.game.ui.account.my_profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.seno.game.R
-import com.seno.game.extensions.createRandomNickname
 import com.seno.game.extensions.toast
 import com.seno.game.manager.AccountManager
 import com.seno.game.manager.GoogleAccountManager
@@ -45,6 +45,7 @@ import com.seno.game.ui.component.CommonCustomDialog
 import com.seno.game.ui.component.LoadingView
 import kotlinx.coroutines.launch
 
+@SuppressLint("LocalContextResourcesRead")
 @Composable
 fun MyProfileScreen(
     onClickClose: () -> Unit,
@@ -124,11 +125,8 @@ fun MyProfileScreen(
                             profileState.showLoading(isShow = false)
                             profileState.showLogoutDialog(isShow = false)
 
-                            PrefsManager.apply {
-                                this.nickname = context.resources.createRandomNickname()
-                                this.platform = ""
-                                this.profileUri = ""
-                            }
+                            AccountManager.initData()
+
                             profileState.apply {
                                 setNickname(nickname = PrefsManager.nickname)
                                 setProfileUri(profileUri = "")
@@ -172,11 +170,8 @@ fun MyProfileScreen(
                                         profileState.showLoading(isShow = false)
                                         profileState.showWithdrawalDialog(isShow = false)
 
-                                        PrefsManager.apply {
-                                            this.nickname = context.resources.createRandomNickname()
-                                            this.platform = ""
-                                            this.profileUri = ""
-                                        }
+                                        AccountManager.initData()
+
                                         profileState.apply {
                                             setNickname(nickname = PrefsManager.nickname)
                                             setProfileUri(profileUri = "")

@@ -55,8 +55,8 @@ fun MyProfileScreen(
     val context = LocalContext.current
     val insets = WindowInsets.systemBars.asPaddingValues()
 
-    val googleAccountManager = GoogleAccountManager()
-    val naverAccountManager = NaverAccountManager()
+    val googleAccountManager = GoogleAccountManager(context = context)
+    val naverAccountManager = NaverAccountManager(context = context)
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
     val profileState = rememberProfileState()

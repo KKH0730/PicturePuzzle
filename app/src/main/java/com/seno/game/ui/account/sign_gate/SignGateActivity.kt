@@ -29,8 +29,8 @@ class SignGateActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    googleAccountManager = GoogleAccountManager()
-                    naverAccountManager = NaverAccountManager()
+                    googleAccountManager = GoogleAccountManager(context = this@SignGateActivity)
+                    naverAccountManager = NaverAccountManager(context = this@SignGateActivity)
                     kakaoAccountManager = KakaoAccountManager(context = this@SignGateActivity)
 
                     SignGateScreen(
@@ -64,7 +64,6 @@ class SignGateActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        kakaoAccountManager.release()
         super.onDestroy()
     }
 

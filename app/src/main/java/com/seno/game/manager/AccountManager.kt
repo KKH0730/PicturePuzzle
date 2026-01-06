@@ -220,7 +220,6 @@ object AccountManager {
                 return@launch
             } else {
                 val isProfileDocExist = isExistProfileDocument(uid = uid)
-                Timber.e("isProfileDocExist : $isProfileDocExist")
                 if (isProfileDocExist) {
                     // SNS 로그인
                     getProfileInfo(
@@ -244,6 +243,11 @@ object AccountManager {
         }
     }
 
+    suspend fun signInWithCustomToken(customToken: String): Boolean = withContext(Dispatchers.IO) {
+        val signInTask = firebaseRequest.signInWithCustomToken(fCredentialToken = customToken)
+        signInTask.isSuccessful
+    }
+
     private suspend fun isExistProfileDocument(uid: String) = suspendCoroutine { continuation ->
         profileColRef.document(uid).get()
             .addOnCompleteListener { task ->
@@ -261,14 +265,13 @@ object AccountManager {
             return@suspendCoroutine
         }
 
-
         firebaseRequest.currentUser?.reauthenticate(credential)
             ?.addOnSuccessListener { continuation.resume(true) }
             ?.addOnFailureListener { e -> continuation.resume(false) }
     }
 
     private suspend fun setProfileInfo(
-        uid: String?,
+        uid: String,
         platform: PlatForm,
         email: String,
         nickname: String?,
@@ -276,30 +279,57 @@ object AccountManager {
         onSignInSucceed: () -> Unit,
         onSignInFailed: (Exception?) -> Unit,
     ) {
-        uid?.let {
-            profileUri?.saveDiskCacheData(size = null)
+        profileUri?.saveDiskCacheData(size = null)
 
-            val userInfoTask = setUserInfo(uid = uid, platform = platform, email = email, nickname = nickname, profileUri = profileUri)
-            if (!userInfoTask.isSuccessful) {
-                onSignInFailed.invoke(userInfoTask.exception)
-                return
-            }
+        val userInfoTask = setUserInfo(uid = uid, platform = platform, email = email, nickname = nickname, profileUri = profileUri)
+        if (!userInfoTask.isSuccessful) {
+            onSignInFailed.invoke(userInfoTask.exception)
+            return
+        }
 
-            val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
-            if (!savedGameInfoTask.isSuccessful) {
-                onSignInFailed.invoke(savedGameInfoTask.exception)
-                return
-            }
+        val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
+        if (!savedGameInfoTask.isSuccessful) {
+            onSignInFailed.invoke(savedGameInfoTask.exception)
+            return
+        }
 
-            PrefsManager.apply {
-                this.nickname = nickname ?: ""
-                this.email = email
-                this.platform = platform.value
-                this.profileUri = profileUri ?: ""
-            }
+        PrefsManager.apply {
+            this.nickname = nickname ?: ""
+            this.email = email
+            this.platform = platform.value
+            this.profileUri = profileUri ?: ""
+        }
 
-            onSignInSucceed.invoke()
-        } ?: onSignInFailed.invoke(Exception("uid is null"))
+        onSignInSucceed.invoke()
+    }
+
+    private suspend fun setProfileInfo(
+        uid: String,
+        platform: PlatForm,
+        email: String,
+        nickname: String?,
+        profileUri: String?
+    ): Boolean {
+        profileUri?.saveDiskCacheData(size = null)
+
+        val userInfoTask = setUserInfo(uid = uid, platform = platform, email = email, nickname = nickname, profileUri = profileUri)
+        if (!userInfoTask.isSuccessful) {
+            return false
+        }
+
+        val savedGameInfoTask = setDiffPictureGameInfo(uid = uid)
+        if (!savedGameInfoTask.isSuccessful) {
+            return false
+        }
+
+        PrefsManager.apply {
+            this.nickname = nickname ?: ""
+            this.email = email
+            this.platform = platform.value
+            this.profileUri = profileUri ?: ""
+        }
+
+        return true
     }
 
     private suspend fun setUserInfo(
@@ -430,6 +460,63 @@ object AccountManager {
         } ?: onSignInFailed.invoke(Exception("uid is null"))
     }
 
+    private suspend fun getProfileInfo(uid: String): Boolean {
+        val userInfoTask = getUserInfo(uid = uid)
+        if (!userInfoTask.isSuccessful) return false
+
+        val userDoc = userInfoTask.result as DocumentSnapshot
+        if (userDoc.exists()) {
+            PrefsManager.apply {
+                this.email = userDoc.getString(ApiConstants.UserInfo.EMAIL) ?: email
+                this.nickname = userDoc.getString(ApiConstants.UserInfo.NICKNAME) ?: nickname
+                this.platform = userDoc.getString(ApiConstants.UserInfo.PLATFORM) ?: platform
+                this.profileUri = userDoc.getString(ApiConstants.UserInfo.PROFILE_URI) ?: profileUri
+                this.backgroundVolume = userDoc.getString(ApiConstants.UserInfo.BACKGROUND_VOLUME)?.toFloat() ?: backgroundVolume
+                this.effectVolume = userDoc.getString(ApiConstants.UserInfo.EFFECT_VOLUME)?.toFloat() ?: effectVolume
+                this.isVibrationOn = userDoc.getBoolean(ApiConstants.UserInfo.IS_VIBRATION_ON) ?: isVibrationOn
+                this.isPushOn = userDoc.getBoolean(ApiConstants.UserInfo.IS_PUSH_ON) ?: isPushOn
+                this.isShowAD = userDoc.getBoolean(ApiConstants.UserInfo.IS_SHOW_AD) ?: isShowAD
+                this.profileUri.saveDiskCacheData(size = null)
+            }
+        }
+        val savedGameInfoTask = getDiffPictureGameInfo(uid = uid)
+        if (!savedGameInfoTask.isSuccessful) {
+            return false
+        }
+
+        val savedGameInfoDoc = savedGameInfoTask.result as DocumentSnapshot
+        if (savedGameInfoDoc.exists()) {
+            val heartChargedTime = savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_CHARGED_TIME) ?: PrefsManager.diffPictureHeartChargedTime
+            val localHeartChargedTime = PrefsManager.diffPictureHeartChargedTime
+            val recentChargedTime = heartChargedTime.coerceAtMost(localHeartChargedTime)
+            val recentHeartCount = if (recentChargedTime == localHeartChargedTime) {
+                PrefsManager.diffPictureHeartCount
+            } else {
+                savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_HEART_COUNT)?.toInt() ?: 0
+            }
+            val recentStage = if (recentChargedTime == localHeartChargedTime) {
+                savedGameInfoDoc.getLong(ApiConstants.FirestoreKey.DIFF_PICTURE_GAME_CURRENT_STATE)?.toInt() ?: 0
+            } else {
+                PrefsManager.diffPictureStage
+            }
+            val recentCompleteRound = if (recentChargedTime == localHeartChargedTime) {
+                savedGameInfoDoc.getString(ApiConstants.FirestoreKey.COMPLETE_GAME_ROUND) ?: ""
+            } else {
+                PrefsManager.diffPictureCompleteGameRound
+            }
+
+            PrefsManager.apply {
+                recentCompleteRound
+                    .split(",")
+                    .forEach { round -> this.diffPictureCompleteGameRound = round }
+                this.diffPictureStage = recentStage
+                this.diffPictureHeartCount = recentHeartCount
+                this.diffPictureHeartChargedTime = recentChargedTime
+            }
+        }
+        return true
+    }
+
     suspend fun startLogout(
         context: Context,
         googleAccountManager: GoogleAccountManager?,
@@ -480,7 +567,6 @@ object AccountManager {
             withContext(Dispatchers.Main) {
                 if (deleteAuthTask.exception is FirebaseAuthRecentLoginRequiredException) {
                     reauthenticate(
-                        context = context,
                         uid = uid,
                         googleAccountManager = googleAccountManager,
                         naverAccountManager = naverAccountManager,
@@ -500,7 +586,6 @@ object AccountManager {
     }
 
     private suspend fun reauthenticate(
-        context: Context,
         uid: String,
         googleAccountManager: GoogleAccountManager,
         naverAccountManager: NaverAccountManager,
@@ -508,13 +593,13 @@ object AccountManager {
         isCompleteWithdrawal: () -> Unit,
         onFail: () -> Unit
     ) {
-        val credential = when (authProviderId) {
-            LOGIN_TYPE_GOOGLE -> googleAccountManager.suspendLogin(context = context)
-            LOGIN_TYPE_NAVER -> naverAccountManager.suspendLogin(context = context)
-            else -> kakaoAccountManager.suspendLogin()
+        val isAuthenticated = when (authProviderId) {
+            LOGIN_TYPE_GOOGLE -> reauthenticate(credential = googleAccountManager.reauthenticate())
+            LOGIN_TYPE_NAVER -> naverAccountManager.reauthenticate()
+            else -> kakaoAccountManager.reauthenticate()
         }
-        val isSuccessReAuth = reauthenticate(credential)
-        if (isSuccessReAuth) {
+
+        if (isAuthenticated) {
             deleteUserInfo(uid = uid)
             isCompleteWithdrawal.invoke()
         } else {

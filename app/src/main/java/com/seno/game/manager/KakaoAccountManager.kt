@@ -2,105 +2,79 @@ package com.seno.game.manager
 
 import android.content.Context
 import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.functions.functions
+import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.kakao.sdk.user.model.User
 import com.kakao.sdk.user.rx
-import com.seno.game.extensions.isNotNullAndNotEmpty
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class KakaoAccountManager(private val context: Context) {
-    var disposables = CompositeDisposable()
 
     private val isKakaoTalkInstalled: Boolean
         get() {
             return UserApiClient.instance.isKakaoTalkLoginAvailable(context = context)
         }
 
-    fun login(
+    suspend fun login(
         onSignInSucceed: () -> Unit,
         onSignInFailed: (Exception?) -> Unit
     ) {
-        if (isKakaoTalkInstalled) {
-            loginKakaoTalk(
-                onSignInSucceed = onSignInSucceed,
-                onSignInFailed = onSignInFailed
-            )
-        } else {
-            loginKakaoAccount(
-                onSignInSucceed = onSignInSucceed,
-                onSignInFailed = onSignInFailed
-            )
+        val accessToken = loginWithKakao(context = context)?.accessToken  ?: run {
+            onSignInFailed.invoke(Exception("kakao access token error"))
+            return
         }
+        val kakaoUser = getFirebaseCustomToken(accessToken = accessToken) ?: run {
+            onSignInFailed.invoke(Exception("kakao custom token error"))
+            return
+        }
+
+        AccountManager.signInWithCustomToken(
+            customToken = kakaoUser.customToken,
+            platform = PlatForm.KAKAO,
+            email = kakaoUser.email ?: "",
+            nickname = kakaoUser.nickname ?: "",
+            profileUri = kakaoUser.profileUri ?: "",
+            onSignInSucceed = onSignInSucceed,
+            onSignInFailed = onSignInFailed
+        )
     }
 
-    private fun loginKakaoTalk(
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: (Exception?) -> Unit
-    ) {
-        // 카카오톡으로 로그인
-        UserApiClient.rx.loginWithKakaoTalk(context)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .onErrorResumeNext { error ->
-                // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-                // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-                if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                    Single.error(error)
-                } else {
-                    // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
-                    UserApiClient.rx.loginWithKakaoAccount(context)
+    private suspend fun loginWithKakao(context: Context): OAuthToken? =
+        suspendCoroutine { continuation ->
+            if (isKakaoTalkInstalled) {
+                UserApiClient().loginWithKakaoTalk(context) { token, error ->
+                    if (error != null) {
+                        if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                            continuation.resumeWith(Result.failure(Exception("Unknown error")))
+                        } else {
+                            UserApiClient.rx.loginWithKakaoAccount(context)
+                        }
+                        continuation.resume(null)
+                    } else {
+                        if (token != null) continuation.resume(token)
+                        else continuation.resume(null)
+                    }
+                }
+            } else {
+                UserApiClient().loginWithKakaoAccount(context) { token, error ->
+                    if (error != null) continuation.resume(null)
+                    else if (token != null) continuation.resume(token)
+                    else continuation.resume(null)
                 }
             }
-            .subscribe({ token ->
-                getFirebaseCustomToken(
-                    kakaoAccessToken = token.accessToken,
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
-            }, { error ->
-                onSignInFailed.invoke(Exception(error.message))
-            })
-            .addTo(disposables)
-    }
+        }
 
-    private fun loginKakaoAccount(
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: (Exception?) -> Unit
-    ) {
-        UserApiClient.rx.loginWithKakaoAccount(context)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                getFirebaseCustomToken(
-                    kakaoAccessToken = it.accessToken,
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
-            }, { error -> onSignInFailed.invoke(Exception(error.message)) })
-            .addTo(disposables)
-    }
 
-    fun getFirebaseCustomToken(
-        kakaoAccessToken: String,
-        onSignInSucceed: () -> Unit,
-        onSignInFailed: (Exception?) -> Unit
-    ) {
-        val functions = Firebase.functions(regionOrCustomDomain = "us-central1")
-        functions
+    private suspend fun getFirebaseCustomToken(accessToken: String) = suspendCoroutine { continuation ->
+        Firebase.functions(regionOrCustomDomain = "us-central1")
             .getHttpsCallable("kakao_auth")
-            .call(mapOf("accessToken" to kakaoAccessToken))
+            .call(mapOf("accessToken" to accessToken))
             .addOnSuccessListener { result ->
                 val data = result.data as Map<*, *>
                 val customToken = data["customToken"] as String
@@ -108,57 +82,23 @@ class KakaoAccountManager(private val context: Context) {
                 val nickname = data["nickname"] as? String?
                 val profileUri = data["profileUri"] as? String?
 
-                AccountManager.signInWithCustomToken(
-                    customToken = customToken,
-                    platform = PlatForm.KAKAO,
-                    email = email ?: "",
-                    nickname = nickname ?: "",
-                    profileUri = profileUri ?: "",
-                    onSignInSucceed = onSignInSucceed,
-                    onSignInFailed = onSignInFailed
-                )
+                continuation.resume(KakaoUser(customToken = customToken, email = email, nickname = nickname, profileUri = profileUri))
             }
             .addOnFailureListener { e ->
                 Timber.e("getFirebaseCustomToken Custom Token 호출 실패 : $e")
+                continuation.resume(null)
             }
     }
 
-    suspend fun suspendLogin(): AuthCredential? {
-        return try {
-            val user = getKakaoUser()
-            if (user == null) {
-                return null
-            }
-
-            val email = user.kakaoAccount?.email ?: ""
-            val kakaoUid = user.id.toString()
-
-            if (email.isNotNullAndNotEmpty() && kakaoUid.isNotNullAndNotEmpty()) {
-                EmailAuthProvider.getCredential(email, kakaoUid)
-            } else {
-                null
-            }
+    suspend fun reauthenticate(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val accessToken = loginWithKakao(context)?.accessToken ?: return@withContext false
+            val kakaoUser = getFirebaseCustomToken(accessToken = accessToken) ?: return@withContext false
+            AccountManager.signInWithCustomToken(customToken = kakaoUser.customToken)
         } catch (e: Exception) {
             Timber.e(e)
-            null
+            false
         }
-    }
-
-    suspend fun getKakaoUser(): User? =
-        suspendCoroutine { continuation ->
-            UserApiClient.instance.me { user, error ->
-                if (error != null) {
-                    continuation.resume(null)
-                } else if (user != null) {
-                    continuation.resume(user)
-                } else {
-                    continuation.resume(null)
-                }
-            }
-        }
-
-    fun release() {
-        disposables.dispose()
     }
 
     fun logout() {
@@ -166,8 +106,8 @@ class KakaoAccountManager(private val context: Context) {
     }
 
     data class KakaoUser(
+        val customToken: String,
         val email: String?,
-        val kakaoUid: String?,
         val nickname: String?,
         val profileUri: String?
     )

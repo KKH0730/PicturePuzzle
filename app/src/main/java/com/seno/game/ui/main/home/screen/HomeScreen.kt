@@ -127,8 +127,8 @@ fun HomeUI(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val googleAccountManager = GoogleAccountManager()
-    val naverAccountManager = NaverAccountManager()
+    val googleAccountManager = GoogleAccountManager(context = context)
+    val naverAccountManager = NaverAccountManager(context = context)
     val kakaoAccountManager = KakaoAccountManager(context = context)
 
     var isShowPermissionAlertDialog by remember { mutableStateOf(false) }

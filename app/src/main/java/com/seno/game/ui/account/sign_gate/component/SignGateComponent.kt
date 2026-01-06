@@ -67,7 +67,6 @@ fun GoogleLoginButton(
         onClickSocialLogin.invoke()
         coroutineScope.launch {
             googleAccountManager.login(
-                context = context,
                 onSignInSucceed = onSignInSucceed,
                 onSignInFailed = onSignInFailed
             )
@@ -82,14 +81,18 @@ fun KakaoLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_kakao)
     ) {
-        onClickSocialLogin.invoke()
-        kakaoAccountManager.login(
-            onSignInSucceed = onSignInSucceed,
-            onSignInFailed = onSignInFailed
-        )
+        coroutineScope.launch {
+            onClickSocialLogin.invoke()
+            kakaoAccountManager.login(
+                onSignInSucceed = onSignInSucceed,
+                onSignInFailed = onSignInFailed
+            )
+        }
     }
 }
 
@@ -100,17 +103,18 @@ fun NaverLoginButton(
     onSignInSucceed: () -> Unit,
     onSignInFailed: (java.lang.Exception?) -> Unit
 ) {
-    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     SnsLoginButton(
         snsImage = painterResource(id = R.drawable.ic_sns_naver)
     ) {
-        onClickSocialLogin.invoke()
-        naverAccountManager.login(
-            context = context,
-            onSignInSucceed = onSignInSucceed,
-            onSigInFailed = onSignInFailed,
-        )
+        coroutineScope.launch {
+            onClickSocialLogin.invoke()
+            naverAccountManager.login(
+                onSignInSucceed = onSignInSucceed,
+                onSignInFailed = onSignInFailed,
+            )
+        }
     }
 }
 

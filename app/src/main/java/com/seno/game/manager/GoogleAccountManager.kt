@@ -16,12 +16,10 @@ import com.seno.game.extensions.getString
 import timber.log.Timber
 
 
-class GoogleAccountManager() {
+class GoogleAccountManager(private val context: Context) {
 
     val googleIdOption = GetGoogleIdOption.Builder()
-        // Your server's client ID, not your Android client ID.
         .setServerClientId(getString(R.string.default_web_client_id))
-        // Only show accounts previously used to sign in.
         .setFilterByAuthorizedAccounts(true)
         .build()
 
@@ -30,7 +28,6 @@ class GoogleAccountManager() {
         .build()
 
     suspend fun login(
-        context: Context,
         onSignInSucceed: () -> Unit,
         onSignInFailed: (java.lang.Exception?) -> Unit
     ) {
@@ -63,7 +60,7 @@ class GoogleAccountManager() {
         }
     }
 
-    suspend fun suspendLogin(context: Context): AuthCredential? {
+    suspend fun reauthenticate(): AuthCredential? {
         return try {
             val credentialManager = CredentialManager.create(context)
             val result = credentialManager.getCredential(

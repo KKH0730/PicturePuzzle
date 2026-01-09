@@ -25,18 +25,17 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    compileSdk = 36
-    namespace = "com.seno.game"
+    namespace = Apps.namespace
+    compileSdk = Apps.compileSdk
+
     defaultConfig {
-        applicationId = "com.seno.game"
-        minSdk = 26
-        targetSdk = 36
-        versionCode = 100001
-        versionName = "1.0.1"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = Apps.applicationId
+        minSdk = Apps.minSdk
+        targetSdk = Apps.targetSdk
+        versionCode = Apps.versionCode
+        versionName = Apps.versionName
+        testInstrumentationRunner = Apps.androidJUnitRunner
     }
-
 
     signingConfigs {
         create("release") {

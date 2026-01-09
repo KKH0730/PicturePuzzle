@@ -1,3 +1,18 @@
+object Apps {
+    const val namespace = "com.seno.game"
+    const val compileSdk = 36
+    const val minSdk = 26
+    const val targetSdk = 36
+    const val applicationId = "com.seno.game"
+    const val androidJUnitRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    private const val versionMajor = 1
+    private const val versionMinor = 0
+    private const val versionPatch = 2
+    const val versionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
+    const val versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
 object Version {
     const val COMPOSE = "1.2.0"
 }

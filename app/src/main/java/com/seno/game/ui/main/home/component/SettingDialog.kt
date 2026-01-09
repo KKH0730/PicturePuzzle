@@ -2,7 +2,6 @@ package com.seno.game.ui.main.home.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +22,6 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,9 +36,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.seno.game.R
+import com.seno.game.extensions.capitalizeFirst
 import com.seno.game.extensions.noRippleClickable
 import com.seno.game.extensions.textDp
-import com.seno.game.manager.AccountManager
 import com.seno.game.prefs.PrefsManager
 import kotlin.math.roundToInt
 
@@ -359,7 +356,7 @@ fun AccountPanel(
                     String.format(
                         format = stringResource(id = R.string.home_setting_account_member),
                         PrefsManager.nickname,
-                        AccountManager.authProviderName
+                        PrefsManager.platform.takeIf { it.isNotEmpty() }?.capitalizeFirst() ?: ""
                     )
                 },
                 textAlign = TextAlign.Center,

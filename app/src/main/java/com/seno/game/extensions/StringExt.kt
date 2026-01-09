@@ -1,6 +1,5 @@
 package com.seno.game.extensions
 
-import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.text.Html
@@ -29,7 +28,6 @@ fun String.fromHtml(): Spanned {
     }
 }
 
-
 fun Resources.createRandomNickname(): String {
     val random = Random()
     val adjectiveList = getStringArray(R.array.adjective)
@@ -46,10 +44,14 @@ fun Int.saveCompleteDPGameRound(currentStagePosition: Int) {
     }
 }
 
-
 fun String.getDrawableResourceId(): Int {
     val context = App.getInstance()
     val resName = "@drawable/$this"
     val packName = context.packageName
     return context.resources.getIdentifier(resName, "drawable", packName)
 }
+
+fun String.capitalizeFirst(): String =
+    replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase() else it.toString()
+    }

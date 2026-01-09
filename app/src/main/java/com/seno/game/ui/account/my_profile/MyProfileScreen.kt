@@ -138,7 +138,10 @@ fun MyProfileScreen(
                     )
                 }
             },
-            onDismissed = { profileState.showLogoutDialog(isShow = false) }
+            onDismissed = {
+                profileState.showLogoutDialog(isShow = false)
+                profileState.showLoading(isShow = false)
+            }
         )
     }
 
@@ -188,7 +191,10 @@ fun MyProfileScreen(
                     )
                 }
             },
-            onDismissed = { profileState.showWithdrawalDialog(isShow = false) }
+            onDismissed = {
+                profileState.showWithdrawalDialog(isShow = false)
+                profileState.showLoading(isShow = false)
+            }
         )
     }
 

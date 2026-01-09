@@ -65,7 +65,7 @@ fun UserInfoContainer(
                 UserInfoSpacer()
                 UserInfoPanel(
                     label = stringResource(id = R.string.my_profile_email),
-                    value = AccountManager.firebaseEmail
+                    value = PrefsManager.email
                 )
                 UserInfoSpacer()
                 UserInfoPanel(

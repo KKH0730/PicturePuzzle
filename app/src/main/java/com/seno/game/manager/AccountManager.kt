@@ -63,66 +63,6 @@ object AccountManager {
 
     const val DIFF_PICTURE_DOC = "diff_picture"
 
-    private val authProviderId: String
-        get() {
-            var providerId = ""
-            FirebaseAuth.getInstance().currentUser?.providerData?.forEach {
-                providerId = when (it.providerId) {
-                    "google.com" -> LOGIN_TYPE_GOOGLE
-                    "password" -> {
-                        val list = currentUser?.email?.split("_") ?: listOf()
-                        if (list.isNotEmpty()) {
-                            when(list[0]) {
-                                "naver" -> LOGIN_TYPE_NAVER
-                                "kakao" -> LOGIN_TYPE_KAKAO
-                                else -> LOGIN_TYPE_UNKNOWN
-                            }
-                        } else {
-                            LOGIN_TYPE_UNKNOWN
-                        }
-                    }
-                    else -> ""
-                }
-            }
-            return providerId
-        }
-
-    val authProviderName: String
-        get() {
-            var provider = ""
-            currentUser?.providerData?.forEach {
-                when (it.providerId) {
-                    "facebook.com" -> provider = getString(R.string.facebook)
-                    "google.com" -> provider = getString(R.string.google)
-                    "password" -> provider = if (currentUser?.email?.contains("naver.com") == true) {
-                        getString(R.string.naver)
-                    } else {
-                        getString(R.string.kakao)
-                    }
-                }
-            }
-            return provider
-        }
-
-    private val displayName: String?
-        get() {
-            return FirebaseAuth.getInstance().currentUser?.displayName
-        }
-
-    val firebaseEmail: String get() {
-        return when(authProviderId) {
-            LOGIN_TYPE_GOOGLE ->  currentUser?.providerData?.firstOrNull { it.email.isNotNullAndNotEmpty() }?.email ?: ""
-            else -> {
-                val emailParts  = currentUser?.email?.split("_") ?: listOf()
-                if (emailParts.size > 1) {
-                    (1 until emailParts.size).joinToString { emailParts[it] }
-                } else {
-                    ""
-                }
-            }
-        }
-    }
-
     @JvmStatic
     fun addAuthStateListener(onSignedIn: () -> Unit, onSignedOut: () -> Unit) {
         val authStateListener = FirebaseAuth.AuthStateListener {
@@ -593,9 +533,9 @@ object AccountManager {
         isCompleteWithdrawal: () -> Unit,
         onFail: () -> Unit
     ) {
-        val isAuthenticated = when (authProviderId) {
-            LOGIN_TYPE_GOOGLE -> reauthenticate(credential = googleAccountManager.reauthenticate())
-            LOGIN_TYPE_NAVER -> naverAccountManager.reauthenticate()
+        val isAuthenticated = when (PrefsManager.platform) {
+            PlatForm.GOOGLE.value -> reauthenticate(credential = googleAccountManager.reauthenticate())
+            PlatForm.NAVER.value -> naverAccountManager.reauthenticate()
             else -> kakaoAccountManager.reauthenticate()
         }
 
@@ -612,9 +552,9 @@ object AccountManager {
             return
         }
 
-        when (authProviderId) {
-            LOGIN_TYPE_GOOGLE -> onSignOutCallbackListener.onSignOutGoogle()
-            LOGIN_TYPE_NAVER -> onSignOutCallbackListener.onSignOutNaver()
+        when (PrefsManager.platform) {
+            PlatForm.GOOGLE.value -> onSignOutCallbackListener.onSignOutGoogle()
+            PlatForm.NAVER.value -> onSignOutCallbackListener.onSignOutNaver()
             else -> onSignOutCallbackListener.onSignOutKakao()
         }
     }

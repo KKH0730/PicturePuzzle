@@ -202,3 +202,5 @@ fabric.properties
 /app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
 /app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
 /app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+/buildSrc/.kotlin/sessions/kotlin-compiler-2127709374670864347.salive
+/.kotlin/sessions/kotlin-compiler-2244993547780159267.salive

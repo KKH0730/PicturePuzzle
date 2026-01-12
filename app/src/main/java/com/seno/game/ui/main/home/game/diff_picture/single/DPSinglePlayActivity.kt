@@ -223,6 +223,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
                     viewModel.drawAnswerHint.collectLatest { point ->
                         val answerCenterX = (binding.ivOrigin.width.toFloat() * point.centerX / point.srcWidth)
                         val answerCenterY = (diff / 2f) + (resizedLength * point.centerY / point.srcHeight)
+                        delay(200)
 
                         (this@DPSinglePlayActivity).drawLottieAnswerCircle(
 //                            x = binding.ivOrigin.x + answerCenterX - (point.answerRadius / 2),
@@ -252,6 +253,7 @@ class DPSinglePlayActivity : BaseActivity<ActivityDiffPictureSinglePlayBinding>(
 //                            y = binding.ivCopy.y + answerCenterY - (point.answerRadius / 2),
                             centerX = binding.ivCopy.x + answerCenterX,
                             centerY = binding.ivCopy.y + answerCenterY,
+                            imageContainerX = binding.clPictureContainer.x.toInt(),
                             imageContainerY = binding.clPictureContainer.y.toInt(),
                             rawRes = R.raw.right_answer_mark,
                             speed = 1f,

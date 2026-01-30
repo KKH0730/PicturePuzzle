@@ -339,22 +339,6 @@ fun StageCircle(
                     )
             )
         } else {
-            if (!isSelected || dpSingleGame.id != isFistIsNotCompleteIndex) {
-                Icon(
-                    painterResource(R.drawable.ic_lock),
-                    contentDescription = null,
-                    tint = colorResource(R.color.color_9CA3AF),
-                    modifier = Modifier
-                        .size(size = 15.dp)
-                        .align(alignment = Alignment.TopEnd)
-                        .offset(x = (-5).dp, y = (-5).dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { animateTrigger += 1 }
-                        )
-                )
-            }
             Box(
                 modifier = modifier
                     .clip(shape = CircleShape)
@@ -383,6 +367,22 @@ fun StageCircle(
                     modifier = Modifier
                         .clip(shape = CircleShape)
                         .align(alignment = Alignment.Center)
+                )
+            }
+            if (!isSelected || dpSingleGame.id != isFistIsNotCompleteIndex) {
+                Icon(
+                    painterResource(R.drawable.ic_lock),
+                    contentDescription = null,
+                    tint = colorResource(R.color.color_9CA3AF),
+                    modifier = Modifier
+                        .size(size = 15.dp)
+                        .align(alignment = Alignment.TopEnd)
+                        .offset(x = (-5).dp, y = (-5).dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { animateTrigger += 1 }
+                        )
                 )
             }
         }

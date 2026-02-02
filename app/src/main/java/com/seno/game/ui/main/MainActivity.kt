@@ -31,6 +31,7 @@ import com.seno.game.prefs.PrefsManager
 import com.seno.game.ui.component.CommonAlertDialog
 import com.seno.game.ui.main.home.screen.HomeLoadingScreen
 import com.seno.game.ui.main.home.screen.HomeScreen
+import com.seno.game.ui.main.screen.MainScreen
 import com.seno.game.ui.main.screen.MainViewModel
 import com.seno.game.util.MusicPlayUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,8 +91,7 @@ class MainActivity : ComponentActivity() {
 
                         // MainScreen을 띄울 때, 화면이 깜빡임으로 인해 보기 안좋아 하단에 LoadingScreen을 띄워두어 깜빡임이 보이지 않도록 함
                         HomeLoadingScreen()
-                        HomeScreen()
-//                        MainScreen()
+                        MainScreen()
                     } else {
                         HomeLoadingScreen()
                     }

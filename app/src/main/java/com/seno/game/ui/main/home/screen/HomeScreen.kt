@@ -285,17 +285,17 @@ fun HomeUI(
             GamePlayContainer(
                 onClickSoloPlay = { DPSinglePlayListActivity.start(context = context) },
                 onClickMultiPlay = {
-                    isShowMultiPlayPrepareDialog = true
-//                    if (AccountManager.isUser) {
-//                        EntryActivity.start(context = context, launcher = entryLauncher)
-//                    } else {
-//                        SignGateActivity.start(
-//                            context = context,
-//                            path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
-//                            resultCode = ResultConstants.RESULT_ENTRY,
-//                            launcher = loginLauncher
-//                        )
-//                    }
+//                    isShowMultiPlayPrepareDialog = true
+                    if (AccountManager.isUser) {
+                        EntryActivity.start(context = context, launcher = entryLauncher)
+                    } else {
+                        SignGateActivity.start(
+                            context = context,
+                            path = "${AccountManager.firebaseUid}_${System.currentTimeMillis()}",
+                            resultCode = ResultConstants.RESULT_ENTRY,
+                            launcher = loginLauncher
+                        )
+                    }
                 },
                 onClickQuit = { isShowQuitDialog = true },
             )

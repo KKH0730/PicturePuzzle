@@ -32,8 +32,8 @@ android {
         applicationId = Apps.applicationId
         minSdk = Apps.minSdk
         targetSdk = Apps.targetSdk
-        versionCode = 100006
-        versionName = "1.0.6"
+        versionCode = 100007
+        versionName = "1.0.7"
         testInstrumentationRunner = Apps.androidJUnitRunner
     }
 
